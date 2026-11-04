@@ -7,5 +7,4 @@ public class NegativeCiTests
     {
         Assert.Equal(1, 2);
     }
-        public   int   BadlyFormatted   =   1;
 }
