@@ -40,6 +40,23 @@ npm test
 npm run build
 ```
 
+## CI
+
+При всеки pull request към `main` (и при push в `main`) GitHub Actions пуска `.github/workflows/ci.yml` с пет jobs: `backend`, `frontend`, `docker`, `audit` и `secrets`. Версиите на .NET и Node.js се вземат от `global.json` и `.nvmrc`.
+
+Същите проверки локално (backend и frontend командите са в раздела по-горе):
+
+```bash
+docker build -f src/backend/Dockerfile .
+docker build -f src/web/docker/Dockerfile --build-arg APP=storefront src/web
+docker build -f src/web/docker/Dockerfile --build-arg APP=admin src/web
+dotnet list Storefront.slnx package --vulnerable --include-transitive
+(cd src/web && npm audit --omit=dev --audit-level=high)
+gitleaks git --redact --verbose
+```
+
+`audit` блокира при High и Critical. Находките в dev инструментите (умерени, през `typescript-eslint`) само се показват.
+
 ## Състояние
 
 Налични са скелетът на backend (Domain, Application, Infrastructure, Api), магазинът и админ панелът, Docker файловете и тестовете за `/health`. Следващите задачи са в [`docs/project-start.md`](docs/project-start.md).
