@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Storefront.Application\Storefront.Application.csproj" />
+    <ProjectReference Include="..\Storefront.Domain\Storefront.Domain.csproj" />
+  </ItemGroup>
+</Project>
