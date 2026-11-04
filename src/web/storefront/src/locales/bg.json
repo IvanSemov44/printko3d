@@ -1,0 +1,6 @@
+{
+  "app.title": "Магазин",
+  "api.checking": "Проверка на връзката с API…",
+  "api.available": "API е достъпно",
+  "api.unavailable": "API не е достъпно"
+}
