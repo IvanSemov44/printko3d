@@ -1,0 +1,61 @@
+name: storefront
+
+services:
+  db:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: src/backend/Dockerfile
+    environment:
+      Database__ConnectionString: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};GSS Encryption Mode=Disable
+      Cors__AllowedOrigins__0: http://localhost:${STOREFRONT_PORT:-5173}
+      Cors__AllowedOrigins__1: http://localhost:${ADMIN_PORT:-5174}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  storefront:
+    build:
+      context: src/web
+      dockerfile: docker/Dockerfile
+      args:
+        APP: storefront
+    environment:
+      API_URL: http://localhost:${API_PORT:-8080}
+    ports:
+      - "${STOREFRONT_PORT:-5173}:8080"
+    depends_on:
+      - api
+
+  admin:
+    build:
+      context: src/web
+      dockerfile: docker/Dockerfile
+      args:
+        APP: admin
+    environment:
+      API_URL: http://localhost:${API_PORT:-8080}
+    ports:
+      - "${ADMIN_PORT:-5174}:8080"
+    depends_on:
+      - api
+
+volumes:
+  db-data:
