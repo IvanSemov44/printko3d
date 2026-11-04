@@ -2,11 +2,47 @@
 
 Онлайн магазин за 3D принтове. Кодът е общ, а всичко, което е специфично за конкретен магазин (име, валута, цветове, контакти), е настройка в базата, така че проектът да може да се ползва и за друг магазин.
 
+## Как се стартира
+
+Нужни са Docker Desktop, .NET SDK (версията е в `global.json`) и Node.js (версията е в `.nvmrc`).
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+| Услуга | Адрес |
+| --- | --- |
+| Магазин | http://localhost:5173 |
+| Админ панел | http://localhost:5174 |
+| API (`GET /health`) | http://localhost:8080/health |
+| PostgreSQL | `localhost:5433` |
+
+Магазинът и админ панелът показват дали API е достъпно. Портовете се сменят в `.env` (`API_PORT`, `STOREFRONT_PORT`, `ADMIN_PORT`, `POSTGRES_PORT`). Ако порт е зает от друга програма, например друг Vite сървър, `localhost` в браузъра може да отвори нея вместо контейнера. Тогава я спри или смени порта.
+
+## Тестове и проверки
+
+Backend (интеграционните тестове стартират PostgreSQL с Testcontainers, затова Docker трябва да работи):
+
+```bash
+dotnet build Storefront.slnx
+dotnet test Storefront.slnx
+dotnet format Storefront.slnx --verify-no-changes
+```
+
+Frontend (от папка `src/web`):
+
+```bash
+npm ci
+npm run lint
+npm run format:check
+npm test
+npm run build
+```
+
 ## Състояние
 
-Репото е в начален етап. Налични са само документацията, правилата за код и структурата на папките. Приложението се създава със задачите от [`docs/project-start.md`](docs/project-start.md), като се започне със [`docs/tasks/01-skeleton.md`](docs/tasks/01-skeleton.md).
-
-Докато задача 1 не е изпълнена, `docker compose up` и командите за тестове още не съществуват. Този файл се допълва със стъпките за стартиране в края на задача 1.
+Налични са скелетът на backend (Domain, Application, Infrastructure, Api), магазинът и админ панелът, Docker файловете и тестовете за `/health`. Следващите задачи са в [`docs/project-start.md`](docs/project-start.md).
 
 ## Документи
 
@@ -37,7 +73,9 @@ ASP.NET и EF Core, PostgreSQL, React с TypeScript (SPA с Vite), Docker. Де�
 │     ├─ admin/           админ панел
 │     └─ shared/          общ код
 └─ tests/
+   ├─ Storefront.UnitTests/
+   ├─ Storefront.IntegrationTests/
    └─ e2e/
 ```
 
-Останалите файлове (`docker-compose.yml`, `render.yaml`, CI, `.env.example`) се добавят със съответните задачи.
+Останалите файлове (`render.yaml`, CI) се добавят със съответните задачи.
