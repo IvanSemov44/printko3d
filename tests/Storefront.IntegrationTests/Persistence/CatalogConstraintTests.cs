@@ -140,7 +140,7 @@ public sealed class CatalogConstraintTests(PostgresFixture postgres)
         await using var context = database.CreateContext();
         var product = CatalogData.Product(categoryId, "phoenix");
         CatalogData.Variant(product, "PHX-001");
-        product.AddImage("a.jpg", "alt", variantId: Guid.CreateVersion7());
+        CatalogData.Image(product, "a.jpg", variantId: Guid.CreateVersion7());
         context.Add(product);
 
         Assert.Equal(PostgresErrorCodes.ForeignKeyViolation, await SqlStateOfAsync(() => context.SaveChangesAsync()));
@@ -155,9 +155,9 @@ public sealed class CatalogConstraintTests(PostgresFixture postgres)
         await using (var context = database.CreateContext())
         {
             var product = await context.Products.Include(p => p.Images).SingleAsync(p => p.Id == productId);
-            product.AddImage("a.jpg", "alt", isPrimary: true);
-            product.AddImage("b.jpg", "alt");
-            product.AddImage("c.jpg", "alt");
+            CatalogData.Image(product, "a.jpg", isPrimary: true);
+            CatalogData.Image(product, "b.jpg");
+            CatalogData.Image(product, "c.jpg");
             await context.SaveChangesAsync();
         }
 
@@ -165,14 +165,14 @@ public sealed class CatalogConstraintTests(PostgresFixture postgres)
         {
             var other = CatalogData.Product(categoryId, "phoenix");
             CatalogData.Variant(other, "PHX-001");
-            other.AddImage("d.jpg", "alt", isPrimary: true);
+            CatalogData.Image(other, "d.jpg", isPrimary: true);
             context.Add(other);
             await context.SaveChangesAsync();
         }
 
         await using var second = database.CreateContext();
         var target = await second.Products.Include(p => p.Images).SingleAsync(p => p.Id == productId);
-        target.AddImage("e.jpg", "alt", isPrimary: true);
+        CatalogData.Image(target, "e.jpg", isPrimary: true);
 
         Assert.Equal(PostgresErrorCodes.UniqueViolation, await SqlStateOfAsync(() => second.SaveChangesAsync()));
     }
@@ -270,8 +270,7 @@ public sealed class CatalogConstraintTests(PostgresFixture postgres)
         {
             var category = CatalogData.Category();
             var product = CatalogData.Product(category.Id);
-            product.AddVariant(
-                "DRG-001", "Blue", 1500, 100, attributes: new Dictionary<string, string> { ["color"] = "blue" });
+            CatalogData.Variant(product, attributes: new Dictionary<string, string> { ["color"] = "blue" });
             context.Add(category);
             context.Add(product);
             await context.SaveChangesAsync();

@@ -1,103 +1,155 @@
+using Storefront.Application.Catalog;
+using Storefront.Application.Exceptions;
 using Storefront.Domain.Catalog;
 
 namespace Storefront.UnitTests;
 
 public sealed class CatalogInvariantTests
 {
-    private static Product NewProduct(FulfilmentType type = FulfilmentType.InStock, int? leadTimeDays = null) =>
-        new(Guid.CreateVersion7(), "Dragon", "dragon", "Short", "Long", type, leadTimeDays);
+    private readonly FakeRepositoryManager _repositories = new();
+    private readonly ServiceManager _services;
 
-    [Fact]
-    public void MadeToOrderProduct_WithoutLeadTime_IsRejected()
+    public CatalogInvariantTests() => _services = new ServiceManager(_repositories);
+
+    private static NewVariant Variant(
+        long price = 100,
+        int? stockQuantity = null,
+        string sku = "SKU-1") =>
+        new(sku, "Blue", price, WeightGrams: 10, StockQuantity: stockQuantity);
+
+    private async Task<Guid> CreateCategoryAsync()
     {
-        Assert.Throws<InvalidOperationException>(() => NewProduct(FulfilmentType.MadeToOrder));
+        var id = await _services.Category.CreateAsync(new NewCategory("Figures", "figures"), default);
+        return id;
+    }
+
+    private async Task<Guid> CreateProductAsync(
+        FulfilmentType type = FulfilmentType.InStock,
+        int? leadTimeDays = null,
+        string shortDescription = "Short")
+    {
+        var categoryId = await CreateCategoryAsync();
+        return await _services.Product.CreateAsync(
+            new NewProduct(categoryId, "Dragon", "dragon", shortDescription, "Long", type, leadTimeDays),
+            default);
     }
 
     [Fact]
-    public void MadeToOrderProduct_WithLeadTime_IsAccepted()
+    public async Task MadeToOrderProduct_WithoutLeadTime_IsRejected()
     {
-        var product = NewProduct(FulfilmentType.MadeToOrder, leadTimeDays: 7);
-
-        Assert.Equal(7, product.LeadTimeDays);
+        await Assert.ThrowsAsync<ValidationFailedException>(
+            () => CreateProductAsync(FulfilmentType.MadeToOrder));
+        Assert.Empty(_repositories.Products);
     }
 
     [Fact]
-    public void InStockProduct_WithoutLeadTime_IsAccepted()
+    public async Task MadeToOrderProduct_WithLeadTime_IsAccepted()
     {
-        Assert.Null(NewProduct().LeadTimeDays);
+        await CreateProductAsync(FulfilmentType.MadeToOrder, leadTimeDays: 7);
+
+        Assert.Equal(7, Assert.Single(_repositories.Products).LeadTimeDays);
     }
 
     [Fact]
-    public void ShortDescription_LongerThan200Characters_IsRejected()
+    public async Task InStockProduct_WithoutLeadTime_IsAccepted()
     {
-        Assert.Throws<ArgumentException>(() => new Product(
-            Guid.CreateVersion7(), "Dragon", "dragon", new string('a', 201), "Long", FulfilmentType.InStock));
+        await CreateProductAsync();
+
+        Assert.Null(Assert.Single(_repositories.Products).LeadTimeDays);
     }
 
     [Fact]
-    public void Variant_WithNegativePrice_IsRejected()
+    public async Task ShortDescription_LongerThan200Characters_IsRejected()
     {
-        var product = NewProduct();
-
-        Assert.Throws<ArgumentOutOfRangeException>(() => product.AddVariant("SKU-1", "Blue", -1, 10));
+        await Assert.ThrowsAsync<ValidationFailedException>(
+            () => CreateProductAsync(shortDescription: new string('a', 201)));
     }
 
     [Fact]
-    public void Variant_WithNegativeStock_IsRejected()
+    public async Task Product_InUnknownCategory_IsRejected()
     {
-        var product = NewProduct();
+        var product = new NewProduct(
+            Guid.CreateVersion7(), "Dragon", "dragon", "Short", "Long", FulfilmentType.InStock);
 
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => product.AddVariant("SKU-1", "Blue", 100, 10, stockQuantity: -1));
+        await Assert.ThrowsAsync<NotFoundException>(() => _services.Product.CreateAsync(product, default));
     }
 
     [Fact]
-    public void Variant_WithZeroPriceAndStock_IsAccepted()
+    public async Task Variant_WithNegativePrice_IsRejected()
     {
-        var product = NewProduct();
+        var productId = await CreateProductAsync();
 
-        var variant = product.AddVariant("SKU-1", "Blue", 0, 10, stockQuantity: 0);
+        await Assert.ThrowsAsync<ValidationFailedException>(
+            () => _services.Product.AddVariantAsync(productId, Variant(price: -1), default));
+        Assert.Empty(_repositories.Products[0].Variants);
+    }
 
+    [Fact]
+    public async Task Variant_WithNegativeStock_IsRejected()
+    {
+        var productId = await CreateProductAsync();
+
+        await Assert.ThrowsAsync<ValidationFailedException>(
+            () => _services.Product.AddVariantAsync(productId, Variant(stockQuantity: -1), default));
+    }
+
+    [Fact]
+    public async Task Variant_WithZeroPriceAndStock_IsAccepted()
+    {
+        var productId = await CreateProductAsync();
+
+        await _services.Product.AddVariantAsync(productId, Variant(price: 0, stockQuantity: 0), default);
+
+        var variant = Assert.Single(_repositories.Products[0].Variants);
         Assert.Equal(0, variant.Price);
         Assert.Equal(0, variant.StockQuantity);
     }
 
     [Fact]
-    public void Category_UnderASubcategory_IsRejected()
+    public async Task Category_UnderASubcategory_IsRejected()
     {
-        var root = new Category("Root", "root");
-        var child = new Category("Child", "child", root);
+        var rootId = await CreateCategoryAsync();
+        var childId = await _services.Category.CreateAsync(new NewCategory("Child", "child", rootId), default);
 
-        Assert.Throws<InvalidOperationException>(() => new Category("Grandchild", "grandchild", child));
+        await Assert.ThrowsAsync<ValidationFailedException>(
+            () => _services.Category.CreateAsync(new NewCategory("Grandchild", "grandchild", childId), default));
     }
 
     [Fact]
-    public void Category_UnderARootCategory_IsAccepted()
+    public async Task Category_UnderARootCategory_IsAccepted()
     {
-        var root = new Category("Root", "root");
+        var rootId = await CreateCategoryAsync();
 
-        var child = new Category("Child", "child", root);
+        var childId = await _services.Category.CreateAsync(new NewCategory("Child", "child", rootId), default);
 
-        Assert.Equal(root.Id, child.ParentId);
+        Assert.Equal(rootId, _repositories.Categories.Single(c => c.Id == childId).ParentId);
     }
 
     [Fact]
-    public void Product_WithoutVariants_CannotBePublished()
+    public async Task Product_WithoutVariants_CannotBePublished()
     {
-        var product = NewProduct();
+        var productId = await CreateProductAsync();
 
-        Assert.Throws<InvalidOperationException>(product.Publish);
-        Assert.Equal(ProductStatus.Draft, product.Status);
+        await Assert.ThrowsAsync<ValidationFailedException>(
+            () => _services.Product.PublishAsync(productId, default));
+        Assert.Equal(ProductStatus.Draft, _repositories.Products[0].Status);
     }
 
     [Fact]
-    public void Product_WithAVariant_CanBePublished()
+    public async Task Product_WithAVariant_CanBePublished()
     {
-        var product = NewProduct();
-        product.AddVariant("SKU-1", "Blue", 100, 10);
+        var productId = await CreateProductAsync();
+        await _services.Product.AddVariantAsync(productId, Variant(), default);
 
-        product.Publish();
+        await _services.Product.PublishAsync(productId, default);
 
-        Assert.Equal(ProductStatus.Published, product.Status);
+        Assert.Equal(ProductStatus.Published, _repositories.Products[0].Status);
+    }
+
+    [Fact]
+    public async Task Publishing_UnknownProduct_IsNotFound()
+    {
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _services.Product.PublishAsync(Guid.CreateVersion7(), default));
     }
 }

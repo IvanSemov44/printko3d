@@ -40,6 +40,8 @@ public sealed class PostgresFixture : IAsyncLifetime
 
 public sealed class TestDatabase(string connectionString)
 {
+    public string ConnectionString => connectionString;
+
     public StorefrontDbContext CreateContext(TimeProvider? timeProvider = null)
     {
         var options = new DbContextOptionsBuilder<StorefrontDbContext>()
