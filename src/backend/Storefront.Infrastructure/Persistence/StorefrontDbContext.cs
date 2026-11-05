@@ -53,10 +53,11 @@ public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> op
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.StampCreated(now);
+                    entry.Entity.CreatedAt = now;
+                    entry.Entity.UpdatedAt = now;
                     break;
                 case EntityState.Modified:
-                    entry.Entity.StampUpdated(now);
+                    entry.Entity.UpdatedAt = now;
                     break;
             }
         }
