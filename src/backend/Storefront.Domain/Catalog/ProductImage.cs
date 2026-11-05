@@ -2,38 +2,15 @@ namespace Storefront.Domain.Catalog;
 
 public sealed class ProductImage : Entity
 {
-    private ProductImage()
-    {
-    }
+    public Guid ProductId { get; set; }
 
-    internal ProductImage(
-        Guid productId,
-        string storageKey,
-        string altText,
-        int sortOrder,
-        bool isPrimary,
-        Guid? variantId)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(storageKey);
-        ArgumentNullException.ThrowIfNull(altText);
+    public Guid? VariantId { get; set; }
 
-        ProductId = productId;
-        VariantId = variantId;
-        StorageKey = storageKey;
-        AltText = altText;
-        SortOrder = sortOrder;
-        IsPrimary = isPrimary;
-    }
+    public string StorageKey { get; set; } = string.Empty;
 
-    public Guid ProductId { get; private set; }
+    public string AltText { get; set; } = string.Empty;
 
-    public Guid? VariantId { get; private set; }
+    public int SortOrder { get; set; }
 
-    public string StorageKey { get; private set; } = string.Empty;
-
-    public string AltText { get; private set; } = string.Empty;
-
-    public int SortOrder { get; private set; }
-
-    public bool IsPrimary { get; private set; }
+    public bool IsPrimary { get; set; }
 }
