@@ -26,3 +26,4 @@
 - [0002 – Един магазин на инсталация](0002-single-store-per-installation.md)
 - [0003 – Магазин и админ панел като отделни приложения](0003-separate-storefront-and-admin.md)
 - [0004 – Публично GitHub репо до включване на GitHub Pro](0004-public-repository.md)
+- [0006 – Слоеве по книгата: прости ентита, repository-та, услуги и контролери](0006-book-style-layers-and-controllers.md)
