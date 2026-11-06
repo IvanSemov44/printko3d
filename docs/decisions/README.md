@@ -27,3 +27,4 @@
 - [0003 – Магазин и админ панел като отделни приложения](0003-separate-storefront-and-admin.md)
 - [0004 – Публично GitHub репо до включване на GitHub Pro](0004-public-repository.md)
 - [0006 – Слоеве по книгата: прости ентита, repository-та, услуги и контролери](0006-book-style-layers-and-controllers.md)
+- [0007 – Схемата на базата е в генериран документ, който се проверява](0007-generated-database-schema-document.md)
