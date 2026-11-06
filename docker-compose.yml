@@ -22,6 +22,7 @@ services:
       context: .
       dockerfile: src/backend/Dockerfile
     environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
       Database__ConnectionString: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};GSS Encryption Mode=Disable
       Cors__AllowedOrigins__0: http://localhost:${STOREFRONT_PORT:-5173}
       Cors__AllowedOrigins__1: http://localhost:${ADMIN_PORT:-5174}

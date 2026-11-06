@@ -1,6 +1,13 @@
+using Storefront.Api;
 using Storefront.Application.Catalog;
 using Storefront.Application.Health;
 using Storefront.Infrastructure;
+
+if (SeedCommand.IsRequested(args))
+{
+    Environment.ExitCode = await SeedCommand.RunAsync(args, Console.Out, Console.Error, CancellationToken.None);
+    return;
+}
 
 var builder = WebApplication.CreateBuilder(args);
 

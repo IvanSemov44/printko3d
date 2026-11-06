@@ -20,6 +20,34 @@ docker compose up --build
 
 Магазинът и админ панелът показват дали API е достъпно. Портовете се сменят в `.env` (`API_PORT`, `STOREFRONT_PORT`, `ADMIN_PORT`, `POSTGRES_PORT`). Ако порт е зает от друга програма, например друг Vite сървър, `localhost` в браузъра може да отвори нея вместо контейнера. Тогава я спри или смени порта.
 
+## Демо данни
+
+Командата `seed` зарежда 16 фалшиви продукта в четири категории и един ред настройки на магазина (`is_demo = true`). Данните са едни и същи при всяко зареждане. Командата работи само в среда `Development` и `Demo`, иначе излиза с грешка. Тя **не прилага миграции** и не се пуска сама при старт на API. Ако схемата липсва, спира и казва какво да направиш.
+
+1. Приложи миграциите върху базата (от хоста; PostgreSQL от `docker compose up db` слуша на порт 5433, вземи паролата от `.env`):
+
+   ```bash
+   dotnet tool restore
+   export Database__ConnectionString="Host=localhost;Port=5433;Database=storefront;Username=storefront;Password=<паролата от .env>"
+   dotnet ef database update --project src/backend/Storefront.Infrastructure
+   ```
+
+2. Зареди данните, или локално:
+
+   ```bash
+   dotnet run --project src/backend/Storefront.Api -- seed
+   ```
+
+   или в Docker (услугата `api` е със среда `Development` по подразбиране; за демо средата задай `ASPNETCORE_ENVIRONMENT=Demo`):
+
+   ```bash
+   docker compose run --rm api seed
+   ```
+
+`dotnet run` ползва профила от `launchSettings.json`, който задава `Development`. За друга среда добави `--no-launch-profile`, например `ASPNETCORE_ENVIRONMENT=Production dotnet run --no-launch-profile --project src/backend/Storefront.Api -- seed` отказва с код 1.
+
+Повторното пускане е безопасно: продуктите и категориите, които вече ги има (по слъг), се пропускат, а настройките не се презаписват. За начисто изтрий базата (`docker compose down -v`), приложи миграциите и пусни `seed` отново.
+
 ## Тестове и проверки
 
 Backend (интеграционните тестове стартират PostgreSQL с Testcontainers, затова Docker трябва да работи):
