@@ -10,4 +10,7 @@ internal sealed class CategoryRepository(StorefrontDbContext context)
 {
     public Task<Category?> GetByIdAsync(Guid id, bool trackChanges, CancellationToken cancellationToken) =>
         Query(trackChanges).SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
+
+    public Task<Category?> GetBySlugAsync(string slug, bool trackChanges, CancellationToken cancellationToken) =>
+        Query(trackChanges).SingleOrDefaultAsync(c => c.Slug == slug, cancellationToken);
 }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Storefront.Application.Contracts;
 using Storefront.Application.Health;
+using Storefront.Application.Seeding;
 using Storefront.Infrastructure.Health;
 using Storefront.Infrastructure.Persistence;
 using Storefront.Infrastructure.Repositories;
@@ -23,6 +24,7 @@ public static class DependencyInjection
             serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString));
         services.AddScoped<IRepositoryManager, RepositoryManager>();
         services.AddScoped<IDatabaseProbe, NpgsqlDatabaseProbe>();
+        services.AddScoped<ISchemaProbe, MigrationSchemaProbe>();
         return services;
     }
 }
