@@ -1,3 +1,4 @@
+using Storefront.Application.Catalog;
 using Storefront.Application.Health;
 using Storefront.Infrastructure;
 
@@ -8,6 +9,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<HealthService>();
+builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 builder.Services.AddCors(options =>

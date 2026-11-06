@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\backend\Storefront.Application\Storefront.Application.csproj" />
+    <ProjectReference Include="..\..\src\backend\Storefront.Domain\Storefront.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
