@@ -12,6 +12,7 @@ internal sealed class ProductRepository(StorefrontDbContext context)
         Query(trackChanges)
             .Include(p => p.Variants)
             .Include(p => p.Images)
+            .AsSplitQuery()
             .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
 
     public Task<bool> ExistsBySlugAsync(string slug, CancellationToken cancellationToken) =>
