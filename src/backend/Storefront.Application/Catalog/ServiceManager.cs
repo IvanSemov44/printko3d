@@ -7,7 +7,11 @@ public sealed class ServiceManager(IRepositoryManager repositories) : IServiceMa
     private readonly Lazy<ICategoryService> _category = new(() => new CategoryService(repositories));
     private readonly Lazy<IProductService> _product = new(() => new ProductService(repositories));
 
+    private readonly Lazy<IStoreSettingsService> _storeSettings = new(() => new StoreSettingsService(repositories));
+
     public ICategoryService Category => _category.Value;
 
     public IProductService Product => _product.Value;
+
+    public IStoreSettingsService StoreSettings => _storeSettings.Value;
 }

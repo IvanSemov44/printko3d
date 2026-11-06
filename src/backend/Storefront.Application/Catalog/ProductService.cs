@@ -70,6 +70,40 @@ internal sealed class ProductService(IRepositoryManager repositories) : IProduct
         return variant.Id;
     }
 
+    public async Task<Guid> AddImageAsync(Guid productId, NewImage input, CancellationToken cancellationToken)
+    {
+        Guard.NotBlank(input.StorageKey, nameof(input.StorageKey));
+        Guard.NotBlank(input.AltText, nameof(input.AltText));
+
+        var product = await GetTrackedProductAsync(productId, cancellationToken);
+        if (input.VariantId is { } variantId && product.Variants.All(v => v.Id != variantId))
+        {
+            throw new ValidationFailedException("The variant does not belong to this product.");
+        }
+
+        var makePrimary = input.IsPrimary || product.Images.Count == 0;
+        var currentPrimary = product.Images.SingleOrDefault(i => i.IsPrimary);
+        if (makePrimary && currentPrimary is not null)
+        {
+            // Saved separately: the database allows one primary image per product at any moment.
+            currentPrimary.IsPrimary = false;
+            await repositories.SaveAsync(cancellationToken);
+        }
+
+        var image = new ProductImage
+        {
+            ProductId = product.Id,
+            VariantId = input.VariantId,
+            StorageKey = input.StorageKey,
+            AltText = input.AltText,
+            SortOrder = input.SortOrder,
+            IsPrimary = makePrimary,
+        };
+        product.Images.Add(image);
+        await repositories.SaveAsync(cancellationToken);
+        return image.Id;
+    }
+
     public async Task PublishAsync(Guid productId, CancellationToken cancellationToken)
     {
         var product = await GetTrackedProductAsync(productId, cancellationToken);
@@ -79,6 +113,13 @@ internal sealed class ProductService(IRepositoryManager repositories) : IProduct
         }
 
         product.Status = ProductStatus.Published;
+        await repositories.SaveAsync(cancellationToken);
+    }
+
+    public async Task ArchiveAsync(Guid productId, CancellationToken cancellationToken)
+    {
+        var product = await GetTrackedProductAsync(productId, cancellationToken);
+        product.Status = ProductStatus.Archived;
         await repositories.SaveAsync(cancellationToken);
     }
 
