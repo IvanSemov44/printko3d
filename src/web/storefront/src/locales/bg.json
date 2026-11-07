@@ -1,6 +1,16 @@
 {
-  "app.title": "Магазин",
-  "api.checking": "Проверка на връзката с API…",
-  "api.available": "API е достъпно",
-  "api.unavailable": "API не е достъпно"
+  "layout.skipToContent": "Към съдържанието",
+  "layout.homeLink": "Към началната страница",
+  "layout.categoriesNav": "Категории",
+  "layout.footerNav": "Контакти",
+  "layout.contactEmail": "Имейл",
+  "layout.contactPhone": "Телефон",
+  "demo.banner": "Това е демо версия. Данните са примерни, а поръчките не са истински.",
+  "demo.bannerLabel": "Демо версия",
+  "settings.loading": "Зареждане…",
+  "settings.error": "Магазинът не може да се зареди в момента. Опитайте отново след малко.",
+  "settings.retry": "Опитай пак",
+  "home.heading": "Начало",
+  "notFound.heading": "Страницата не е намерена",
+  "notFound.back": "Към началната страница"
 }

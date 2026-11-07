@@ -1,20 +1,19 @@
-import { ApiStatus, useApiHealth } from '@storefront/shared';
-import { t } from './i18n';
+import { Route, Routes } from 'react-router';
+import { HomePage } from './features/home/HomePage';
+import { NotFoundPage } from './features/home/NotFoundPage';
+import { Layout } from './features/layout/Layout';
+import { StoreSettingsProvider } from './features/store-settings/StoreSettingsProvider';
 
+/** Needs a router and a QueryClientProvider above it (see main.tsx). */
 export function App() {
-  const state = useApiHealth();
-
   return (
-    <main>
-      <h1>{t('app.title')}</h1>
-      <ApiStatus
-        state={state}
-        labels={{
-          checking: t('api.checking'),
-          available: t('api.available'),
-          unavailable: t('api.unavailable'),
-        }}
-      />
-    </main>
+    <StoreSettingsProvider>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<HomePage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
+      </Routes>
+    </StoreSettingsProvider>
   );
 }
