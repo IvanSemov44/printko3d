@@ -7,4 +7,6 @@ public interface IServiceManager
     IProductService Product { get; }
 
     IStoreSettingsService StoreSettings { get; }
+
+    ICatalogReadService Catalog { get; }
 }

@@ -21,6 +21,8 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
     public IStoreSettingsRepository StoreSettings => _storeSettings;
 
+    public ICatalogQueries Catalog => throw new NotSupportedException("Read queries are covered by the integration tests.");
+
     public List<StoreSettings> Settings => _storeSettings.Items;
 
     public Task SaveAsync(CancellationToken cancellationToken)

@@ -9,6 +9,10 @@ internal sealed class RepositoryManager(StorefrontDbContext context) : IReposito
     private readonly Lazy<IProductRepository> _product = new(() => new ProductRepository(context));
     private readonly Lazy<IStoreSettingsRepository> _storeSettings = new(() => new StoreSettingsRepository(context));
 
+    private readonly Lazy<ICatalogQueries> _catalog = new(() => new CatalogQueries(context));
+
+    public ICatalogQueries Catalog => _catalog.Value;
+
     public ICategoryRepository Category => _category.Value;
 
     public IProductRepository Product => _product.Value;

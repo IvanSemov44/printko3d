@@ -8,5 +8,7 @@ public interface IRepositoryManager
 
     IStoreSettingsRepository StoreSettings { get; }
 
+    ICatalogQueries Catalog { get; }
+
     Task SaveAsync(CancellationToken cancellationToken);
 }
