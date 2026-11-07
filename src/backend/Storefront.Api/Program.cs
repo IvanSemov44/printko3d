@@ -13,7 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.AddJsonConsole(options => options.IncludeScopes = true);
 builder.Services.AddOpenApi();
-builder.Services.AddProblemDetails();
+builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = context =>
+{
+    // Model-binding errors (for example page=abc) never reach ApiExceptionHandler; give them the same stable code.
+    if (context.ProblemDetails.Status == StatusCodes.Status400BadRequest)
+    {
+        context.ProblemDetails.Extensions.TryAdd("code", "validation.failed");
+    }
+});
+builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+builder.Services.AddControllers();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<HealthService>();
 builder.Services.AddScoped<IServiceManager, ServiceManager>();
@@ -34,6 +43,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.MapControllers();
 
 app.MapGet("/health", async (HealthService healthService, CancellationToken cancellationToken) =>
 {
