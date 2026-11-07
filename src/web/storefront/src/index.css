@@ -1,18 +1,127 @@
+:root {
+  --color-primary: #2f5d8a;
+  --color-on-primary: #ffffff;
+  --color-text: #1f2328;
+  --color-surface: #ffffff;
+  --color-muted: #f3f4f6;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   font-family: system-ui, sans-serif;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+#root {
+  display: contents;
+}
+
+:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--color-primary);
+  border-radius: 0.25rem;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  cursor: pointer;
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -4rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 2px solid var(--color-text);
+  z-index: 10;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+.demo-banner {
+  padding: 0.5rem 1rem;
+  text-align: center;
+  background: #fff3bf;
+  color: #000000;
+}
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.site-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.category-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.category-nav a[aria-current='page'] {
+  font-weight: 700;
 }
 
 main {
-  max-width: 40rem;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  flex: 1;
+  width: 100%;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
 }
 
-[data-state='available'] {
-  color: #1a7f37;
+main:focus {
+  outline: none;
 }
 
-[data-state='unavailable'] {
-  color: #b42318;
+.status-screen {
+  text-align: center;
+}
+
+.site-footer {
+  padding: 1rem;
+  background: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.site-footer p {
+  margin: 0.25rem 0;
+}
+
+address {
+  font-style: normal;
 }

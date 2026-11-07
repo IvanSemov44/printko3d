@@ -12,7 +12,7 @@ export default defineConfig(
     languageOptions: {
       globals: globals.browser,
       parserOptions: {
-        projectService: { allowDefaultProject: ['eslint.config.js', 'shared/vitest.config.ts'] },
+        projectService: true,
       },
     },
     rules: {

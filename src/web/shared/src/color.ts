@@ -1,0 +1,39 @@
+/** Used when the store settings contain no valid primary colour. */
+export const DEFAULT_PRIMARY_COLOR = '#2f5d8a';
+
+const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
+
+export function isHexColor(value: string): boolean {
+  return HEX_COLOR.test(value);
+}
+
+/** Returns the colour in lowercase `#rrggbb` form, or the default when the value is not `#RRGGBB`. */
+export function normalizePrimaryColor(value: string): string {
+  return isHexColor(value) ? value.toLowerCase() : DEFAULT_PRIMARY_COLOR;
+}
+
+function channelLuminance(channel: number): number {
+  const value = channel / 255;
+  return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(hex: string): number {
+  const red = channelLuminance(parseInt(hex.slice(1, 3), 16));
+  const green = channelLuminance(parseInt(hex.slice(3, 5), 16));
+  const blue = channelLuminance(parseInt(hex.slice(5, 7), 16));
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+/** WCAG 2.1 contrast ratio between two `#rrggbb` colours, from 1 to 21. */
+export function contrastRatio(first: string, second: string): number {
+  const a = relativeLuminance(first);
+  const b = relativeLuminance(second);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
+/** Picks black or white text, whichever is more readable on the background (always at least 4.5:1). */
+export function readableTextColor(background: string): '#000000' | '#ffffff' {
+  return contrastRatio(background, '#ffffff') >= contrastRatio(background, '#000000')
+    ? '#ffffff'
+    : '#000000';
+}

@@ -6,3 +6,13 @@ export { checkApiHealth } from './health';
 export { createTranslator } from './i18n';
 export { useApiHealth } from './useApiHealth';
 export type { ApiHealthState } from './useApiHealth';
+export { ApiError, getCategories, getStoreSettings } from './api/client';
+export type { Category, StoreSettings } from './api/client';
+export {
+  DEFAULT_PRIMARY_COLOR,
+  contrastRatio,
+  isHexColor,
+  normalizePrimaryColor,
+  readableTextColor,
+} from './color';
+export { formatMoney } from './money';

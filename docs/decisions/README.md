@@ -28,5 +28,6 @@
 - [0004 – Публично GitHub репо до включване на GitHub Pro](0004-public-repository.md)
 - [0006 – Слоеве по книгата: прости ентита, repository-та, услуги и контролери](0006-book-style-layers-and-controllers.md)
 - [0007 – Схемата на базата е в генериран документ, който се проверява](0007-generated-database-schema-document.md)
+- [0010 – TanStack Query за слоя с API заявки и генерирани типове от OpenAPI](0010-tanstack-query-for-api-layer.md)
 - [0008 – Книгата на Code Maze е справочник за стила на кода](0008-code-style-reference-book.md)
 - [0009 – Списъкът с категории е без страниране](0009-categories-list-without-paging.md)
