@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Storefront.Application.Contracts;
 using Storefront.Application.Health;
+using Storefront.Application.Migrations;
 using Storefront.Application.Seeding;
 using Storefront.Infrastructure.Health;
 using Storefront.Infrastructure.Persistence;
@@ -17,6 +18,13 @@ public static class DependencyInjection
     {
         services.AddOptions<DatabaseOptions>()
             .Bind(configuration.GetSection(DatabaseOptions.SectionName))
+            .PostConfigure(options =>
+            {
+                if (string.IsNullOrWhiteSpace(options.ConnectionString) && !string.IsNullOrWhiteSpace(options.Url))
+                {
+                    options.ConnectionString = PostgresConnectionString.FromUrl(options.Url);
+                }
+            })
             .ValidateDataAnnotations()
             .ValidateOnStart();
         services.AddSingleton(TimeProvider.System);
@@ -25,6 +33,7 @@ public static class DependencyInjection
         services.AddScoped<IRepositoryManager, RepositoryManager>();
         services.AddScoped<IDatabaseProbe, NpgsqlDatabaseProbe>();
         services.AddScoped<ISchemaProbe, MigrationSchemaProbe>();
+        services.AddScoped<IDatabaseMigrator, EfDatabaseMigrator>();
         return services;
     }
 }

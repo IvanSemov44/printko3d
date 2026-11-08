@@ -32,3 +32,4 @@
 - [0008 – Книгата на Code Maze е справочник за стила на кода](0008-code-style-reference-book.md)
 - [0009 – Списъкът с категории е без страниране](0009-categories-list-without-paging.md)
 - [0011 – Адресът на снимка се сглобява от основен адрес в `config.json`](0011-image-url-from-base-address-in-config.md)
+- [0012 – В демото миграциите и демо данните се пускат ръчно, с команди на API](0012-demo-migrations-and-seed-run-by-hand.md)

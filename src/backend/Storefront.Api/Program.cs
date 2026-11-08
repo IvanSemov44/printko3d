@@ -3,6 +3,12 @@ using Storefront.Application.Catalog;
 using Storefront.Application.Health;
 using Storefront.Infrastructure;
 
+if (MigrateCommand.IsRequested(args))
+{
+    Environment.ExitCode = await MigrateCommand.RunAsync(args, Console.Out, Console.Error, CancellationToken.None);
+    return;
+}
+
 if (SeedCommand.IsRequested(args))
 {
     Environment.ExitCode = await SeedCommand.RunAsync(args, Console.Out, Console.Error, CancellationToken.None);

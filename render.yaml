@@ -1,0 +1,71 @@
+# Demo environment on render.com (fake data, no real payments). See "Демо в render.com" in README.md.
+# No secrets here: the database password comes from the database itself, and the public addresses of the
+# services are entered once in the render.com dashboard (sync: false), because one service cannot read
+# another one's public address.
+databases:
+  - name: printko3d-db
+    plan: free
+    region: frankfurt
+
+services:
+  - type: web
+    name: printko3d-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    # Deploy from main once its GitHub checks have passed.
+    autoDeployTrigger: checksPass
+    dockerfilePath: ./src/backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Demo
+      - key: PORT
+        value: "8080"
+      - key: Database__Url
+        fromDatabase:
+          name: printko3d-db
+          property: connectionString
+      # The public addresses of the storefront and the admin panel, for example https://printko3d-storefront.onrender.com
+      - key: Cors__AllowedOrigins__0
+        sync: false
+      - key: Cors__AllowedOrigins__1
+        sync: false
+
+  - type: web
+    name: printko3d-storefront
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    autoDeployTrigger: checksPass
+    dockerfilePath: ./src/web/docker/Dockerfile
+    dockerContext: ./src/web
+    envVars:
+      # Render passes environment variables to the Docker build as build arguments.
+      - key: APP
+        value: storefront
+      - key: PORT
+        value: "8080"
+      # The public address of the API, for example https://printko3d-api.onrender.com
+      - key: API_URL
+        sync: false
+
+  - type: web
+    name: printko3d-admin
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    autoDeployTrigger: checksPass
+    dockerfilePath: ./src/web/docker/Dockerfile
+    dockerContext: ./src/web
+    envVars:
+      - key: APP
+        value: admin
+      - key: PORT
+        value: "8080"
+      - key: API_URL
+        sync: false
