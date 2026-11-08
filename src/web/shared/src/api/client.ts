@@ -1,4 +1,5 @@
-import { loadRuntimeConfig } from '../config';
+import { loadRuntimeConfig, type RuntimeConfig } from '../config';
+import { imageUrl } from '../images';
 import { toSafeInteger } from '../numbers';
 import type { components } from './schema';
 
@@ -14,6 +15,34 @@ export type ProductListItem = Omit<ProductListItemDto, 'minPrice' | 'leadTimeDay
   /** In the currency's smallest unit. */
   minPrice: number;
   leadTimeDays: number | null;
+};
+
+type ProductDetailsDto = components['schemas']['ProductDetailsDto'];
+type ProductVariantDto = components['schemas']['ProductVariantDto'];
+type ProductImageDto = components['schemas']['ProductImageDto'];
+
+/** A purchasable variant; prices are in the currency's smallest unit. */
+export type ProductVariant = Omit<
+  ProductVariantDto,
+  'price' | 'compareAtPrice' | 'weightGrams' | 'sortOrder'
+> & {
+  price: number;
+  compareAtPrice: number | null;
+  weightGrams: number;
+  sortOrder: number;
+};
+
+/** A product image. `url` is null when the environment has no image storage (decision 0011). */
+export type ProductImage = Omit<ProductImageDto, 'sortOrder'> & {
+  sortOrder: number;
+  url: string | null;
+};
+
+/** A product page; variants and images are ordered by `sortOrder`. */
+export type ProductDetails = Omit<ProductDetailsDto, 'leadTimeDays' | 'variants' | 'images'> & {
+  leadTimeDays: number | null;
+  variants: ProductVariant[];
+  images: ProductImage[];
 };
 
 export interface ProductPage {
@@ -55,13 +84,20 @@ async function readErrorCode(response: Response): Promise<string | null> {
   return null;
 }
 
-async function getJson(path: string, signal?: AbortSignal): Promise<unknown> {
-  const { apiUrl } = await loadRuntimeConfig(signal);
-  const response = await fetch(`${apiUrl}${path}`, { signal });
+async function getJsonWithConfig(
+  path: string,
+  signal?: AbortSignal,
+): Promise<{ body: unknown; config: RuntimeConfig }> {
+  const config = await loadRuntimeConfig(signal);
+  const response = await fetch(`${config.apiUrl}${path}`, { signal });
   if (!response.ok) {
     throw new ApiError(response.status, await readErrorCode(response));
   }
-  return response.json();
+  return { body: await response.json(), config };
+}
+
+async function getJson(path: string, signal?: AbortSignal): Promise<unknown> {
+  return (await getJsonWithConfig(path, signal)).body;
 }
 
 export async function getStoreSettings(signal?: AbortSignal): Promise<StoreSettings> {
@@ -98,5 +134,42 @@ export async function getProducts(query: ProductQuery, signal?: AbortSignal): Pr
       dto.totalPages === undefined
         ? Math.ceil(totalCount / pageSize)
         : toSafeInteger(dto.totalPages),
+  };
+}
+
+function bySortOrder<T extends { sortOrder: number }>(items: T[]): T[] {
+  return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+function toProductVariant(variant: ProductVariantDto): ProductVariant {
+  return {
+    ...variant,
+    price: toSafeInteger(variant.price),
+    compareAtPrice: variant.compareAtPrice === null ? null : toSafeInteger(variant.compareAtPrice),
+    weightGrams: toSafeInteger(variant.weightGrams),
+    sortOrder: toSafeInteger(variant.sortOrder),
+  };
+}
+
+function toProductImage(image: ProductImageDto, imageBaseUrl: string | null): ProductImage {
+  return {
+    ...image,
+    sortOrder: toSafeInteger(image.sortOrder),
+    url: imageUrl(imageBaseUrl, image.storageKey),
+  };
+}
+
+/** One published product. An unknown, unpublished or hidden product is an ApiError with status 404. */
+export async function getProduct(slug: string, signal?: AbortSignal): Promise<ProductDetails> {
+  const { body, config } = await getJsonWithConfig(
+    `/api/v1/products/${encodeURIComponent(slug)}`,
+    signal,
+  );
+  const dto = body as ProductDetailsDto;
+  return {
+    ...dto,
+    leadTimeDays: dto.leadTimeDays === null ? null : toSafeInteger(dto.leadTimeDays),
+    variants: bySortOrder(dto.variants.map(toProductVariant)),
+    images: bySortOrder(dto.images.map((image) => toProductImage(image, config.imageBaseUrl))),
   };
 }

@@ -8,6 +8,7 @@ import {
   settingsFixture,
   stubNetwork,
 } from '../../testing/renderApp';
+import { plain } from '../../testing/text';
 
 const ok = (body: unknown) => () => Response.json(body);
 
@@ -32,11 +33,6 @@ function productRequests(fetchMock: ReturnType<typeof stub>): URLSearchParams[] 
 
 function lastPageRequested(fetchMock: ReturnType<typeof stub>): string | null {
   return productRequests(fetchMock).at(-1)?.get('page') ?? null;
-}
-
-/** Intl separates number and symbol with a non-breaking space; compare with a plain one. */
-function plain(text: string | null): string {
-  return (text ?? '').replace(new RegExp('[  ]', 'g'), ' ');
 }
 
 /** The product list is the only list inside the main content. */

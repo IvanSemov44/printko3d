@@ -3,6 +3,7 @@ import { CategoryPage } from './features/catalog/CategoryPage';
 import { HomePage } from './features/home/HomePage';
 import { NotFoundPage } from './features/home/NotFoundPage';
 import { Layout } from './features/layout/Layout';
+import { ProductPage } from './features/product/ProductPage';
 import { StoreSettingsProvider } from './features/store-settings/StoreSettingsProvider';
 
 /** Needs a router and a QueryClientProvider above it (see main.tsx). */
@@ -13,6 +14,7 @@ export function App() {
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="categories/:slug" element={<CategoryPage />} />
+          <Route path="products/:slug" element={<ProductPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

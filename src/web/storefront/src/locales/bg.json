@@ -24,5 +24,11 @@
   "catalog.pagination": "Страниране",
   "catalog.previous": "Предишна",
   "catalog.next": "Следваща",
-  "catalog.page": "Страница"
+  "catalog.page": "Страница",
+  "product.error": "Продуктът не може да се зареди в момента. Опитайте отново след малко.",
+  "product.variant": "Вариант",
+  "product.price": "Цена:",
+  "product.oldPrice": "Стара цена:",
+  "product.gallery": "Снимки на продукта",
+  "product.imageNumber": "Снимка {number}"
 }

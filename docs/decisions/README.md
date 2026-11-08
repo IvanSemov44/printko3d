@@ -31,3 +31,4 @@
 - [0010 – TanStack Query за слоя с API заявки и генерирани типове от OpenAPI](0010-tanstack-query-for-api-layer.md)
 - [0008 – Книгата на Code Maze е справочник за стила на кода](0008-code-style-reference-book.md)
 - [0009 – Списъкът с категории е без страниране](0009-categories-list-without-paging.md)
+- [0011 – Адресът на снимка се сглобява от основен адрес в `config.json`](0011-image-url-from-base-address-in-config.md)

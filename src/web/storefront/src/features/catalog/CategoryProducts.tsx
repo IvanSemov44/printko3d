@@ -1,6 +1,7 @@
 import type { Category } from '@storefront/shared';
 import { useEffect, useRef } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
+import { LoadingStatus } from '../layout/LoadingStatus';
 import { useT } from '../store-settings/useStoreSettings';
 import { CatalogError } from './CatalogError';
 import { Pagination } from './Pagination';
@@ -29,7 +30,7 @@ export function CategoryProducts({ category }: { category: Category }) {
   if (isError) {
     content = <CatalogError onRetry={() => void refetch()} />;
   } else if (!data) {
-    content = <p role="status">{t('settings.loading')}</p>;
+    content = <LoadingStatus />;
   } else if (!isPlaceholderData && data.totalPages > 0 && page > data.totalPages) {
     const last = data.totalPages;
     content = <Navigate replace to={{ search: last === 1 ? '' : `?page=${String(last)}` }} />;
