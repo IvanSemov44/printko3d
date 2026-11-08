@@ -12,5 +12,17 @@
   "settings.retry": "Опитай пак",
   "home.heading": "Начало",
   "notFound.heading": "Страницата не е намерена",
-  "notFound.back": "Към началната страница"
+  "notFound.back": "Към началната страница",
+  "catalog.priceFrom": "от",
+  "catalog.inStock": "В наличност",
+  "catalog.soldOut": "Изчерпан",
+  "catalog.madeToOrder": "По поръчка",
+  "catalog.leadTime.one": "{count} ден",
+  "catalog.leadTime.other": "{count} дни",
+  "catalog.empty": "В тази категория още няма продукти",
+  "catalog.error": "Продуктите не могат да се заредят в момента. Опитайте отново след малко.",
+  "catalog.pagination": "Страниране",
+  "catalog.previous": "Предишна",
+  "catalog.next": "Следваща",
+  "catalog.page": "Страница"
 }

@@ -1,8 +1,34 @@
 import { loadRuntimeConfig } from '../config';
+import { toSafeInteger } from '../numbers';
 import type { components } from './schema';
 
 export type StoreSettings = components['schemas']['StoreSettingsDto'];
 export type Category = components['schemas']['CategoryDto'];
+export type FulfilmentType = components['schemas']['FulfilmentType'];
+
+type ProductListItemDto = components['schemas']['ProductListItemDto'];
+type ProductPageDto = components['schemas']['PagedResultOfProductListItemDto'];
+
+/** A product card; the integer fields are real numbers (the generated types allow strings). */
+export type ProductListItem = Omit<ProductListItemDto, 'minPrice' | 'leadTimeDays'> & {
+  /** In the currency's smallest unit. */
+  minPrice: number;
+  leadTimeDays: number | null;
+};
+
+export interface ProductPage {
+  items: ProductListItem[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+export interface ProductQuery {
+  category: string;
+  page: number;
+  pageSize: number;
+}
 
 /** A non-2xx API answer. `code` is the stable error code from ProblemDetails, when present. */
 export class ApiError extends Error {
@@ -44,4 +70,33 @@ export async function getStoreSettings(signal?: AbortSignal): Promise<StoreSetti
 
 export async function getCategories(signal?: AbortSignal): Promise<Category[]> {
   return (await getJson('/api/v1/categories', signal)) as Category[];
+}
+
+function toProductListItem(item: ProductListItemDto): ProductListItem {
+  return {
+    ...item,
+    minPrice: toSafeInteger(item.minPrice),
+    leadTimeDays: item.leadTimeDays === null ? null : toSafeInteger(item.leadTimeDays),
+  };
+}
+
+export async function getProducts(query: ProductQuery, signal?: AbortSignal): Promise<ProductPage> {
+  const params = new URLSearchParams({
+    category: query.category,
+    page: String(query.page),
+    pageSize: String(query.pageSize),
+  });
+  const dto = (await getJson(`/api/v1/products?${params.toString()}`, signal)) as ProductPageDto;
+  const pageSize = toSafeInteger(dto.pageSize);
+  const totalCount = toSafeInteger(dto.totalCount);
+  return {
+    items: dto.items.map(toProductListItem),
+    page: toSafeInteger(dto.page),
+    pageSize,
+    totalCount,
+    totalPages:
+      dto.totalPages === undefined
+        ? Math.ceil(totalCount / pageSize)
+        : toSafeInteger(dto.totalPages),
+  };
 }
