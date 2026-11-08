@@ -6,13 +6,16 @@ export { checkApiHealth } from './health';
 export { createTranslator } from './i18n';
 export { useApiHealth } from './useApiHealth';
 export type { ApiHealthState } from './useApiHealth';
-export { ApiError, getCategories, getProducts, getStoreSettings } from './api/client';
+export { ApiError, getCategories, getProduct, getProducts, getStoreSettings } from './api/client';
 export type {
   Category,
   FulfilmentType,
+  ProductDetails,
+  ProductImage,
   ProductListItem,
   ProductPage,
   ProductQuery,
+  ProductVariant,
   StoreSettings,
 } from './api/client';
 export {
@@ -22,5 +25,6 @@ export {
   normalizePrimaryColor,
   readableTextColor,
 } from './color';
+export { imageUrl } from './images';
 export { formatMoney } from './money';
 export { toSafeInteger } from './numbers';

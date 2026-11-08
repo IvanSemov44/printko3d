@@ -1,14 +1,15 @@
 export interface RuntimeConfig {
   apiUrl: string;
+  /** Where product images are served from; `null` when the environment has no image storage yet. */
+  imageBaseUrl: string | null;
 }
 
-function isRuntimeConfig(value: unknown): value is RuntimeConfig {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'apiUrl' in value &&
-    typeof value.apiUrl === 'string'
-  );
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function trimTrailingSlashes(address: string): string {
+  return address.replace(/\/+$/, '');
 }
 
 /** Reads /config.json, written at container start so one build serves every environment. */
@@ -18,8 +19,12 @@ export async function loadRuntimeConfig(signal?: AbortSignal): Promise<RuntimeCo
     throw new Error(`Failed to load runtime config: ${String(response.status)}`);
   }
   const body: unknown = await response.json();
-  if (!isRuntimeConfig(body)) {
+  if (!isRecord(body) || typeof body.apiUrl !== 'string') {
     throw new Error('Runtime config is invalid');
   }
-  return { apiUrl: body.apiUrl.replace(/\/+$/, '') };
+  const imageBaseUrl =
+    typeof body.imageBaseUrl === 'string' && body.imageBaseUrl.trim() !== ''
+      ? trimTrailingSlashes(body.imageBaseUrl.trim())
+      : null;
+  return { apiUrl: trimTrailingSlashes(body.apiUrl), imageBaseUrl };
 }
