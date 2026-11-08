@@ -33,3 +33,4 @@
 - [0009 – Списъкът с категории е без страниране](0009-categories-list-without-paging.md)
 - [0011 – Адресът на снимка се сглобява от основен адрес в `config.json`](0011-image-url-from-base-address-in-config.md)
 - [0012 – В демото миграциите и демо данните се пускат ръчно, с команди на API](0012-demo-migrations-and-seed-run-by-hand.md)
+- [0013 – Двуфакторната защита на администратора се отлага до преди продукция](0013-defer-two-factor-until-before-production.md)
