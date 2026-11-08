@@ -129,3 +129,67 @@ main:focus {
 address {
   font-style: normal;
 }
+
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-list[aria-busy='true'] {
+  opacity: 0.6;
+}
+
+.product-card {
+  padding: 1rem;
+  border: 1px solid var(--color-text);
+  border-radius: 0.25rem;
+  overflow-wrap: anywhere;
+}
+
+.product-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+}
+
+.product-card p {
+  margin: 0.25rem 0;
+}
+
+.product-price {
+  font-weight: 700;
+}
+
+h1:focus {
+  outline: none;
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pagination a,
+.pagination span {
+  display: inline-block;
+  min-width: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+}
+
+.pagination a[aria-current='page'] {
+  font-weight: 700;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.pagination span[aria-disabled='true'] {
+  color: #595959;
+}
