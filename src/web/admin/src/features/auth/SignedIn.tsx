@@ -1,8 +1,11 @@
 import { ApiStatus, useApiHealth, type AdminUser } from '@storefront/shared';
+import { Link, Navigate, NavLink, Route, Routes } from 'react-router';
 import { t } from '../../i18n';
+import { CategoryFormPage } from '../categories/CategoryFormPage';
+import { CategoryListPage } from '../categories/CategoryListPage';
 import { useLogout } from './useAdminSession';
 
-/** What the signed-in administrator sees. The admin functions (categories, products) come with later tasks. */
+/** What the signed-in administrator sees: who is signed in, the menu and the page of the address. */
 export function SignedIn({ user }: { user: AdminUser }) {
   const apiState = useApiHealth();
   const logout = useLogout();
@@ -34,6 +37,26 @@ export function SignedIn({ user }: { user: AdminUser }) {
       >
         {t('auth.logout')}
       </button>
+
+      <nav aria-label={t('nav.label')}>
+        <NavLink to="/categories">{t('nav.categories')}</NavLink>
+      </nav>
+
+      <Routes>
+        <Route index element={<Navigate to="/categories" replace />} />
+        <Route path="categories" element={<CategoryListPage />} />
+        <Route path="categories/new" element={<CategoryFormPage />} />
+        <Route path="categories/:id" element={<CategoryFormPage />} />
+        <Route
+          path="*"
+          element={
+            <>
+              <p>{t('nav.notFound')}</p>
+              <Link to="/categories">{t('categories.backToList')}</Link>
+            </>
+          }
+        />
+      </Routes>
     </>
   );
 }

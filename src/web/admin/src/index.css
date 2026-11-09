@@ -63,3 +63,143 @@ button:disabled {
   opacity: 0.6;
   cursor: progress;
 }
+
+main {
+  max-width: 60rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+nav a {
+  color: #1f2328;
+  font-weight: 600;
+}
+
+nav a[aria-current='page'] {
+  text-decoration-thickness: 3px;
+}
+
+a.button {
+  display: inline-block;
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border: 2px solid #2f5d8a;
+  border-radius: 0.25rem;
+  background: #2f5d8a;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+button.secondary,
+a.button.secondary {
+  background: #ffffff;
+  color: #1f2328;
+  border-color: #57606a;
+}
+
+button.danger {
+  background: #b42318;
+  border-color: #b42318;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.category-tree,
+.category-tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.category-tree ul {
+  margin-left: 2rem;
+}
+
+.category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #d0d7de;
+  border-radius: 0.25rem;
+}
+
+/* Not only a different colour: the row has a dashed border and a text badge as well. */
+.category-row.inactive {
+  background: #f6f8fa;
+  border-style: dashed;
+  color: #57606a;
+}
+
+.category-info {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.category-meta {
+  font-size: 0.875rem;
+}
+
+.badge {
+  justify-self: start;
+  padding: 0 0.5rem;
+  border: 1px solid #57606a;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+}
+
+.category-actions,
+.form-actions,
+.dialog-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.field-hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #57606a;
+}
+
+.field-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+select,
+textarea {
+  font: inherit;
+  padding: 0.5rem;
+  border: 2px solid #57606a;
+  border-radius: 0.25rem;
+}
+
+select[aria-invalid='true'],
+textarea[aria-invalid='true'] {
+  border-color: #b42318;
+}
+
+dialog {
+  max-width: 32rem;
+  border: 2px solid #1f2328;
+  border-radius: 0.5rem;
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 50%);
+}

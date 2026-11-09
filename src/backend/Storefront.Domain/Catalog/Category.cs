@@ -15,4 +15,7 @@ public sealed class Category : Entity
     public int SortOrder { get; set; }
 
     public bool IsActive { get; set; } = true;
+
+    /// <summary>PostgreSQL row version (xmin). Changes on every write; used to detect two people editing at once.</summary>
+    public uint Version { get; set; }
 }

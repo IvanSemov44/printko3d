@@ -4,11 +4,13 @@ using Storefront.Infrastructure.Persistence;
 
 namespace Storefront.Infrastructure.Repositories;
 
-internal abstract class RepositoryBase<T>(StorefrontDbContext context)
+internal abstract class RepositoryBase<T>(StorefrontDbContext dbContext)
     where T : Entity
 {
-    public void Create(T entity) => context.Set<T>().Add(entity);
+    protected StorefrontDbContext Context { get; } = dbContext;
+
+    public void Create(T entity) => Context.Set<T>().Add(entity);
 
     protected IQueryable<T> Query(bool trackChanges) =>
-        trackChanges ? context.Set<T>() : context.Set<T>().AsNoTracking();
+        trackChanges ? Context.Set<T>() : Context.Set<T>().AsNoTracking();
 }

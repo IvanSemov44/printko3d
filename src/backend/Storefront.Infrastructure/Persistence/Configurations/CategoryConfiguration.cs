@@ -16,6 +16,12 @@ internal sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.Property(c => c.Description).HasMaxLength(2000);
         builder.Property(c => c.ImageKey).HasMaxLength(500);
 
+        builder.Property(c => c.Version)
+            .HasColumnName("xmin")
+            .HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken();
+
         builder.HasIndex(c => c.Slug).IsUnique();
         builder.HasOne<Category>()
             .WithMany()

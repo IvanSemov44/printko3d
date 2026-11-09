@@ -11,5 +11,10 @@ public interface ICatalogQueries
 
     Task<ProductDetailsDto?> GetProductBySlugAsync(string slug, CancellationToken cancellationToken);
 
+    /// <summary>Admin side: every category, the inactive ones too, with product counts.</summary>
+    Task<IReadOnlyList<CategoryAdminDto>> GetAdminCategoriesAsync(CancellationToken cancellationToken);
+
+    Task<CategoryAdminDto?> GetAdminCategoryAsync(Guid id, CancellationToken cancellationToken);
+
     Task<StoreSettingsDto?> GetStoreSettingsAsync(CancellationToken cancellationToken);
 }

@@ -1,5 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
 import { createQueryClient } from './queryClient';
@@ -26,6 +27,10 @@ function stubApi(handlers: Handlers) {
       return Promise.resolve(
         new Response(null, { status: handlers.healthOk === false ? 503 : 200 }),
       );
+    }
+    if (url === '/api/v1/admin/categories' && method === 'GET') {
+      // The signed-in panel opens on the category list; these tests are about signing in and out.
+      return Promise.resolve(Response.json([]));
     }
     if (url === '/api/v1/auth/me' && method === 'GET') {
       return Promise.resolve(handlers.me ? handlers.me() : new Response(null, { status: 401 }));
@@ -54,7 +59,9 @@ function requestsTo(fetchMock: ReturnType<typeof stubApi>, url: string) {
 function renderApp() {
   return render(
     <QueryClientProvider client={createQueryClient()}>
-      <App />
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
     </QueryClientProvider>,
   );
 }

@@ -49,6 +49,11 @@ public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> op
         {
             foreach (var property in entityType.GetProperties())
             {
+                if (property.GetColumnName() == "xmin")
+                {
+                    continue;
+                }
+
                 property.SetColumnName(ToSnakeCase(property.Name));
             }
         }
