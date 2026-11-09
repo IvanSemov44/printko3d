@@ -16,3 +16,50 @@ main {
 [data-state='unavailable'] {
   color: #b42318;
 }
+
+:focus-visible {
+  outline: 3px solid #1f2328;
+  outline-offset: 2px;
+}
+
+form {
+  display: grid;
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+input {
+  font: inherit;
+  padding: 0.5rem;
+  border: 2px solid #57606a;
+  border-radius: 0.25rem;
+}
+
+input[aria-invalid='true'] {
+  border-color: #b42318;
+}
+
+.field-error,
+.form-error {
+  margin: 0;
+  color: #b42318;
+}
+
+button {
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border: 2px solid #2f5d8a;
+  border-radius: 0.25rem;
+  background: #2f5d8a;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
