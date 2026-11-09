@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Storefront.Application.Catalog;
 using Storefront.Application.Catalog.Queries;
@@ -5,6 +6,7 @@ using Storefront.Application.Catalog.Queries;
 namespace Storefront.Api.Controllers;
 
 [ApiController]
+[AllowAnonymous]
 [Route("api/v1/categories")]
 public sealed class CategoriesController(IServiceManager services) : ControllerBase
 {

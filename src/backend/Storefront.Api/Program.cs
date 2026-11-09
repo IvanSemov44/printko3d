@@ -15,6 +15,12 @@ if (SeedCommand.IsRequested(args))
     return;
 }
 
+if (CreateAdminCommand.IsRequested(args))
+{
+    Environment.ExitCode = await CreateAdminCommand.RunAsync(args, Console.Out, Console.Error, CancellationToken.None);
+    return;
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.AddJsonConsole(options => options.IncludeScopes = true);
@@ -30,6 +36,7 @@ builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = 
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddControllers();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.AddAdminAuth();
 builder.Services.AddScoped<HealthService>();
 builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
@@ -43,11 +50,17 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseExceptionHandler();
+// Turns the empty 401, 403 and 429 answers into ProblemDetails.
+app.UseStatusCodePages();
 app.UseCors();
+app.UseRateLimiter();
+app.UseCsrfHeaderCheck();
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
 }
 
 app.MapControllers();
@@ -62,6 +75,7 @@ app.MapGet("/health", async (HealthService healthService, CancellationToken canc
             detail: "The database is not reachable.",
             statusCode: StatusCodes.Status503ServiceUnavailable);
 })
+.AllowAnonymous()
 .WithName("GetHealth")
 .Produces<HealthStatus>()
 .ProducesProblem(StatusCodes.Status503ServiceUnavailable);

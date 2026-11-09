@@ -85,7 +85,7 @@ internal static class SchemaDocumentRenderer
         List<Relation> relations)
     {
         var text = new StringBuilder();
-        text.Append("# Схема на базата – каталог на Принтко 3Д\n\n");
+        text.Append("# Схема на базата – Принтко 3Д\n\n");
         text.Append("> Генериран файл. Не се редактира на ръка.\n");
         text.Append("> Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests ");
         text.Append("--filter DatabaseSchemaDocumentTests` (изисква Docker). ");

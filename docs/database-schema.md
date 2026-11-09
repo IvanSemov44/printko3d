@@ -1,15 +1,21 @@
-# Схема на базата – каталог на Принтко 3Д
+# Схема на базата – Принтко 3Д
 
 > Генериран файл. Не се редактира на ръка.
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261104121502_InitialCatalog`
+Последна миграция: `20261109121627_AddAdminIdentity`
 
 ## Връзки
 
 ```mermaid
 erDiagram
+    admin_roles ||--o{ admin_role_claims : "role_id"
+    admin_users ||--o{ admin_user_claims : "user_id"
+    admin_users ||--o{ admin_user_logins : "user_id"
+    admin_roles ||--o{ admin_user_roles : "role_id"
+    admin_users ||--o{ admin_user_roles : "user_id"
+    admin_users ||--o{ admin_user_tokens : "user_id"
     categories |o--o{ categories : "parent_id"
     products ||--o{ product_images : "product_id"
     product_variants |o--o{ product_images : "variant_id"
@@ -18,6 +24,163 @@ erDiagram
 ```
 
 ## Таблици
+
+### admin_role_claims
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | integer | не |  |
+| role_id | uuid | не |  |
+| claim_type | text | да |  |
+| claim_value | text | да |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_admin_role_claims | първичен ключ | `PRIMARY KEY (id)` |
+| FK_admin_role_claims_admin_roles_role_id | външен ключ | `FOREIGN KEY (role_id) REFERENCES admin_roles(id) ON DELETE CASCADE` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_admin_role_claims_role_id | `CREATE INDEX "IX_admin_role_claims_role_id" ON public.admin_role_claims USING btree (role_id)` |
+
+### admin_roles
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| name | character varying(256) | да |  |
+| normalized_name | character varying(256) | да |  |
+| concurrency_stamp | text | да |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_admin_roles | първичен ключ | `PRIMARY KEY (id)` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| RoleNameIndex | `CREATE UNIQUE INDEX "RoleNameIndex" ON public.admin_roles USING btree (normalized_name)` |
+
+### admin_user_claims
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | integer | не |  |
+| user_id | uuid | не |  |
+| claim_type | text | да |  |
+| claim_value | text | да |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_admin_user_claims | първичен ключ | `PRIMARY KEY (id)` |
+| FK_admin_user_claims_admin_users_user_id | външен ключ | `FOREIGN KEY (user_id) REFERENCES admin_users(id) ON DELETE CASCADE` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_admin_user_claims_user_id | `CREATE INDEX "IX_admin_user_claims_user_id" ON public.admin_user_claims USING btree (user_id)` |
+
+### admin_user_logins
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| login_provider | text | не |  |
+| provider_key | text | не |  |
+| provider_display_name | text | да |  |
+| user_id | uuid | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_admin_user_logins | първичен ключ | `PRIMARY KEY (login_provider, provider_key)` |
+| FK_admin_user_logins_admin_users_user_id | външен ключ | `FOREIGN KEY (user_id) REFERENCES admin_users(id) ON DELETE CASCADE` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_admin_user_logins_user_id | `CREATE INDEX "IX_admin_user_logins_user_id" ON public.admin_user_logins USING btree (user_id)` |
+
+### admin_user_roles
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| user_id | uuid | не |  |
+| role_id | uuid | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_admin_user_roles | първичен ключ | `PRIMARY KEY (user_id, role_id)` |
+| FK_admin_user_roles_admin_roles_role_id | външен ключ | `FOREIGN KEY (role_id) REFERENCES admin_roles(id) ON DELETE CASCADE` |
+| FK_admin_user_roles_admin_users_user_id | външен ключ | `FOREIGN KEY (user_id) REFERENCES admin_users(id) ON DELETE CASCADE` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_admin_user_roles_role_id | `CREATE INDEX "IX_admin_user_roles_role_id" ON public.admin_user_roles USING btree (role_id)` |
+
+### admin_user_tokens
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| user_id | uuid | не |  |
+| login_provider | text | не |  |
+| name | text | не |  |
+| value | text | да |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_admin_user_tokens | първичен ключ | `PRIMARY KEY (user_id, login_provider, name)` |
+| FK_admin_user_tokens_admin_users_user_id | външен ключ | `FOREIGN KEY (user_id) REFERENCES admin_users(id) ON DELETE CASCADE` |
+
+### admin_users
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| user_name | character varying(256) | да |  |
+| normalized_user_name | character varying(256) | да |  |
+| email | character varying(256) | да |  |
+| normalized_email | character varying(256) | да |  |
+| email_confirmed | boolean | не |  |
+| password_hash | text | да |  |
+| security_stamp | text | да |  |
+| concurrency_stamp | text | да |  |
+| phone_number | text | да |  |
+| phone_number_confirmed | boolean | не |  |
+| two_factor_enabled | boolean | не |  |
+| lockout_end | timestamp with time zone | да |  |
+| lockout_enabled | boolean | не |  |
+| access_failed_count | integer | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_admin_users | първичен ключ | `PRIMARY KEY (id)` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| EmailIndex | `CREATE INDEX "EmailIndex" ON public.admin_users USING btree (normalized_email)` |
+| UserNameIndex | `CREATE UNIQUE INDEX "UserNameIndex" ON public.admin_users USING btree (normalized_user_name)` |
 
 ### categories
 
@@ -47,6 +210,20 @@ erDiagram
 | --- | --- |
 | IX_categories_parent_id | `CREATE INDEX "IX_categories_parent_id" ON public.categories USING btree (parent_id)` |
 | IX_categories_slug | `CREATE UNIQUE INDEX "IX_categories_slug" ON public.categories USING btree (slug)` |
+
+### data_protection_keys
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | integer | не |  |
+| friendly_name | text | да |  |
+| xml | text | да |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_data_protection_keys | първичен ключ | `PRIMARY KEY (id)` |
 
 ### product_images
 

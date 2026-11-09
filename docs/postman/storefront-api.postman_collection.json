@@ -1,0 +1,239 @@
+{
+  "info": {
+    "name": "Storefront API",
+    "description": "Local requests for the Storefront API. Set the environment 'Storefront local' first and put the administrator password in adminPassword (current value only, never commit it).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "productSlug", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "1. Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 and the email comes back', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().email).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Requested-With", "value": "postman" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "login"] },
+            "description": "Needs X-Requested-With: every request that changes data does, login included (without it: 403 csrf.header_required). Wrong email or password, and a locked account: the same 401. More than 5 requests a minute: 429."
+          }
+        },
+        {
+          "name": "2. Me (needs login)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 when signed in', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/me", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "me"] },
+            "description": "200 with the email when the cookie is sent, otherwise 401. After Logout it must be 401 again."
+          }
+        },
+        {
+          "name": "3. Logout (needs login)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Requested-With", "value": "postman" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/logout", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "logout"] },
+            "description": "Ends the session and changes the security stamp, so the old cookie stops working at once."
+          }
+        },
+        {
+          "name": "4. Logout without the CSRF header (expect 403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403 csrf.header_required', () => {",
+                  "  pm.response.to.have.status(403);",
+                  "  pm.expect(pm.response.json().code).to.eql('csrf.header_required');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/logout", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "logout"] },
+            "description": "Run it while signed in. The header check comes before the sign-in check, so the answer is 403 either way."
+          }
+        },
+        {
+          "name": "5. Login with a wrong password (expect 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 auth.invalid_credentials', () => {",
+                  "  pm.response.to.have.status(401);",
+                  "  pm.expect(pm.response.json().code).to.eql('auth.invalid_credentials');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Requested-With", "value": "postman" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"definitely-the-wrong-password\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "login"] },
+            "description": "Five wrong passwords in a row lock the account for 15 minutes. Do not repeat it more than 4 times."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catalog (public)",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+          }
+        },
+        {
+          "name": "Store settings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/store-settings", "host": ["{{baseUrl}}"], "path": ["api", "v1", "store-settings"] }
+          }
+        },
+        {
+          "name": "Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/categories", "host": ["{{baseUrl}}"], "path": ["api", "v1", "categories"] }
+          }
+        },
+        {
+          "name": "Products (list, first slug is saved)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('200 with a page of items', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(body.items).to.be.an('array');",
+                  "});",
+                  "if (body.items && body.items.length > 0) {",
+                  "  pm.collectionVariables.set('productSlug', body.items[0].slug);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products?page=1&pageSize=12&sort=name",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "12", "description": "1 to 48" },
+                { "key": "sort", "value": "name", "description": "name, -name, price or -price" },
+                { "key": "category", "value": "", "description": "category slug", "disabled": true },
+                { "key": "fulfilmentType", "value": "InStock", "description": "InStock or MadeToOrder", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Product by slug (uses productSlug)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/products/{{productSlug}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "products", "{{productSlug}}"] },
+            "description": "Run 'Products (list)' first, it saves the slug of the first product."
+          }
+        },
+        {
+          "name": "Products with a bad sort (expect 400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products?sort=banana",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"],
+              "query": [{ "key": "sort", "value": "banana" }]
+            }
+          }
+        },
+        {
+          "name": "OpenAPI document (Development only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/openapi/v1.json", "host": ["{{baseUrl}}"], "path": ["openapi", "v1.json"] },
+            "description": "Import this address in Postman (Import, Link) to get every request generated."
+          }
+        }
+      ]
+    }
+  ]
+}
