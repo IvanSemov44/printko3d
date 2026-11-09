@@ -2,5 +2,22 @@
   "app.title": "Админ панел",
   "api.checking": "Проверка на връзката с API…",
   "api.available": "API е достъпно",
-  "api.unavailable": "API не е достъпно"
+  "api.unavailable": "API не е достъпно",
+  "auth.title": "Вход",
+  "auth.email": "Имейл",
+  "auth.password": "Парола",
+  "auth.submit": "Влез",
+  "auth.submitting": "Влизане…",
+  "auth.logout": "Изход",
+  "auth.loading": "Зареждане…",
+  "auth.retry": "Опитай отново",
+  "auth.signedInAs": "Влязъл като:",
+  "auth.error.emailRequired": "Въведи имейл.",
+  "auth.error.emailInvalid": "Имейлът не изглежда правилно. Пример: име@домейн.bg",
+  "auth.error.passwordRequired": "Въведи парола.",
+  "auth.error.invalid": "Грешен имейл или парола.",
+  "auth.error.tooMany": "Твърде много опити. Изчакай малко и опитай отново.",
+  "auth.error.unavailable": "Входът не е възможен в момента. Опитай отново след малко.",
+  "auth.error.sessionUnknown": "Не успяхме да проверим дали си влязъл. Провери връзката и опитай отново.",
+  "auth.error.logoutFailed": "Изходът не успя. Опитай отново."
 }

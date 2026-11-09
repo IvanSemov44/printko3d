@@ -69,3 +69,7 @@ services:
         value: "8080"
       - key: API_URL
         sync: false
+      # The same public address of the API. nginx forwards /api/ to it, so the browser talks only to the panel
+      # and the session cookie belongs to one site (decision 0014).
+      - key: API_UPSTREAM
+        sync: false
