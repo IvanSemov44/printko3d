@@ -12,6 +12,9 @@ server {
         add_header Cache-Control "no-store";
     }
 
+    # Empty for the storefront. For the admin panel it forwards /api/ to the API (written by 40-write-config.sh).
+    include /tmp/api-proxy.conf;
+
     location / {
         try_files $uri $uri/ /index.html;
     }
