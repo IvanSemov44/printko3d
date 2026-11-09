@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261109121627_AddAdminIdentity`
+Последна миграция: `20261109152317_CategoryRowVersion`
 
 ## Връзки
 

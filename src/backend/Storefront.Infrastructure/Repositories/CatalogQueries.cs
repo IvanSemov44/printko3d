@@ -16,6 +16,18 @@ internal sealed class CatalogQueries(StorefrontDbContext context) : ICatalogQuer
             .Select(c => new CategoryDto(c.Id, c.ParentId, c.Name, c.Slug, c.Description, c.ImageKey, c.SortOrder))
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<CategoryAdminDto>> GetAdminCategoriesAsync(CancellationToken cancellationToken) =>
+        await AdminCategories(
+                context.Categories.AsNoTracking()
+                    .OrderBy(c => c.SortOrder)
+                    .ThenBy(c => c.Name)
+                    .ThenBy(c => c.Id))
+            .ToListAsync(cancellationToken);
+
+    public Task<CategoryAdminDto?> GetAdminCategoryAsync(Guid id, CancellationToken cancellationToken) =>
+        AdminCategories(context.Categories.AsNoTracking().Where(c => c.Id == id))
+            .SingleOrDefaultAsync(cancellationToken);
+
     public async Task<PagedResult<ProductListItemDto>> GetProductsAsync(
         ProductListQuery query,
         CancellationToken cancellationToken)
@@ -177,6 +189,19 @@ internal sealed class CatalogQueries(StorefrontDbContext context) : ICatalogQuer
             .Where(p => p.Status == ProductStatus.Published
                 && p.Variants.Any(v => v.IsActive)
                 && VisibleCategories().Any(c => c.Id == p.CategoryId));
+
+    /// <summary>Admin view of categories: no visibility rule, but with the number of products directly in each.</summary>
+    private IQueryable<CategoryAdminDto> AdminCategories(IQueryable<Category> categories) =>
+        categories.Select(c => new CategoryAdminDto(
+            c.Id,
+            c.ParentId,
+            c.Name,
+            c.Slug,
+            c.Description,
+            c.SortOrder,
+            c.IsActive,
+            context.Products.Count(p => p.CategoryId == c.Id),
+            c.Version));
 
     /// <summary>Active categories whose parent (if any) is active too. The one place that rule lives.</summary>
     private IQueryable<Category> VisibleCategories() =>

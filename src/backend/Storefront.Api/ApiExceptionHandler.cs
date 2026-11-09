@@ -24,6 +24,15 @@ internal sealed class ApiExceptionHandler(IProblemDetailsService problemDetails)
                     Extensions = { ["code"] = notFound.Code },
                 };
                 break;
+            case ConflictException conflict:
+                details = new ProblemDetails
+                {
+                    Status = StatusCodes.Status409Conflict,
+                    Title = "Conflict",
+                    Detail = conflict.Message,
+                    Extensions = { ["code"] = conflict.Code },
+                };
+                break;
             case ValidationFailedException validation:
                 details = new ValidationProblemDetails(validation.Errors.ToDictionary(e => e.Key, e => e.Value))
                 {

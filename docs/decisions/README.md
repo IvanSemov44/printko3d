@@ -36,3 +36,4 @@
 - [0013 – Двуфакторната защита на администратора се отлага до преди продукция](0013-defer-two-factor-until-before-production.md)
 - [0014 – Сесията на администратора е бисквитка, а панелът препраща заявките към API](0014-admin-session-cookie-through-panel-proxy.md)
 - [0015 – Ключовете за защита на данните са в базата](0015-data-protection-keys-in-database.md)
+- [0016 – Админ списъкът с категории е без страниране, а редакциите се пазят с версия на реда](0016-admin-categories-list-and-row-version.md)

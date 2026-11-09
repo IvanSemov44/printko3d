@@ -1,4 +1,5 @@
 using Storefront.Application.Contracts;
+using Storefront.Application.Exceptions;
 using Storefront.Domain.Catalog;
 
 namespace Storefront.UnitTests;
@@ -27,6 +28,14 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
     public Task SaveAsync(CancellationToken cancellationToken)
     {
+        // Like the real save: a stale version is a conflict and nothing is written.
+        if (_category.Expected.Any(e => e.Key.Version != e.Value))
+        {
+            _category.Expected.Clear();
+            throw new ConflictException("The record was changed by someone else.", "category.version_conflict");
+        }
+
+        _category.Expected.Clear();
         SaveCount++;
         return Task.CompletedTask;
     }
@@ -42,6 +51,20 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
         public Task<Category?> GetBySlugAsync(string slug, bool trackChanges, CancellationToken cancellationToken) =>
             Task.FromResult(Items.SingleOrDefault(c => c.Slug == slug));
+
+        public Task<bool> HasChildrenAsync(Guid id, CancellationToken cancellationToken) =>
+            Task.FromResult(Items.Any(c => c.ParentId == id));
+
+        public Task<IReadOnlyList<Category>> GetSiblingsAsync(Guid? parentId, CancellationToken cancellationToken) =>
+            Task.FromResult<IReadOnlyList<Category>>(Items
+                .Where(c => c.ParentId == parentId)
+                .OrderBy(c => c.SortOrder).ThenBy(c => c.Name).ThenBy(c => c.Id)
+                .ToList());
+
+        // The fake keeps the version the caller expects and compares it with the stored one when saving.
+        public Dictionary<Category, uint> Expected { get; } = [];
+
+        public void ExpectVersion(Category category, uint version) => Expected[category] = version;
     }
 
     private sealed class FakeStoreSettingsRepository : IStoreSettingsRepository
