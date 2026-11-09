@@ -30,3 +30,12 @@ export { formatMoney } from './money';
 export { toSafeInteger } from './numbers';
 export { getCurrentAdmin, login, logout } from './api/auth';
 export type { AdminUser } from './api/auth';
+export {
+  createCategory,
+  getAdminCategories,
+  moveCategory,
+  setCategoryActive,
+  updateCategory,
+} from './api/adminCategories';
+export type { AdminCategory, CategoryInput, MoveDirection } from './api/adminCategories';
+export type { TranslationParams } from './i18n';
