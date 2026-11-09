@@ -61,7 +61,7 @@ dotnet run --project src/backend/Storefront.Api -- create-admin
 
 Ако `Admin__Password` липсва и командата е пусната в терминал, паролата се пита без ехо. Със `docker compose` подай променливите с `-e`: `docker compose run --rm -e Admin__Email -e Admin__Password api create-admin`.
 
-Всички адреси на API са затворени по подразбиране (трябва вход с роля `Admin`). Отворени са само каталогът, настройките на магазина, `/health` и самият вход. Новите адреси са `POST /api/v1/auth/login`, `POST /api/v1/auth/logout` и `GET /api/v1/auth/me`. Заявките, които променят данни, трябва да имат заглавие `X-Requested-With`. Входът е ограничен до 5 заявки в минута от един адрес (`AdminLogin__LoginAttemptsPerMinute`), а след 5 грешни пароли акаунтът се заключва за 15 минути. Сесията и защитата срещу CSRF са в [0014](docs/decisions/0014-admin-session-cookie-through-panel-proxy.md), ключовете в базата са в [0015](docs/decisions/0015-data-protection-keys-in-database.md).
+Всички адреси на API са затворени по подразбиране (трябва вход с роля `Admin`). Отворени са само каталогът, настройките на магазина, `/health` и самият вход. Новите адреси са `POST /api/v1/auth/login`, `POST /api/v1/auth/logout` и `GET /api/v1/auth/me`. Заявките, които променят данни, трябва да имат заглавие `X-Requested-With`. В панела влизаш с този имейл и парола (`http://localhost:5174` в Docker, или `npm run dev` в `src/web` с API на порт 8080; `API_PROXY_TARGET` сменя адреса на API за `npm run dev`). Бисквитката е `Secure`, затова локално работи само на `localhost` (Chrome и Firefox го приемат; Safari не). Входът е ограничен до 5 заявки в минута от един адрес (`AdminLogin__LoginAttemptsPerMinute`), а след 5 грешни пароли акаунтът се заключва за 15 минути. Сесията и защитата срещу CSRF са в [0014](docs/decisions/0014-admin-session-cookie-through-panel-proxy.md), ключовете в базата са в [0015](docs/decisions/0015-data-protection-keys-in-database.md).
 
 ## API за четене на каталога
 
@@ -120,8 +120,9 @@ gitleaks git --redact --verbose
 **Първо внедряване**
 
 1. В render.com: New → Blueprint, избери репото и клона `main`. Render създава `printko3d-db`, `printko3d-api`, `printko3d-storefront` и `printko3d-admin`.
-2. Render пита за четири стойности, които не могат да са в репото, защото адресът на една услуга не е известен на друга. Попълни ги с публичните адреси на услугите (виж ги в таблото; ако имената са свободни, са от вида `https://printko3d-api.onrender.com`):
+2. Render пита за пет стойности, които не могат да са в репото, защото адресът на една услуга не е известен на друга. Попълни ги с публичните адреси на услугите (виж ги в таблото; ако имената са свободни, са от вида `https://printko3d-api.onrender.com`):
    - `API_URL` на магазина и на админ панела: адресът на API;
+   - `API_UPSTREAM` на админ панела: същият адрес на API. Nginx на панела препраща `/api/` към него, така че браузърът говори само с панела и бисквитката на сесията е от един сайт (решение [0014](docs/decisions/0014-admin-session-cookie-through-panel-proxy.md));
    - `Cors__AllowedOrigins__0` на API: адресът на магазина;
    - `Cors__AllowedOrigins__1` на API: адресът на админ панела.
 
@@ -143,7 +144,7 @@ gitleaks git --redact --verbose
    ASPNETCORE_ENVIRONMENT=Demo dotnet run --no-launch-profile --project src/backend/Storefront.Api -- create-admin
    ```
 
-   Командата иска паролата в терминала (или я вземи от `Admin__Password`). Входът с нея работи, след като бъде готов и панелът (задача 10b).
+   Командата иска паролата в терминала (или я вземи от `Admin__Password`).
 4. Отвори адреса на магазина: началната страница, категория и продукт, цени в евро и лента „демо версия“.
 
 **Какво да знаеш за безплатния план** (по документацията на render.com към 2026-11-08; провери я пак преди да разчиташ на нея)
