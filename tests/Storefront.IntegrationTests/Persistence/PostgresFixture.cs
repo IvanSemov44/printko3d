@@ -15,6 +15,9 @@ public sealed class PostgresFixture : IAsyncLifetime
 
     public async Task<TestDatabase> CreateDatabaseAsync(bool migrate = true)
     {
+        // Tests of one collection run one after another. Each finished test leaves idle pooled connections to its own
+        // database, and the container allows only 100 connections, so release them before opening a new database.
+        NpgsqlConnection.ClearAllPools();
         var name = $"test_{Guid.NewGuid():N}";
         await using (var connection = new NpgsqlConnection(_postgres.GetConnectionString()))
         {
