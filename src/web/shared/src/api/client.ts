@@ -72,7 +72,7 @@ export class ApiError extends Error {
   }
 }
 
-async function readErrorCode(response: Response): Promise<string | null> {
+export async function readErrorCode(response: Response): Promise<string | null> {
   try {
     const body: unknown = await response.json();
     if (typeof body === 'object' && body !== null && 'code' in body) {

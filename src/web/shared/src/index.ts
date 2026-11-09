@@ -28,3 +28,5 @@ export {
 export { imageUrl } from './images';
 export { formatMoney } from './money';
 export { toSafeInteger } from './numbers';
+export { getCurrentAdmin, login, logout } from './api/auth';
+export type { AdminUser } from './api/auth';
