@@ -1,12 +1,17 @@
 using System.Text;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Storefront.Domain;
 using Storefront.Domain.Catalog;
+using Storefront.Infrastructure.Identity;
+using Storefront.Infrastructure.Persistence.Configurations;
 
 namespace Storefront.Infrastructure.Persistence;
 
 public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> options, TimeProvider timeProvider)
-    : DbContext(options)
+    : IdentityDbContext<AdminUser, IdentityRole<Guid>, Guid>(options), IDataProtectionKeyContext
 {
     public DbSet<Category> Categories => Set<Category>();
 
@@ -17,6 +22,8 @@ public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> op
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
 
     public DbSet<StoreSettings> StoreSettings => Set<StoreSettings>();
+
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
@@ -34,7 +41,9 @@ public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(StorefrontDbContext).Assembly);
+        IdentityTables.Configure(modelBuilder);
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
