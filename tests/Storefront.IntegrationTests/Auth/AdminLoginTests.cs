@@ -50,10 +50,22 @@ public sealed class AdminLoginTests(PostgresFixture postgres)
         Assert.Equal(HttpStatusCode.Unauthorized, wrongPassword.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, unknownEmail.StatusCode);
         Assert.True(wrongPassword.IsProblemJson());
-        Assert.Equal(
-            await wrongPassword.Content.ReadAsStringAsync(),
-            await unknownEmail.Content.ReadAsStringAsync());
         Assert.Null(AuthApiHost.CookieOf(wrongPassword));
+
+        // Everything that says why the sign-in failed must be equal. Only the id of the request differs by design.
+        var wrongPasswordBody = await ProblemWithoutTraceIdAsync(wrongPassword);
+        var unknownEmailBody = await ProblemWithoutTraceIdAsync(unknownEmail);
+        Assert.Equal(wrongPasswordBody, unknownEmailBody);
+        Assert.Equal("auth.invalid_credentials", wrongPasswordBody["code"]);
+    }
+
+    private static async Task<SortedDictionary<string, string>> ProblemWithoutTraceIdAsync(
+        HttpResponseMessage response)
+    {
+        var body = await response.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+        Assert.NotNull(body);
+        Assert.True(body.Remove("traceId"));
+        return new SortedDictionary<string, string>(body.ToDictionary(p => p.Key, p => p.Value.ToString()));
     }
 
     [Fact]

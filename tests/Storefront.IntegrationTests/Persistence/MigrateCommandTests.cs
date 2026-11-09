@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using Storefront.Api;
+using Storefront.Api.Commands;
 
 namespace Storefront.IntegrationTests.Persistence;
 

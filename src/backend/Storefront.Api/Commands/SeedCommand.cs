@@ -2,7 +2,7 @@ using Storefront.Application.Catalog;
 using Storefront.Application.Seeding;
 using Storefront.Infrastructure;
 
-namespace Storefront.Api;
+namespace Storefront.Api.Commands;
 
 /// <summary>
 /// `Storefront.Api seed`: loads the demo data and exits. It starts no web server and applies no migrations.

@@ -2,7 +2,7 @@ using Npgsql;
 using Storefront.Application.Migrations;
 using Storefront.Infrastructure;
 
-namespace Storefront.Api;
+namespace Storefront.Api.Commands;
 
 /// <summary>
 /// `Storefront.Api migrate`: applies the pending database migrations and exits. It starts no web server,

@@ -2,7 +2,7 @@
 
 Карта за човек и за ИИ: къде слагаш ново нещо и какво не се прави на всяко място. Общата структура на репото е в [project-start.md](project-start.md), правилата за код са в [CLAUDE.md](../CLAUDE.md), а защо са избрани слоевете са в решения [0006](decisions/0006-book-style-layers-and-controllers.md) и [0008](decisions/0008-code-style-reference-book.md). Този файл казва само **къде стои кой код**. Правилата за `Api` са в [0017](decisions/0017-api-structure-and-style.md), а известните отклонения са в [tech-debt.md](tech-debt.md).
 
-**Как се чете.** „Днес“ е това, което е в репото сега. „След 11d“ е целевата подредба на `Api`, която още не е направена. Когато файлът и кодът се разминават, поправя се файлът или се записва дълг.
+**Как се чете.** Описано е това, което е в репото. Когато файлът и кодът се разминават, поправя се файлът или се записва дълг в [tech-debt.md](tech-debt.md).
 
 ## Backend: четири проекта
 
@@ -43,14 +43,14 @@
 
 Правилата са в [0017](decisions/0017-api-structure-and-style.md).
 
-| Папка | Днес | След 11d |
-| --- | --- | --- |
-| `Controllers/` | `AuthController`, `CategoriesController`, `AdminCategoriesController`, `ProductsController`, `StoreSettingsController` | същото, плюс `HealthController` |
-| `Requests/` | няма (request моделите са в контролерите) | по един record на файл |
-| `Commands/` | няма (в корена са `MigrateCommand`, `SeedCommand`, `CreateAdminCommand`) | трите команди |
-| `Auth/` | няма (в корена са `AdminAuthSetup`, `AdminLoginOptions`) | настройка на вход, настройки, CSRF проверка |
-| `Errors/` | няма (`ApiExceptionHandler` е в корена) | `ApiExceptionHandler` и фабриката на `ProblemDetails` |
-| `Setup/` | няма (всичко е в `Program.cs`) | `AddApi…` и `UseApi…` |
+| Папка | Съдържание |
+| --- | --- |
+| `Controllers/` | `AuthController`, `CategoriesController`, `AdminCategoriesController`, `ProductsController`, `StoreSettingsController`, `HealthController`. Образец: `AdminCategoriesController` |
+| `Requests/` | Request моделите, един тип на файл, с атрибути за валидация и `ToModel()`. Образец: `UpdateCategoryRequest` |
+| `Commands/` | `MigrateCommand`, `SeedCommand`, `CreateAdminCommand` и `ApiCommands` (диспечерът). Образец: `MigrateCommand` |
+| `Auth/` | `AdminAuthSetup` (вход, бисквитка, затворено по подразбиране, лимит), `AdminLoginOptions`, `CsrfHeaderMiddleware` |
+| `Errors/` | `ApiExceptionHandler` (изключение към `ProblemDetails`) и `ApiProblems` (единственото място, което решава как изглежда грешка) |
+| `Setup/` | `ApiSetup`: `AddApiServices` и `UseApiPipeline`. `Program.cs` само ги вика |
 
 **Къде слагам нов адрес?** В контролер, под `/api/v1`. Нов админ адрес е затворен сам (политика „затворено по подразбиране“); не се слага `[AllowAnonymous]`, освен ако е публичен и е добавен нарочно в `ClosedByDefaultTests`.
 
