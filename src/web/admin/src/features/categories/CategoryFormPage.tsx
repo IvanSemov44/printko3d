@@ -1,6 +1,8 @@
 import { ApiError, type AdminCategory, type CategoryInput } from '@storefront/shared';
 import { useState, type SubmitEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
+import { FormField } from '../../components/FormField';
+import { focusField, useFormValues } from '../../components/useFormValues';
 import { t, type MessageKey } from '../../i18n';
 import {
   DESCRIPTION_MAX_LENGTH,
@@ -15,9 +17,9 @@ const FIELD_ORDER = ['name', 'slug', 'parentId', 'description', 'sortOrder'] as 
 type FieldName = (typeof FIELD_ORDER)[number];
 type FieldErrors = CategoryFormErrors & { parentId?: MessageKey };
 
-function describedBy(...ids: (string | false)[]): string | undefined {
-  const used = ids.filter((id) => id !== false);
-  return used.length > 0 ? used.join(' ') : undefined;
+/** The translated message of a field, or undefined when the field has no error. */
+function message(key: MessageKey | undefined): string | undefined {
+  return key === undefined ? undefined : t(key);
 }
 
 interface FormProps {
@@ -35,13 +37,15 @@ function CategoryForm({ category, categories, onReload }: FormProps) {
 
   // A new category goes to the end of the list unless the administrator says otherwise.
   const nextSortOrder = Math.max(-1, ...categories.map((item) => item.sortOrder)) + 1;
-  const [name, setName] = useState(category?.name ?? '');
-  const [slug, setSlug] = useState(category?.slug ?? '');
+  const { values, setValue } = useFormValues({
+    name: category?.name ?? '',
+    slug: category?.slug ?? '',
+    parentId: category?.parentId ?? '',
+    description: category?.description ?? '',
+    sortOrder: String(category?.sortOrder ?? nextSortOrder),
+  });
   // The slug follows the name only for a new category, and only until the administrator edits it.
   const [slugEdited, setSlugEdited] = useState(isEdit);
-  const [parentId, setParentId] = useState(category?.parentId ?? '');
-  const [description, setDescription] = useState(category?.description ?? '');
-  const [sortOrder, setSortOrder] = useState(String(category?.sortOrder ?? nextSortOrder));
   const [isActive, setIsActive] = useState(category?.isActive ?? true);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<MessageKey | null>(null);
@@ -53,13 +57,6 @@ function CategoryForm({ category, categories, onReload }: FormProps) {
   const parentOptions = categories.filter(
     (item) => item.parentId === null && item.id !== category?.id,
   );
-
-  function focusField(form: HTMLFormElement, field: string) {
-    const element = form.elements.namedItem(field);
-    if (element instanceof HTMLElement) {
-      element.focus();
-    }
-  }
 
   function handleError(error: Error, form: HTMLFormElement) {
     const code = error instanceof ApiError ? error.code : null;
@@ -84,7 +81,7 @@ function CategoryForm({ category, categories, onReload }: FormProps) {
     setFormError(null);
     setConflict(false);
 
-    const found: FieldErrors = validateCategory({ name, slug, description, sortOrder });
+    const found: FieldErrors = validateCategory(values);
     setErrors(found);
     const firstInvalid = FIELD_ORDER.find((field: FieldName) => found[field] !== undefined);
     if (firstInvalid) {
@@ -93,11 +90,11 @@ function CategoryForm({ category, categories, onReload }: FormProps) {
     }
 
     const input: CategoryInput = {
-      name: name.trim(),
-      slug,
-      parentId: parentId === '' ? null : parentId,
-      description: description.trim() === '' ? null : description,
-      sortOrder: Number(sortOrder),
+      name: values.name.trim(),
+      slug: values.slug,
+      parentId: values.parentId === '' ? null : values.parentId,
+      description: values.description.trim() === '' ? null : values.description,
+      sortOrder: Number(values.sortOrder),
       isActive,
     };
     const callbacks = {
@@ -135,147 +132,118 @@ function CategoryForm({ category, categories, onReload }: FormProps) {
         </p>
       ) : null}
 
-      <div className="field">
-        <label htmlFor="category-name">{t('categories.form.name')}</label>
-        <input
-          id="category-name"
-          name="name"
-          type="text"
-          autoComplete="off"
-          value={name}
-          maxLength={NAME_MAX_LENGTH + 50}
-          aria-invalid={errors.name ? true : undefined}
-          aria-describedby={describedBy(errors.name !== undefined && 'category-name-error')}
-          onChange={(event) => {
-            setName(event.target.value);
-            if (!slugEdited) {
-              setSlug(slugFromName(event.target.value));
-            }
-          }}
-        />
-        {errors.name ? (
-          <p id="category-name-error" className="field-error">
-            {t(errors.name)}
-          </p>
-        ) : null}
-      </div>
+      <FormField
+        id="category-name"
+        name="name"
+        label={t('categories.form.name')}
+        error={message(errors.name)}
+      >
+        {(control) => (
+          <input
+            {...control}
+            type="text"
+            autoComplete="off"
+            value={values.name}
+            maxLength={NAME_MAX_LENGTH + 50}
+            onChange={(event) => {
+              setValue('name', event.target.value);
+              if (!slugEdited) {
+                setValue('slug', slugFromName(event.target.value));
+              }
+            }}
+          />
+        )}
+      </FormField>
 
-      <div className="field">
-        <label htmlFor="category-slug">{t('categories.form.slug')}</label>
-        <input
-          id="category-slug"
-          name="slug"
-          type="text"
-          autoComplete="off"
-          autoCapitalize="none"
-          spellCheck={false}
-          value={slug}
-          maxLength={SLUG_MAX_LENGTH + 50}
-          aria-invalid={errors.slug ? true : undefined}
-          aria-describedby={describedBy(
-            'category-slug-hint',
-            errors.slug !== undefined && 'category-slug-error',
-          )}
-          onChange={(event) => {
-            setSlugEdited(true);
-            setSlug(event.target.value);
-          }}
-        />
-        <p id="category-slug-hint" className="field-hint">
-          {isEdit ? t('categories.form.slugHintEdit') : t('categories.form.slugHint')}
-        </p>
-        {errors.slug ? (
-          <p id="category-slug-error" className="field-error">
-            {t(errors.slug)}
-          </p>
-        ) : null}
-      </div>
+      <FormField
+        id="category-slug"
+        name="slug"
+        label={t('categories.form.slug')}
+        hint={isEdit ? t('categories.form.slugHintEdit') : t('categories.form.slugHint')}
+        error={message(errors.slug)}
+      >
+        {(control) => (
+          <input
+            {...control}
+            type="text"
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            value={values.slug}
+            maxLength={SLUG_MAX_LENGTH + 50}
+            onChange={(event) => {
+              setSlugEdited(true);
+              setValue('slug', event.target.value);
+            }}
+          />
+        )}
+      </FormField>
 
-      <div className="field">
-        <label htmlFor="category-parent">{t('categories.form.parent')}</label>
-        <select
-          id="category-parent"
-          name="parentId"
-          value={parentId}
-          disabled={hasChildren}
-          aria-invalid={errors.parentId ? true : undefined}
-          aria-describedby={describedBy(
-            hasChildren && 'category-parent-hint',
-            errors.parentId !== undefined && 'category-parent-error',
-          )}
-          onChange={(event) => {
-            setParentId(event.target.value);
-          }}
-        >
-          <option value="">{t('categories.form.noParent')}</option>
-          {parentOptions.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.name}
-            </option>
-          ))}
-        </select>
-        {hasChildren ? (
-          <p id="category-parent-hint" className="field-hint">
-            {t('categories.form.parentLocked')}
-          </p>
-        ) : null}
-        {errors.parentId ? (
-          <p id="category-parent-error" className="field-error">
-            {t(errors.parentId)}
-          </p>
-        ) : null}
-      </div>
+      <FormField
+        id="category-parent"
+        name="parentId"
+        label={t('categories.form.parent')}
+        hint={hasChildren ? t('categories.form.parentLocked') : undefined}
+        error={message(errors.parentId)}
+      >
+        {(control) => (
+          <select
+            {...control}
+            value={values.parentId}
+            disabled={hasChildren}
+            onChange={(event) => {
+              setValue('parentId', event.target.value);
+            }}
+          >
+            <option value="">{t('categories.form.noParent')}</option>
+            {parentOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        )}
+      </FormField>
 
-      <div className="field">
-        <label htmlFor="category-description">{t('categories.form.description')}</label>
-        <textarea
-          id="category-description"
-          name="description"
-          rows={4}
-          value={description}
-          maxLength={DESCRIPTION_MAX_LENGTH + 100}
-          aria-invalid={errors.description ? true : undefined}
-          aria-describedby={describedBy(
-            errors.description !== undefined && 'category-description-error',
-          )}
-          onChange={(event) => {
-            setDescription(event.target.value);
-          }}
-        />
-        {errors.description ? (
-          <p id="category-description-error" className="field-error">
-            {t(errors.description)}
-          </p>
-        ) : null}
-      </div>
+      <FormField
+        id="category-description"
+        name="description"
+        label={t('categories.form.description')}
+        error={message(errors.description)}
+      >
+        {(control) => (
+          <textarea
+            {...control}
+            rows={4}
+            value={values.description}
+            maxLength={DESCRIPTION_MAX_LENGTH + 100}
+            onChange={(event) => {
+              setValue('description', event.target.value);
+            }}
+          />
+        )}
+      </FormField>
 
-      <div className="field">
-        <label htmlFor="category-sort-order">{t('categories.form.sortOrder')}</label>
-        <input
-          id="category-sort-order"
-          name="sortOrder"
-          type="text"
-          inputMode="numeric"
-          autoComplete="off"
-          value={sortOrder}
-          aria-invalid={errors.sortOrder ? true : undefined}
-          aria-describedby={describedBy(
-            'category-sort-order-hint',
-            errors.sortOrder !== undefined && 'category-sort-order-error',
-          )}
-          onChange={(event) => {
-            setSortOrder(event.target.value);
-          }}
-        />
-        <p id="category-sort-order-hint" className="field-hint">
-          {t('categories.form.sortOrderHint')}
-        </p>
-        {errors.sortOrder ? (
-          <p id="category-sort-order-error" className="field-error">
-            {t(errors.sortOrder)}
-          </p>
-        ) : null}
-      </div>
+      <FormField
+        id="category-sort-order"
+        name="sortOrder"
+        label={t('categories.form.sortOrder')}
+        hint={t('categories.form.sortOrderHint')}
+        error={message(errors.sortOrder)}
+      >
+        {(control) => (
+          <input
+            {...control}
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            value={values.sortOrder}
+            onChange={(event) => {
+              setValue('sortOrder', event.target.value);
+            }}
+          />
+        )}
+      </FormField>
 
       {isEdit ? (
         <p>

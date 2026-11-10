@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { t, type MessageKey } from '../../i18n';
 import { buildCategoryTree, siblingsOf } from './categoryTree';
-import { ConfirmDialog } from './ConfirmDialog';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { useAdminCategories, useMoveCategory, useSetCategoryActive } from './useCategories';
 
 /** A 409 means someone else saved the category first; the list is reloaded and the action can be repeated. */
