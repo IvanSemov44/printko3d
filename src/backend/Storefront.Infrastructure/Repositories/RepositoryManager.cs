@@ -1,16 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using Storefront.Application.Contracts;
-using Storefront.Application.Exceptions;
 using Storefront.Infrastructure.Persistence;
 
 namespace Storefront.Infrastructure.Repositories;
 
 internal sealed class RepositoryManager(StorefrontDbContext context) : IRepositoryManager
 {
-    private const string UniqueViolation = "23505";
-    private const string CategorySlugIndex = "IX_categories_slug";
-
     private readonly Lazy<ICategoryRepository> _category = new(() => new CategoryRepository(context));
     private readonly Lazy<IProductRepository> _product = new(() => new ProductRepository(context));
     private readonly Lazy<IStoreSettingsRepository> _storeSettings = new(() => new StoreSettingsRepository(context));
@@ -31,19 +26,9 @@ internal sealed class RepositoryManager(StorefrontDbContext context) : IReposito
         {
             await context.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (DbUpdateException ex) when (SaveErrorTranslator.Translate(ex) is not null)
         {
-            throw new ConflictException(
-                "The record was changed by someone else. Reload it and try again.",
-                "category.version_conflict");
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException
-        {
-            SqlState: UniqueViolation,
-            ConstraintName: CategorySlugIndex,
-        })
-        {
-            throw new ConflictException("The slug is already used.", "category.slug_taken");
+            throw SaveErrorTranslator.Translate(ex)!;
         }
     }
 }
