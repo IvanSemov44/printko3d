@@ -195,6 +195,8 @@ gitleaks git --redact --verbose
 | [`docs/requirements.md`](docs/requirements.md) | Обхват, взети решения и изисквания за версия 1 |
 | [`docs/data-model.md`](docs/data-model.md) | Модел на данните на каталога |
 | [`docs/project-start.md`](docs/project-start.md) | Структура на репото и задачи по ред |
+| [`docs/architecture.md`](docs/architecture.md) | Къде стои кой код и къде се слага ново нещо |
+| [`docs/tech-debt.md`](docs/tech-debt.md) | Регистър на техническия дълг |
 | [`docs/decisions/`](docs/decisions/) | Записани решения |
 | [`docs/tasks/`](docs/tasks/) | Описания на задачите за ИИ |
 

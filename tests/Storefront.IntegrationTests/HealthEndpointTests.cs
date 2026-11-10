@@ -31,5 +31,7 @@ public sealed class HealthEndpointTests : IAsyncLifetime
         var response = await client.GetAsync("/health");
 
         Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("health.database_unreachable", await response.Content.ReadAsStringAsync());
     }
 }

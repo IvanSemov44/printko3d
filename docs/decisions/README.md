@@ -37,3 +37,4 @@
 - [0014 – Сесията на администратора е бисквитка, а панелът препраща заявките към API](0014-admin-session-cookie-through-panel-proxy.md)
 - [0015 – Ключовете за защита на данните са в базата](0015-data-protection-keys-in-database.md)
 - [0016 – Админ списъкът с категории е без страниране, а редакциите се пазят с версия на реда](0016-admin-categories-list-and-row-version.md)
+- [0017 – Структура и стил на `Storefront.Api`](0017-api-structure-and-style.md)

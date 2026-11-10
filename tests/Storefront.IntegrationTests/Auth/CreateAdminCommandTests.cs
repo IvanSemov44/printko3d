@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Storefront.Api;
+using Storefront.Api.Commands;
 using Storefront.Application.Auth;
 using Storefront.IntegrationTests.Persistence;
 

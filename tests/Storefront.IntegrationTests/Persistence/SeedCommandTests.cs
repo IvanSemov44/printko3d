@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Storefront.Api;
+using Storefront.Api.Commands;
 using Storefront.Domain.Catalog;
 
 namespace Storefront.IntegrationTests.Persistence;

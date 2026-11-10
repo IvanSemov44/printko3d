@@ -1,4 +1,4 @@
-namespace Storefront.Api;
+namespace Storefront.Api.Auth;
 
 /// <summary>Settings for the administrator login (section "AdminLogin").</summary>
 public sealed class AdminLoginOptions

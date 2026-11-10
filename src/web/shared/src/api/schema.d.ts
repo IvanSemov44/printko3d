@@ -4,22 +4,6 @@
  */
 
 export interface paths {
-  '/health': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['GetHealth'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   '/api/v1/admin/categories': {
     parameters: {
       query?: never;
@@ -630,8 +614,30 @@ export interface paths {
             'text/json': components['schemas']['AdminUserDto'];
           };
         };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
         /** @description Unauthorized */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -788,6 +794,54 @@ export interface paths {
             'text/plain': components['schemas']['CategoryDto'][];
             'application/json': components['schemas']['CategoryDto'][];
             'text/json': components['schemas']['CategoryDto'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/health': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['HealthStatus'];
+            'application/json': components['schemas']['HealthStatus'];
+            'text/json': components['schemas']['HealthStatus'];
+          };
+        };
+        /** @description Service Unavailable */
+        503: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
           };
         };
       };
@@ -1145,34 +1199,4 @@ export interface components {
   pathItems: never;
 }
 export type $defs = Record<string, never>;
-export interface operations {
-  GetHealth: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HealthStatus'];
-        };
-      };
-      /** @description Service Unavailable */
-      503: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/problem+json': components['schemas']['ProblemDetails'];
-        };
-      };
-    };
-  };
-}
+export type operations = Record<string, never>;

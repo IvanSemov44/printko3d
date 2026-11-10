@@ -10,9 +10,9 @@ namespace Storefront.Api.Controllers;
 [Route("api/v1/categories")]
 public sealed class CategoriesController(IServiceManager services) : ControllerBase
 {
-    /// <summary>Active categories, ordered by sortOrder.</summary>
+    /// <summary>Active categories, ordered by sortOrder. Without paging (decision 0009). Never returns an error code of its own.</summary>
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<CategoryDto>>(StatusCodes.Status200OK)]
-    public async Task<IReadOnlyList<CategoryDto>> GetCategories(CancellationToken cancellationToken) =>
-        await services.Catalog.GetCategoriesAsync(cancellationToken);
+    public async Task<ActionResult<IReadOnlyList<CategoryDto>>> GetCategories(CancellationToken cancellationToken) =>
+        Ok(await services.Catalog.GetCategoriesAsync(cancellationToken));
 }

@@ -2,7 +2,7 @@ using Storefront.Application.Auth;
 using Storefront.Infrastructure;
 using Storefront.Infrastructure.Identity;
 
-namespace Storefront.Api;
+namespace Storefront.Api.Commands;
 
 /// <summary>
 /// `Storefront.Api create-admin`: creates the administrator and exits. There is no registration.
