@@ -1,15 +1,22 @@
 import {
   addVariant,
   createProduct,
+  deleteProductImage,
   getAdminProduct,
   getAdminProducts,
   getStoreMoneySettings,
+  loadRuntimeConfig,
+  moveProductImage,
   moveVariant,
+  setPrimaryProductImage,
   setProductStatus,
   setVariantActive,
   updateProduct,
+  updateProductImage,
   updateVariant,
+  uploadProductImage,
   type AdminProduct,
+  type ImageUploadInput,
   type AdminProductQuery,
   type MoveDirection,
   type ProductInput,
@@ -132,6 +139,73 @@ export function useMoveVariant(productId: string) {
   return useMutation({
     mutationFn: (change: { variantId: string; direction: MoveDirection }) =>
       moveVariant(productId, change.variantId, change.direction),
+    onSuccess: remember,
+    onError: () => forget(productId),
+  });
+}
+
+/**
+ * Where the images are served from (decision 0011), read from /config.json. `null` while it loads, when the file cannot
+ * be read, and when the environment has no image storage: the panel then shows a placeholder instead of a preview.
+ */
+export function useImageBaseUrl(): string | null {
+  const config = useQuery({
+    queryKey: ['admin', 'runtime-config'] as const,
+    queryFn: ({ signal }) => loadRuntimeConfig(signal),
+    staleTime: Infinity,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  return config.data?.imageBaseUrl ?? null;
+}
+
+export function useUploadImage(productId: string) {
+  const remember = useRememberProduct();
+  return useMutation({
+    mutationFn: (input: ImageUploadInput) => uploadProductImage(productId, input),
+    onSuccess: remember,
+  });
+}
+
+export function useUpdateImage(productId: string) {
+  const remember = useRememberProduct();
+  return useMutation({
+    mutationFn: (change: { imageId: string; altText: string; variantId: string | null }) =>
+      updateProductImage(productId, change.imageId, {
+        altText: change.altText,
+        variantId: change.variantId,
+      }),
+    onSuccess: remember,
+  });
+}
+
+export function useSetPrimaryImage(productId: string) {
+  const remember = useRememberProduct();
+  const forget = useForgetProduct();
+  return useMutation({
+    mutationFn: (imageId: string) => setPrimaryProductImage(productId, imageId),
+    onSuccess: remember,
+    // A refusal means the copy on screen is out of date (another image became primary a moment earlier).
+    onError: () => forget(productId),
+  });
+}
+
+export function useMoveImage(productId: string) {
+  const remember = useRememberProduct();
+  const forget = useForgetProduct();
+  return useMutation({
+    mutationFn: (change: { imageId: string; direction: MoveDirection }) =>
+      moveProductImage(productId, change.imageId, change.direction),
+    onSuccess: remember,
+    onError: () => forget(productId),
+  });
+}
+
+export function useDeleteImage(productId: string) {
+  const remember = useRememberProduct();
+  const forget = useForgetProduct();
+  return useMutation({
+    mutationFn: (imageId: string) => deleteProductImage(productId, imageId),
     onSuccess: remember,
     onError: () => forget(productId),
   });

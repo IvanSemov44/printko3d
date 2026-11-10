@@ -57,6 +57,7 @@ function product(id: string, overrides: Partial<AdminProduct> = {}): AdminProduc
     seoDescription: null,
     version: 1,
     variants: [],
+    images: [],
     ...overrides,
   };
 }

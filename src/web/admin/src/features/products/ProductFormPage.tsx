@@ -13,6 +13,7 @@ import { buildCategoryTree } from '../categories/categoryTree';
 import { SLUG_MAX_LENGTH, slugFromName } from '../categories/slug';
 import { useAdminCategories } from '../categories/useCategories';
 import { FULFILMENT_KEYS, FULFILMENT_TYPES, STATUS_KEYS } from './productLabels';
+import { ImagesSection } from './ImagesSection';
 import { ProductStatusSection } from './ProductStatusSection';
 import {
   NAME_MAX_LENGTH,
@@ -549,6 +550,7 @@ export function ProductFormPage() {
         <>
           <ProductStatusSection product={current} onReload={reload} />
           <VariantsSection product={current} money={money.data} />
+          <ImagesSection product={current} />
         </>
       ) : null}
     </>
