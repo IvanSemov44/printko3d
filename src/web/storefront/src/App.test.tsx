@@ -13,7 +13,6 @@ function stubHappyPath(settings: Record<string, unknown> = {}) {
 
 describe('App', () => {
   beforeEach(() => {
-    document.title = 'Storefront';
     document.documentElement.removeAttribute('style');
   });
 

@@ -2,6 +2,7 @@ import { ApiError } from '@storefront/shared';
 import { useParams } from 'react-router';
 import { CatalogError } from '../catalog/CatalogError';
 import { NotFoundPage } from '../home/NotFoundPage';
+import { PageMeta } from '../seo/PageMeta';
 import { LoadingStatus } from '../layout/LoadingStatus';
 import { useT } from '../store-settings/useStoreSettings';
 import { ProductDetailsView } from './ProductDetailsView';
@@ -17,10 +18,20 @@ export function ProductPage() {
     if (error instanceof ApiError && error.status === 404) {
       return <NotFoundPage />;
     }
-    return <CatalogError message={t('product.error')} onRetry={() => void refetch()} />;
+    return (
+      <>
+        <PageMeta noindex />
+        <CatalogError message={t('product.error')} onRetry={() => void refetch()} />
+      </>
+    );
   }
   if (!product) {
-    return <LoadingStatus />;
+    return (
+      <>
+        <PageMeta noindex />
+        <LoadingStatus />
+      </>
+    );
   }
   return <ProductDetailsView product={product} />;
 }

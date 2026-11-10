@@ -20,9 +20,33 @@ export function settingsFixture(overrides: Record<string, unknown> = {}) {
 
 export function categoriesFixture() {
   return [
-    { id: '1', parentId: null, name: 'Puzzles', slug: 'puzzles', sortOrder: 1 },
-    { id: '2', parentId: null, name: 'Figurines', slug: 'figurines', sortOrder: 2 },
-    { id: '3', parentId: '1', name: 'Small puzzles', slug: 'small-puzzles', sortOrder: 1 },
+    {
+      id: '1',
+      parentId: null,
+      name: 'Puzzles',
+      slug: 'puzzles',
+      description: 'Wooden and printed puzzles',
+      imageKey: null,
+      sortOrder: 1,
+    },
+    {
+      id: '2',
+      parentId: null,
+      name: 'Figurines',
+      slug: 'figurines',
+      description: null,
+      imageKey: null,
+      sortOrder: 2,
+    },
+    {
+      id: '3',
+      parentId: '1',
+      name: 'Small puzzles',
+      slug: 'small-puzzles',
+      description: null,
+      imageKey: null,
+      sortOrder: 1,
+    },
   ];
 }
 

@@ -1,8 +1,8 @@
-import { createTranslator } from '@storefront/shared';
+import { createTranslator, type TranslationParams } from '@storefront/shared';
 import bg from './locales/bg.json';
 
 export type MessageKey = keyof typeof bg;
-export type Translate = (key: MessageKey) => string;
+export type Translate = (key: MessageKey, params?: TranslationParams) => string;
 
 const fallback: Translate = createTranslator<MessageKey>(bg);
 const translators = new Map<string, Translate>([['bg', fallback]]);

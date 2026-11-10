@@ -1,6 +1,13 @@
-import { useT } from '../store-settings/useStoreSettings';
+import { PageMeta } from '../seo/PageMeta';
+import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 
 export function HomePage() {
   const t = useT();
-  return <h1>{t('home.heading')}</h1>;
+  const { storeName } = useStoreSettings();
+  return (
+    <>
+      <PageMeta description={t('seo.homeDescription', { storeName })} />
+      <h1>{t('home.heading')}</h1>
+    </>
+  );
 }

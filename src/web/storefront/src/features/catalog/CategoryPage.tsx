@@ -1,6 +1,7 @@
 import { useParams } from 'react-router';
 import { NotFoundPage } from '../home/NotFoundPage';
 import { LoadingStatus } from '../layout/LoadingStatus';
+import { PageMeta } from '../seo/PageMeta';
 import { CatalogError } from './CatalogError';
 import { CategoryProducts } from './CategoryProducts';
 import { useCategoriesQuery } from './useCategoriesQuery';
@@ -11,10 +12,20 @@ export function CategoryPage() {
   const { data: categories, isError, refetch } = useCategoriesQuery();
 
   if (isError) {
-    return <CatalogError onRetry={() => void refetch()} />;
+    return (
+      <>
+        <PageMeta noindex />
+        <CatalogError onRetry={() => void refetch()} />
+      </>
+    );
   }
   if (!categories) {
-    return <LoadingStatus />;
+    return (
+      <>
+        <PageMeta noindex />
+        <LoadingStatus />
+      </>
+    );
   }
   const category = categories.find((candidate) => candidate.slug === slug);
   if (!category) {
