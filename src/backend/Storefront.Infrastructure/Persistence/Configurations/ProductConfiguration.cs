@@ -19,6 +19,9 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             table.HasCheckConstraint(
                 "ck_products_lead_time_for_made_to_order",
                 "fulfilment_type <> 'MadeToOrder' OR lead_time_days IS NOT NULL");
+            table.HasCheckConstraint(
+                "ck_products_lead_time_positive",
+                "lead_time_days IS NULL OR lead_time_days > 0");
         });
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Id).ValueGeneratedNever();
@@ -30,6 +33,12 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.Status).HasConversion<string>().HasMaxLength(20);
         builder.Property(p => p.SeoTitle).HasMaxLength(200);
         builder.Property(p => p.SeoDescription).HasMaxLength(500);
+
+        builder.Property(p => p.Version)
+            .HasColumnName("xmin")
+            .HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken();
 
         builder.HasIndex(p => p.Slug).IsUnique();
         builder.HasIndex(p => new { p.CategoryId, p.Status });
