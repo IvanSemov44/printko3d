@@ -13,7 +13,6 @@ export function StoreSettingsProvider({ children }: StoreSettingsProviderProps) 
 
   useEffect(() => {
     if (data) {
-      document.title = data.storeName;
       applyTheme(data.primaryColor);
     }
   }, [data]);

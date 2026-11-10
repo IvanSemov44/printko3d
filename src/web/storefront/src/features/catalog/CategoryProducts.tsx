@@ -2,7 +2,8 @@ import type { Category } from '@storefront/shared';
 import { useEffect, useRef } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
 import { LoadingStatus } from '../layout/LoadingStatus';
-import { useT } from '../store-settings/useStoreSettings';
+import { PageMeta } from '../seo/PageMeta';
+import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 import { CatalogError } from './CatalogError';
 import { Pagination } from './Pagination';
 import { ProductCard } from './ProductCard';
@@ -12,6 +13,7 @@ import { useProductsQuery } from './useProductsQuery';
 /** Heading, product list and paging for one known category. The page number comes from `?page=`. */
 export function CategoryProducts({ category }: { category: Category }) {
   const t = useT();
+  const { storeName } = useStoreSettings();
   const [searchParams] = useSearchParams();
   const page = parsePageParam(searchParams.get('page'));
   const { data, isError, isPlaceholderData, refetch } = useProductsQuery(category.slug, page);
@@ -51,6 +53,16 @@ export function CategoryProducts({ category }: { category: Category }) {
 
   return (
     <>
+      <PageMeta
+        pageTitle={page > 1 ? `${category.name} – ${t('seo.pageNumber', { page })}` : category.name}
+        description={
+          category.description !== null && category.description.trim() !== ''
+            ? category.description
+            : t('seo.categoryDescription', { category: category.name, storeName })
+        }
+        page={page}
+        noindex={isError}
+      />
       <h1 ref={headingRef} tabIndex={-1}>
         {category.name}
       </h1>
