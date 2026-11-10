@@ -18,7 +18,7 @@ public sealed class ProductImageAndSettingsTests
         var productId = await _services.Product.CreateAsync(
             new NewProduct(categoryId, "Dragon", slug, "Short", "Long", FulfilmentType.InStock),
             default);
-        await _services.Product.AddVariantAsync(productId, new NewVariant(sku, "Blue", 100, 10), default);
+        await _services.Product.AddVariantAsync(productId, new NewVariant(sku, "Blue", 100, 10, StockQuantity: 5), default);
         return productId;
     }
 

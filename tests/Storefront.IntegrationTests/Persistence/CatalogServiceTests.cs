@@ -45,7 +45,8 @@ public sealed class CatalogServiceTests(PostgresFixture postgres)
             new NewProduct(categoryId, "Dragon", "dragon", "Short", "Long", FulfilmentType.InStock),
             default);
 
-        await Assert.ThrowsAsync<ValidationFailedException>(() => services.Product.PublishAsync(productId, default));
+        var error = await Assert.ThrowsAsync<ConflictException>(() => services.Product.PublishAsync(productId, default));
+        Assert.Equal("product.cannot_publish_without_active_variant", error.Code);
 
         await using var read = database.CreateContext();
         Assert.Equal(ProductStatus.Draft, (await read.Products.AsNoTracking().SingleAsync()).Status);

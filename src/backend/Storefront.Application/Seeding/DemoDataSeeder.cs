@@ -48,7 +48,7 @@ public sealed class DemoDataSeeder(
         var productsSkipped = 0;
         foreach (var product in plan.Products)
         {
-            if (await repositories.Product.ExistsBySlugAsync(product.Slug, cancellationToken))
+            if (await repositories.Product.ExistsBySlugAsync(product.Slug, exceptProductId: null, cancellationToken))
             {
                 productsSkipped++;
                 continue;

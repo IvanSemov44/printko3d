@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Storefront.Application.Catalog.Queries;
 using Storefront.Application.Contracts;
 using Storefront.Application.Exceptions;
@@ -6,10 +5,9 @@ using Storefront.Domain.Catalog;
 
 namespace Storefront.Application.Catalog;
 
-internal sealed partial class CategoryService(IRepositoryManager repositories) : ICategoryService
+internal sealed class CategoryService(IRepositoryManager repositories) : ICategoryService
 {
     private const int NameMaxLength = 200;
-    private const int SlugMaxLength = 200;
     private const int DescriptionMaxLength = 2000;
 
     public async Task<Guid> CreateAsync(NewCategory input, CancellationToken cancellationToken)
@@ -122,9 +120,9 @@ internal sealed partial class CategoryService(IRepositoryManager repositories) :
         {
             errors["slug"] = ["Slug is required."];
         }
-        else if (slug.Length > SlugMaxLength || !SlugFormat().IsMatch(slug))
+        else if (!SlugRules.IsValid(slug))
         {
-            errors["slug"] = ["Slug may contain only lower-case letters, digits and single hyphens between them."];
+            errors["slug"] = [SlugRules.FormatMessage];
         }
 
         if (description is { Length: > DescriptionMaxLength })
@@ -187,8 +185,4 @@ internal sealed partial class CategoryService(IRepositoryManager repositories) :
 
         await EnsureParentAllowsChildAsync(parentId, cancellationToken);
     }
-
-    // \z, not $: "$" would also accept a trailing line break.
-    [GeneratedRegex(@"^[a-z0-9]+(-[a-z0-9]+)*\z")]
-    private static partial Regex SlugFormat();
 }
