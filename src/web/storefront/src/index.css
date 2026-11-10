@@ -288,3 +288,21 @@ h1:focus {
 .product-description {
   white-space: pre-line;
 }
+
+.product-card-image {
+  display: block;
+  aspect-ratio: 1;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  border-radius: 0.25rem;
+  background: var(--color-muted);
+  color: var(--color-text);
+}
+
+.product-card-image img,
+.product-card-image .image-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -64,6 +64,43 @@ describe('API client', () => {
       );
     });
 
+    describe('the main image of a card', () => {
+      const withImage = {
+        ...item,
+        minPrice: 1250,
+        leadTimeDays: null,
+        primaryImage: { storageKey: 'products/p1/a b.jpg', altText: 'Дракон отпред' },
+      };
+      const page = { items: [withImage], page: 1, pageSize: 12, totalCount: 1, totalPages: 1 };
+
+      it('gets its address from the base address of config.json and the storage key', async () => {
+        stubApi(200, page, { imageBaseUrl: 'https://media.example.test/bucket/' });
+
+        const result = await getProducts({ category: 'a', page: 1, pageSize: 12 });
+
+        expect(result.items[0]?.primaryImage).toEqual({
+          url: 'https://media.example.test/bucket/products/p1/a%20b.jpg',
+          altText: 'Дракон отпред',
+        });
+      });
+
+      it('has no address when the environment has no image storage, but keeps the alt text', async () => {
+        stubApi(200, page);
+
+        const result = await getProducts({ category: 'a', page: 1, pageSize: 12 });
+
+        expect(result.items[0]?.primaryImage).toEqual({ url: null, altText: 'Дракон отпред' });
+      });
+
+      it('stays empty for a product without an image', async () => {
+        stubApi(200, { ...page, items: [{ ...withImage, primaryImage: null }] });
+
+        const result = await getProducts({ category: 'a', page: 1, pageSize: 12 });
+
+        expect(result.items[0]?.primaryImage).toBeNull();
+      });
+    });
+
     it('turns integers sent as strings into numbers', async () => {
       stubApi(200, {
         items: [{ ...item, minPrice: '1250', leadTimeDays: '5' }],
