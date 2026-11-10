@@ -37,3 +37,18 @@ export function readableTextColor(background: string): '#000000' | '#ffffff' {
     ? '#ffffff'
     : '#000000';
 }
+
+/**
+ * The primary colour is a frame and a button background, so it must stand out from white by at least 3:1
+ * (WCAG 2.1, criterion 1.4.11 for components). The API checks the same limit with the same formula
+ * (`ColorContrast` in Application); the tests of both use the same colours.
+ */
+export const MIN_PRIMARY_COLOR_CONTRAST = 3;
+
+export function primaryColorContrast(color: string): number {
+  return contrastRatio(color, '#ffffff');
+}
+
+export function hasEnoughPrimaryColorContrast(color: string): boolean {
+  return isHexColor(color) && primaryColorContrast(color) >= MIN_PRIMARY_COLOR_CONTRAST;
+}

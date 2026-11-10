@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_PRIMARY_COLOR,
   contrastRatio,
+  hasEnoughPrimaryColorContrast,
   isHexColor,
   normalizePrimaryColor,
+  primaryColorContrast,
   readableTextColor,
 } from './color';
 
@@ -43,5 +45,30 @@ describe('contrastRatio', () => {
   it('is 21 for black on white and 1 for identical colours', () => {
     expect(contrastRatio('#000000', '#ffffff')).toBeCloseTo(21);
     expect(contrastRatio('#336699', '#336699')).toBeCloseTo(1);
+  });
+});
+
+// The same colours and limits are checked by StoreSettingsManagementTests in the API tests. If one formula
+// changes, the two lists of values stop agreeing and one of the tests fails.
+describe('primary colour contrast limit (shared with the API)', () => {
+  it.each([
+    ['#949494', true],
+    ['#959595', false],
+    ['#ffffff', false],
+    ['#000000', true],
+    ['#2f5d8a', true],
+  ])('%s against white is accepted: %s', (color, accepted) => {
+    expect(hasEnoughPrimaryColorContrast(color)).toBe(accepted);
+  });
+
+  it('gives the same ratios as the API tests', () => {
+    expect(primaryColorContrast('#ffffff')).toBeCloseTo(1, 2);
+    expect(primaryColorContrast('#000000')).toBeCloseTo(21, 2);
+    expect(primaryColorContrast('#949494')).toBeCloseTo(3.03, 2);
+    expect(primaryColorContrast('#2f5d8a')).toBeCloseTo(6.877, 2);
+  });
+
+  it('refuses a value that is not #RRGGBB', () => {
+    expect(hasEnoughPrimaryColorContrast('#000')).toBe(false);
   });
 });

@@ -74,12 +74,15 @@ export interface ProductQuery {
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string | null;
+  /** For a 400 answer: the names of the fields that were rejected, as the API wrote them (camelCase). */
+  readonly fields: readonly string[];
 
-  constructor(status: number, code: string | null) {
+  constructor(status: number, code: string | null, fields: readonly string[] = []) {
     super(`API request failed with status ${String(status)}`);
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
+    this.fields = fields;
   }
 }
 
@@ -190,4 +193,20 @@ export async function getProduct(slug: string, signal?: AbortSignal): Promise<Pr
     variants: bySortOrder(dto.variants.map(toProductVariant)),
     images: bySortOrder(dto.images.map((image) => toProductImage(image, config.imageBaseUrl))),
   };
+}
+
+/** The names of the fields in the `errors` of a 400 ProblemDetails answer, or an empty list for any other body. */
+export async function readErrorFields(response: Response): Promise<string[]> {
+  try {
+    const body: unknown = await response.clone().json();
+    if (typeof body === 'object' && body !== null && 'errors' in body) {
+      const errors = body.errors;
+      if (typeof errors === 'object' && errors !== null) {
+        return Object.keys(errors);
+      }
+    }
+  } catch {
+    // The body is not JSON; there are no fields to name.
+  }
+  return [];
 }

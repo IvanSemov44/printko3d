@@ -27,6 +27,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // The first part is "admin", so signing out removes everything loaded for the administrator.
 const PRODUCTS_KEY = ['admin', 'products'] as const;
+
+/** The currency and locale of the shop. The settings screen replaces it after a save. */
+export const STORE_MONEY_KEY = ['admin', 'store-money'] as const;
 const LIST_KEY = [...PRODUCTS_KEY, 'list'] as const;
 const itemKey = (id: string) => [...PRODUCTS_KEY, 'item', id] as const;
 
@@ -54,7 +57,7 @@ export function useAdminProduct(id: string | undefined) {
 /** The currency and locale of the shop, for typing and showing prices. They hardly ever change. */
 export function useStoreMoney() {
   return useQuery({
-    queryKey: ['admin', 'store-money'] as const,
+    queryKey: STORE_MONEY_KEY,
     queryFn: ({ signal }) => getStoreMoneySettings(signal),
     staleTime: Infinity,
   });
