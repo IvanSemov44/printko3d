@@ -15,9 +15,13 @@ internal sealed class ProductRepository(StorefrontDbContext context)
             .AsSplitQuery()
             .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
 
-    public Task<bool> ExistsBySlugAsync(string slug, CancellationToken cancellationToken) =>
-        Query(trackChanges: false).AnyAsync(p => p.Slug == slug, cancellationToken);
+    public Task<bool> ExistsBySlugAsync(string slug, Guid? exceptProductId, CancellationToken cancellationToken) =>
+        Query(trackChanges: false).AnyAsync(p => p.Slug == slug && p.Id != exceptProductId, cancellationToken);
 
-    public Task<bool> ExistsBySkuAsync(string sku, CancellationToken cancellationToken) =>
-        Query(trackChanges: false).AnyAsync(p => p.Variants.Any(v => v.Sku == sku), cancellationToken);
+    public Task<bool> ExistsBySkuAsync(string sku, Guid? exceptVariantId, CancellationToken cancellationToken) =>
+        Context.Set<ProductVariant>().AsNoTracking()
+            .AnyAsync(v => v.Sku == sku && v.Id != exceptVariantId, cancellationToken);
+
+    public void ExpectVersion(Product product, uint version) =>
+        Context.Entry(product).Property(p => p.Version).OriginalValue = version;
 }

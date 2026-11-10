@@ -35,7 +35,14 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
             throw new ConflictException("The record was changed by someone else.", "category.version_conflict");
         }
 
+        if (_product.Expected.Any(e => e.Key.Version != e.Value))
+        {
+            _product.Expected.Clear();
+            throw new ConflictException("The record was changed by someone else.", "product.version_conflict");
+        }
+
         _category.Expected.Clear();
+        _product.Expected.Clear();
         SaveCount++;
         return Task.CompletedTask;
     }
@@ -86,10 +93,14 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
         public Task<Product?> GetByIdAsync(Guid id, bool trackChanges, CancellationToken cancellationToken) =>
             Task.FromResult(Items.SingleOrDefault(p => p.Id == id));
 
-        public Task<bool> ExistsBySlugAsync(string slug, CancellationToken cancellationToken) =>
-            Task.FromResult(Items.Any(p => p.Slug == slug));
+        public Dictionary<Product, uint> Expected { get; } = [];
 
-        public Task<bool> ExistsBySkuAsync(string sku, CancellationToken cancellationToken) =>
-            Task.FromResult(Items.Any(p => p.Variants.Any(v => v.Sku == sku)));
+        public void ExpectVersion(Product product, uint version) => Expected[product] = version;
+
+        public Task<bool> ExistsBySlugAsync(string slug, Guid? exceptProductId, CancellationToken cancellationToken) =>
+            Task.FromResult(Items.Any(p => p.Slug == slug && p.Id != exceptProductId));
+
+        public Task<bool> ExistsBySkuAsync(string sku, Guid? exceptVariantId, CancellationToken cancellationToken) =>
+            Task.FromResult(Items.Any(p => p.Variants.Any(v => v.Sku == sku && v.Id != exceptVariantId)));
     }
 }

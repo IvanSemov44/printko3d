@@ -224,6 +224,49 @@ public sealed class CatalogConstraintTests(PostgresFixture postgres)
     }
 
     [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task Product_RejectsLeadTimeThatIsNotPositive(int leadTimeDays)
+    {
+        var database = await postgres.CreateDatabaseAsync();
+        var (categoryId, _) = await SeedProductAsync(database);
+        await using (var context = database.CreateContext())
+        {
+            var product = CatalogData.Product(categoryId, "puzzle", FulfilmentType.MadeToOrder, leadTimeDays: 7);
+            CatalogData.Variant(product, "PZL-001");
+            context.Add(product);
+            await context.SaveChangesAsync();
+        }
+
+        await using var check = database.CreateContext();
+        var state = await SqlStateOfAsync(() => check.Database.ExecuteSqlAsync(
+            $"UPDATE products SET lead_time_days = {leadTimeDays} WHERE slug = 'puzzle'"));
+        Assert.Equal(PostgresErrorCodes.CheckViolation, state);
+
+        var one = await check.Database.ExecuteSqlRawAsync(
+            "UPDATE products SET lead_time_days = 1 WHERE slug = 'puzzle'");
+        Assert.Equal(1, one);
+    }
+
+    [Fact]
+    public async Task Product_SavedWithAStaleVersion_IsRejected()
+    {
+        var database = await postgres.CreateDatabaseAsync();
+        var (_, productId) = await SeedProductAsync(database);
+
+        await using var first = database.CreateContext();
+        await using var second = database.CreateContext();
+        var firstCopy = await first.Products.SingleAsync(p => p.Id == productId);
+        var secondCopy = await second.Products.SingleAsync(p => p.Id == productId);
+
+        firstCopy.Name = "First";
+        await first.SaveChangesAsync();
+        secondCopy.Name = "Second";
+
+        await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => second.SaveChangesAsync());
+    }
+
+    [Theory]
     [InlineData("UPDATE products SET status = 'Deleted'")]
     [InlineData("UPDATE products SET fulfilment_type = 'Dropship'")]
     public async Task Product_RejectsUnknownEnumValues(string sql)

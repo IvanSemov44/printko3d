@@ -24,6 +24,9 @@ public sealed class Product : Entity
 
     public string? SeoDescription { get; set; }
 
+    /// <summary>PostgreSQL row version (xmin). Changes on every write to the product row; used to detect two people editing at once.</summary>
+    public uint Version { get; set; }
+
     public ICollection<ProductVariant> Variants { get; set; } = [];
 
     public ICollection<ProductImage> Images { get; set; } = [];

@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261109152317_CategoryRowVersion`
+Последна миграция: `20261110093657_ProductRowVersionAndLeadTime`
 
 ## Връзки
 
@@ -315,6 +315,7 @@ erDiagram
 | FK_products_categories_category_id | външен ключ | `FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT` |
 | ck_products_fulfilment_type | проверка | `CHECK (((fulfilment_type)::text = ANY ((ARRAY['InStock'::character varying, 'MadeToOrder'::character varying])::text[])))` |
 | ck_products_lead_time_for_made_to_order | проверка | `CHECK ((((fulfilment_type)::text <> 'MadeToOrder'::text) OR (lead_time_days IS NOT NULL)))` |
+| ck_products_lead_time_positive | проверка | `CHECK (((lead_time_days IS NULL) OR (lead_time_days > 0)))` |
 | ck_products_status | проверка | `CHECK (((status)::text = ANY ((ARRAY['Draft'::character varying, 'Published'::character varying, 'Archived'::character varying])::text[])))` |
 
 **Индекси**

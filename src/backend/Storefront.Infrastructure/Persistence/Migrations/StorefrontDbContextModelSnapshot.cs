@@ -327,6 +327,12 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Slug")
@@ -339,6 +345,8 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("ck_products_fulfilment_type", "fulfilment_type IN ('InStock', 'MadeToOrder')");
 
                             t.HasCheckConstraint("ck_products_lead_time_for_made_to_order", "fulfilment_type <> 'MadeToOrder' OR lead_time_days IS NOT NULL");
+
+                            t.HasCheckConstraint("ck_products_lead_time_positive", "lead_time_days IS NULL OR lead_time_days > 0");
 
                             t.HasCheckConstraint("ck_products_status", "status IN ('Draft', 'Published', 'Archived')");
                         });

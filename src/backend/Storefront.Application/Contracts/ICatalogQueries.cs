@@ -16,5 +16,11 @@ public interface ICatalogQueries
 
     Task<CategoryAdminDto?> GetAdminCategoryAsync(Guid id, CancellationToken cancellationToken);
 
+    /// <summary>Admin side: every product whatever its status, one page at a time.</summary>
+    Task<PagedResult<ProductAdminListItemDto>> GetAdminProductsAsync(ProductAdminListQuery query, CancellationToken cancellationToken);
+
+    /// <summary>Admin side: one product with all its variants, the inactive ones too.</summary>
+    Task<ProductAdminDto?> GetAdminProductAsync(Guid id, CancellationToken cancellationToken);
+
     Task<StoreSettingsDto?> GetStoreSettingsAsync(CancellationToken cancellationToken);
 }

@@ -13,7 +13,7 @@ public sealed class CatalogInvariantTests
 
     private static NewVariant Variant(
         long price = 100,
-        int? stockQuantity = null,
+        int? stockQuantity = 5,
         string sku = "SKU-1") =>
         new(sku, "Blue", price, WeightGrams: 10, StockQuantity: stockQuantity);
 
@@ -130,8 +130,9 @@ public sealed class CatalogInvariantTests
     {
         var productId = await CreateProductAsync();
 
-        await Assert.ThrowsAsync<ValidationFailedException>(
+        var error = await Assert.ThrowsAsync<ConflictException>(
             () => _services.Product.PublishAsync(productId, default));
+        Assert.Equal("product.cannot_publish_without_active_variant", error.Code);
         Assert.Equal(ProductStatus.Draft, _repositories.Products[0].Status);
     }
 

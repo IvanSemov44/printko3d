@@ -45,6 +45,7 @@ internal static class SaveErrorTranslator
         return entity switch
         {
             Category => "category.version_conflict",
+            Product => "product.version_conflict",
             _ => null,
         };
     }
