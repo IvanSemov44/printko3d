@@ -26,6 +26,12 @@ services:
       Database__ConnectionString: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};GSS Encryption Mode=Disable
       Cors__AllowedOrigins__0: http://localhost:${STOREFRONT_PORT:-5173}
       Cors__AllowedOrigins__1: http://localhost:${ADMIN_PORT:-5174}
+      # Where uploaded product images are kept (decision 0018). Empty until set in .env: only uploading fails then.
+      ImageStorage__Endpoint: ${IMAGE_STORAGE_ENDPOINT:-}
+      ImageStorage__Region: ${IMAGE_STORAGE_REGION:-}
+      ImageStorage__Bucket: ${IMAGE_STORAGE_BUCKET:-}
+      ImageStorage__AccessKey: ${IMAGE_STORAGE_ACCESS_KEY:-}
+      ImageStorage__SecretKey: ${IMAGE_STORAGE_SECRET_KEY:-}
     ports:
       - "${API_PORT:-8080}:8080"
     depends_on:
@@ -40,6 +46,7 @@ services:
         APP: storefront
     environment:
       API_URL: http://localhost:${API_PORT:-8080}
+      IMAGE_BASE_URL: ${IMAGE_BASE_URL:-}
     ports:
       - "${STOREFRONT_PORT:-5173}:8080"
     depends_on:
@@ -53,6 +60,7 @@ services:
         APP: admin
     environment:
       API_URL: http://localhost:${API_PORT:-8080}
+      IMAGE_BASE_URL: ${IMAGE_BASE_URL:-}
       # nginx forwards /api/ here, so the session cookie belongs to the panel address (decision 0014).
       API_UPSTREAM: http://api:8080
     ports:

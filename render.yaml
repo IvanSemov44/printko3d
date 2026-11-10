@@ -33,6 +33,17 @@ services:
         sync: false
       - key: Cors__AllowedOrigins__1
         sync: false
+      # Where uploaded product images are kept (decision 0018). Enter them in the dashboard; the two keys are secrets.
+      - key: ImageStorage__Endpoint
+        sync: false
+      - key: ImageStorage__Region
+        sync: false
+      - key: ImageStorage__Bucket
+        sync: false
+      - key: ImageStorage__AccessKey
+        sync: false
+      - key: ImageStorage__SecretKey
+        sync: false
 
   - type: web
     name: printko3d-storefront
@@ -52,6 +63,9 @@ services:
       # The public address of the API, for example https://printko3d-api.onrender.com
       - key: API_URL
         sync: false
+      # The public address that the images are read from (decision 0011), the same in the shop and in the panel.
+      - key: IMAGE_BASE_URL
+        sync: false
 
   - type: web
     name: printko3d-admin
@@ -68,6 +82,8 @@ services:
       - key: PORT
         value: "8080"
       - key: API_URL
+        sync: false
+      - key: IMAGE_BASE_URL
         sync: false
       # The same public address of the API. nginx forwards /api/ to it, so the browser talks only to the panel
       # and the session cookie belongs to one site (decision 0014).
