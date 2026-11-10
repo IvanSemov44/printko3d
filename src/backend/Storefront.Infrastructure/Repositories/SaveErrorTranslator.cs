@@ -17,6 +17,8 @@ internal static class SaveErrorTranslator
     {
         ["IX_categories_slug"] = ("The slug is already used.", "category.slug_taken"),
         ["IX_products_slug"] = ("The slug is already used.", "product.slug_taken"),
+        ["ux_product_images_one_primary_per_product"] =
+            ("Another image became the primary one at the same moment. Reload and try again.", "image.primary_conflict"),
         ["IX_product_variants_sku"] = ("The SKU is already used.", "variant.sku_taken"),
     };
 

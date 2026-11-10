@@ -23,6 +23,23 @@ public interface IProductService
 
     Task<Guid> AddImageAsync(Guid productId, NewImage image, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Checks the file (type from its first bytes, size, count), stores it and adds the row. The first image of a product
+    /// is its primary one. Returns the id of the new image.
+    /// </summary>
+    Task<Guid> UploadImageAsync(Guid productId, NewImageUpload input, CancellationToken cancellationToken);
+
+    Task UpdateImageAsync(Guid productId, Guid imageId, UpdateImage input, CancellationToken cancellationToken);
+
+    /// <summary>Makes the image the primary one of its product and the old primary one an ordinary image.</summary>
+    Task SetPrimaryImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken);
+
+    /// <summary>Moves an image one place and renumbers the images of the product 0, 1, 2...</summary>
+    Task MoveImageAsync(Guid productId, Guid imageId, MoveDirection direction, CancellationToken cancellationToken);
+
+    /// <summary>Removes the row and the file. If the primary image goes, the first one in order becomes primary.</summary>
+    Task DeleteImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken);
+
     Task PublishAsync(Guid productId, CancellationToken cancellationToken);
 
     Task ArchiveAsync(Guid productId, CancellationToken cancellationToken);

@@ -10,7 +10,7 @@ public sealed class DemoDataSeederTests
     private readonly StubSchemaProbe _schema = new(true);
 
     private DemoDataSeeder CreateSeeder() =>
-        new(new ServiceManager(_repositories), _repositories, _schema);
+        new(new ServiceManager(_repositories, new FakeImageStorage()), _repositories, _schema);
 
     [Fact]
     public void Plan_HasSixteenProductsInFourCategories()
@@ -95,7 +95,7 @@ public sealed class DemoDataSeederTests
     [Fact]
     public async Task Seeding_WithoutASchema_IsRefused_AndNothingIsCreated()
     {
-        var seeder = new DemoDataSeeder(new ServiceManager(_repositories), _repositories, new StubSchemaProbe(false));
+        var seeder = new DemoDataSeeder(new ServiceManager(_repositories, new FakeImageStorage()), _repositories, new StubSchemaProbe(false));
 
         var exception = await Assert.ThrowsAsync<SeedRefusedException>(() => seeder.SeedAsync("Development", default));
 

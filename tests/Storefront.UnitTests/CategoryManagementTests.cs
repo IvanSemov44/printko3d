@@ -9,7 +9,7 @@ public sealed class CategoryManagementTests
     private readonly FakeRepositoryManager _repositories = new();
     private readonly ServiceManager _services;
 
-    public CategoryManagementTests() => _services = new ServiceManager(_repositories);
+    public CategoryManagementTests() => _services = new ServiceManager(_repositories, new FakeImageStorage());
 
     private Category Add(string slug, Category? parent = null, int sortOrder = 0, bool isActive = true, uint version = 1)
     {

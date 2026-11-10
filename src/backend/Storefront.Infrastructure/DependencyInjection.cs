@@ -9,6 +9,7 @@ using Storefront.Application.Seeding;
 using Storefront.Infrastructure.Health;
 using Storefront.Infrastructure.Persistence;
 using Storefront.Infrastructure.Repositories;
+using Storefront.Infrastructure.Storage;
 
 namespace Storefront.Infrastructure;
 
@@ -27,6 +28,9 @@ public static class DependencyInjection
             })
             .ValidateDataAnnotations()
             .ValidateOnStart();
+        // Not validated at startup: the API runs without image storage, and only the image calls fail until it is set.
+        services.AddOptions<ImageStorageOptions>().Bind(configuration.GetSection(ImageStorageOptions.SectionName));
+        services.AddSingleton<IImageStorage, S3ImageStorage>();
         services.AddSingleton(TimeProvider.System);
         services.AddDbContext<StorefrontDbContext>((serviceProvider, options) => options.UseNpgsql(
             serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString));

@@ -17,4 +17,5 @@ public sealed record ProductAdminDto(
     string? SeoTitle,
     string? SeoDescription,
     uint Version,
-    IReadOnlyList<VariantAdminDto> Variants);
+    IReadOnlyList<VariantAdminDto> Variants,
+    IReadOnlyList<ProductImageDto> Images);
