@@ -579,6 +579,812 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/admin/products': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          status?: string;
+          categoryId?: string;
+          search?: string;
+          page?: number | string;
+          pageSize?: number | string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['PagedResultOfProductAdminListItemDto'];
+            'application/json': components['schemas']['PagedResultOfProductAdminListItemDto'];
+            'text/json': components['schemas']['PagedResultOfProductAdminListItemDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CreateProductRequest'];
+          'text/json': components['schemas']['CreateProductRequest'];
+          'application/*+json': components['schemas']['CreateProductRequest'];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProductAdminDto'];
+            'application/json': components['schemas']['ProductAdminDto'];
+            'text/json': components['schemas']['ProductAdminDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/products/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProductAdminDto'];
+            'application/json': components['schemas']['ProductAdminDto'];
+            'text/json': components['schemas']['ProductAdminDto'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateProductRequest'];
+          'text/json': components['schemas']['UpdateProductRequest'];
+          'application/*+json': components['schemas']['UpdateProductRequest'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProductAdminDto'];
+            'application/json': components['schemas']['ProductAdminDto'];
+            'text/json': components['schemas']['ProductAdminDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/products/{id}/status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['SetProductStatusRequest'];
+          'text/json': components['schemas']['SetProductStatusRequest'];
+          'application/*+json': components['schemas']['SetProductStatusRequest'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProductAdminDto'];
+            'application/json': components['schemas']['ProductAdminDto'];
+            'text/json': components['schemas']['ProductAdminDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/products/{id}/variants': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CreateVariantRequest'];
+          'text/json': components['schemas']['CreateVariantRequest'];
+          'application/*+json': components['schemas']['CreateVariantRequest'];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProductAdminDto'];
+            'application/json': components['schemas']['ProductAdminDto'];
+            'text/json': components['schemas']['ProductAdminDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/products/{id}/variants/{variantId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          variantId: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateVariantRequest'];
+          'text/json': components['schemas']['UpdateVariantRequest'];
+          'application/*+json': components['schemas']['UpdateVariantRequest'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProductAdminDto'];
+            'application/json': components['schemas']['ProductAdminDto'];
+            'text/json': components['schemas']['ProductAdminDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/products/{id}/variants/{variantId}/active': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          variantId: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['SetVariantActiveRequest'];
+          'text/json': components['schemas']['SetVariantActiveRequest'];
+          'application/*+json': components['schemas']['SetVariantActiveRequest'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProductAdminDto'];
+            'application/json': components['schemas']['ProductAdminDto'];
+            'text/json': components['schemas']['ProductAdminDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/products/{id}/variants/{variantId}/move': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          variantId: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['MoveVariantRequest'];
+          'text/json': components['schemas']['MoveVariantRequest'];
+          'application/*+json': components['schemas']['MoveVariantRequest'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProductAdminDto'];
+            'application/json': components['schemas']['ProductAdminDto'];
+            'text/json': components['schemas']['ProductAdminDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/auth/login': {
     parameters: {
       query?: never;
@@ -1059,6 +1865,41 @@ export interface components {
       /** @default true */
       isActive: boolean;
     };
+    CreateProductRequest: {
+      /** Format: uuid */
+      categoryId: string;
+      name: string;
+      slug: string;
+      shortDescription: string;
+      description: string;
+      fulfilmentType: components['schemas']['FulfilmentType'];
+      /** Format: int32 */
+      leadTimeDays: null | number | string;
+      seoTitle: null | string;
+      seoDescription: null | string;
+    };
+    CreateVariantRequest: {
+      sku: string;
+      name: string;
+      /** Format: int64 */
+      price: number | string;
+      /** Format: int32 */
+      weightGrams: number | string;
+      /** Format: int64 */
+      compareAtPrice: null | number | string;
+      /** Format: int32 */
+      stockQuantity: null | number | string;
+      attributes: null | {
+        [key: string]: string;
+      };
+      /** @default true */
+      isActive: boolean;
+      /**
+       * Format: int32
+       * @default 0
+       */
+      sortOrder: number | string;
+    };
     /** @enum {unknown} */
     FulfilmentType: 'InStock' | 'MadeToOrder';
     HealthStatus: {
@@ -1080,6 +1921,20 @@ export interface components {
     };
     /** @enum {unknown} */
     MoveDirection: 'Up' | 'Down';
+    MoveVariantRequest: {
+      direction: components['schemas']['MoveDirection'];
+    };
+    PagedResultOfProductAdminListItemDto: {
+      items: components['schemas']['ProductAdminListItemDto'][];
+      /** Format: int32 */
+      page: number | string;
+      /** Format: int32 */
+      pageSize: number | string;
+      /** Format: int32 */
+      totalCount: number | string;
+      /** Format: int32 */
+      totalPages?: number | string;
+    };
     PagedResultOfProductListItemDto: {
       items: components['schemas']['ProductListItemDto'][];
       /** Format: int32 */
@@ -1098,6 +1953,44 @@ export interface components {
       status?: null | number | string;
       detail?: null | string;
       instance?: null | string;
+    };
+    ProductAdminDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      categoryId: string;
+      name: string;
+      slug: string;
+      shortDescription: string;
+      description: string;
+      fulfilmentType: components['schemas']['FulfilmentType'];
+      /** Format: int32 */
+      leadTimeDays: null | number | string;
+      status: components['schemas']['ProductStatus'];
+      seoTitle: null | string;
+      seoDescription: null | string;
+      /** Format: uint32 */
+      version: number | string;
+      variants: components['schemas']['VariantAdminDto'][];
+    };
+    ProductAdminListItemDto: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      slug: string;
+      /** Format: uuid */
+      categoryId: string;
+      categoryName: string;
+      status: components['schemas']['ProductStatus'];
+      fulfilmentType: components['schemas']['FulfilmentType'];
+      /** Format: int32 */
+      variantCount: number | string;
+      /** Format: int64 */
+      minPrice: null | number | string;
+      /** Format: int32 */
+      totalStock: null | number | string;
+      /** Format: uint32 */
+      version: number | string;
     };
     ProductDetailsDto: {
       /** Format: uuid */
@@ -1140,6 +2033,8 @@ export interface components {
       primaryImage: null | components['schemas']['ImageRefDto'];
       isAvailable: boolean;
     };
+    /** @enum {unknown} */
+    ProductStatus: 'Draft' | 'Published' | 'Archived';
     ProductVariantDto: {
       /** Format: uuid */
       id: string;
@@ -1157,6 +2052,14 @@ export interface components {
       };
       /** Format: int32 */
       sortOrder: number | string;
+    };
+    SetProductStatusRequest: {
+      status: components['schemas']['ProductStatus'];
+      /** Format: uint32 */
+      version: number | string;
+    };
+    SetVariantActiveRequest: {
+      isActive: boolean;
     };
     StoreSettingsDto: {
       storeName: string;
@@ -1180,6 +2083,39 @@ export interface components {
       /** Format: uint32 */
       version: number | string;
     };
+    UpdateProductRequest: {
+      /** Format: uuid */
+      categoryId: string;
+      name: string;
+      slug: string;
+      shortDescription: string;
+      description: string;
+      fulfilmentType: components['schemas']['FulfilmentType'];
+      /** Format: int32 */
+      leadTimeDays: null | number | string;
+      seoTitle: null | string;
+      seoDescription: null | string;
+      /** Format: uint32 */
+      version: number | string;
+      variantStock?: null | {
+        [key: string]: number | string;
+      };
+    };
+    UpdateVariantRequest: {
+      sku: string;
+      name: string;
+      /** Format: int64 */
+      price: number | string;
+      /** Format: int32 */
+      weightGrams: number | string;
+      /** Format: int64 */
+      compareAtPrice: null | number | string;
+      /** Format: int32 */
+      stockQuantity: null | number | string;
+      attributes: null | {
+        [key: string]: string;
+      };
+    };
     ValidationProblemDetails: {
       type?: null | string;
       title?: null | string;
@@ -1190,6 +2126,26 @@ export interface components {
       errors?: {
         [key: string]: string[];
       };
+    };
+    VariantAdminDto: {
+      /** Format: uuid */
+      id: string;
+      sku: string;
+      name: string;
+      /** Format: int64 */
+      price: number | string;
+      /** Format: int64 */
+      compareAtPrice: null | number | string;
+      /** Format: int32 */
+      stockQuantity: null | number | string;
+      /** Format: int32 */
+      weightGrams: number | string;
+      attributes: {
+        [key: string]: string;
+      };
+      isActive: boolean;
+      /** Format: int32 */
+      sortOrder: number | string;
     };
   };
   responses: never;
