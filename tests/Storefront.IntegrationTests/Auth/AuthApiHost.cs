@@ -63,18 +63,21 @@ internal sealed class AuthApiHost : IAsyncDisposable
         bool createAdmin = true,
         TestDatabase? database = null,
         Action<IServiceCollection>? configureServices = null,
-        bool loginEnabled = true)
+        bool loginEnabled = true,
+        IReadOnlyDictionary<string, string>? extraSettings = null)
     {
         database ??= await postgres.CreateDatabaseAsync();
-        var host = new AuthApiHost(
-            database,
-            environment,
-            new Dictionary<string, string>
-            {
-                ["AdminLogin:LoginAttemptsPerMinute"] = attemptsPerMinute.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                ["AdminLogin:Enabled"] = loginEnabled ? "true" : "false",
-            },
-            configureServices);
+        var settings = new Dictionary<string, string>
+        {
+            ["AdminLogin:LoginAttemptsPerMinute"] = attemptsPerMinute.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            ["AdminLogin:Enabled"] = loginEnabled ? "true" : "false",
+        };
+        foreach (var (key, value) in extraSettings ?? new Dictionary<string, string>())
+        {
+            settings[key] = value;
+        }
+
+        var host = new AuthApiHost(database, environment, settings, configureServices);
         if (createAdmin)
         {
             await using var scope = host.Services.CreateAsyncScope();
