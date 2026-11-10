@@ -21,9 +21,12 @@ export type {
 } from './api/client';
 export {
   DEFAULT_PRIMARY_COLOR,
+  MIN_PRIMARY_COLOR_CONTRAST,
   contrastRatio,
+  hasEnoughPrimaryColorContrast,
   isHexColor,
   normalizePrimaryColor,
+  primaryColorContrast,
   readableTextColor,
 } from './color';
 export { imageUrl } from './images';
@@ -72,6 +75,14 @@ export type {
   ProductStatus,
   VariantInput,
 } from './api/adminProducts';
-export { getStoreMoneySettings } from './api/adminSettings';
-export type { StoreMoneySettings } from './api/adminSettings';
+export {
+  getAdminStoreSettings,
+  getStoreMoneySettings,
+  updateStoreSettings,
+} from './api/adminSettings';
+export type {
+  AdminStoreSettings,
+  StoreMoneySettings,
+  StoreSettingsInput,
+} from './api/adminSettings';
 export type { TranslationParams } from './i18n';

@@ -207,6 +207,43 @@ describe('App', () => {
     });
   });
 
+  describe('after the settings are edited in the admin panel', () => {
+    it('follows the new name, colour, demo bar and contacts when the page is opened again', async () => {
+      stubHappyPath({
+        storeName: 'Old Shop',
+        primaryColor: '#0A1F44',
+        isDemo: true,
+        contactEmail: 'old@example.test',
+        contactPhone: '+359 111 222 333',
+      });
+      const first = renderApp();
+      await screen.findByRole('complementary', { name: 'Демо версия' });
+      expect(document.title).toBe('Old Shop');
+      expect(document.documentElement.style.getPropertyValue('--color-on-primary')).toBe('#ffffff');
+      first.unmount();
+
+      // The administrator saves new settings; the shop shows them after the page is loaded again.
+      stubHappyPath({
+        storeName: 'New Shop',
+        primaryColor: '#FFE066',
+        isDemo: false,
+        contactEmail: 'new@example.test',
+        contactPhone: '',
+      });
+      renderApp();
+
+      const footer = await screen.findByRole('contentinfo');
+      expect(within(footer).getByText('New Shop')).toBeInTheDocument();
+      expect(within(footer).getByRole('link', { name: 'new@example.test' })).toBeInTheDocument();
+      expect(within(footer).queryByText('+359 111 222 333')).not.toBeInTheDocument();
+      expect(document.title).toBe('New Shop');
+      const style = document.documentElement.style;
+      expect(style.getPropertyValue('--color-primary')).toBe('#ffe066');
+      expect(style.getPropertyValue('--color-on-primary')).toBe('#000000');
+      expect(screen.queryByRole('complementary', { name: 'Демо версия' })).not.toBeInTheDocument();
+    });
+  });
+
   describe('locale', () => {
     it('falls back to Bulgarian texts when the default locale has no translation', async () => {
       stubHappyPath({ defaultLocale: 'de-DE' });

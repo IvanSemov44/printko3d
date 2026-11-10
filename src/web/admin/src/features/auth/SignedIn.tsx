@@ -5,6 +5,7 @@ import { CategoryFormPage } from '../categories/CategoryFormPage';
 import { CategoryListPage } from '../categories/CategoryListPage';
 import { ProductFormPage } from '../products/ProductFormPage';
 import { ProductListPage } from '../products/ProductListPage';
+import { SettingsPage } from '../settings/SettingsPage';
 import { useLogout } from './useAdminSession';
 
 /** What the signed-in administrator sees: who is signed in, the menu and the page of the address. */
@@ -43,6 +44,7 @@ export function SignedIn({ user }: { user: AdminUser }) {
       <nav aria-label={t('nav.label')}>
         <NavLink to="/products">{t('nav.products')}</NavLink>
         <NavLink to="/categories">{t('nav.categories')}</NavLink>
+        <NavLink to="/settings">{t('nav.settings')}</NavLink>
       </nav>
 
       <Routes>
@@ -53,6 +55,7 @@ export function SignedIn({ user }: { user: AdminUser }) {
         <Route path="categories" element={<CategoryListPage />} />
         <Route path="categories/new" element={<CategoryFormPage />} />
         <Route path="categories/:id" element={<CategoryFormPage />} />
+        <Route path="settings" element={<SettingsPage />} />
         <Route
           path="*"
           element={

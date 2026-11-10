@@ -1,4 +1,4 @@
-import { ApiError, readErrorCode } from './client';
+import { ApiError, readErrorCode, readErrorFields } from './client';
 
 /** Every request that changes data must carry this header, or the API answers 403 (decision 0014). */
 const CSRF_HEADERS = { 'X-Requested-With': 'XMLHttpRequest' };
@@ -11,7 +11,9 @@ const CSRF_HEADERS = { 'X-Requested-With': 'XMLHttpRequest' };
 export async function adminRequest(url: string, init: RequestInit): Promise<unknown> {
   const response = await fetch(url, init);
   if (!response.ok) {
-    throw new ApiError(response.status, await readErrorCode(response));
+    // The fields are read from a copy first, so the original body is still there for the code.
+    const fields = await readErrorFields(response);
+    throw new ApiError(response.status, await readErrorCode(response), fields);
   }
   return response.json();
 }

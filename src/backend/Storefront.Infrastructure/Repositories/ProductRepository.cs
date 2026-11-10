@@ -22,6 +22,9 @@ internal sealed class ProductRepository(StorefrontDbContext context)
         Context.Set<ProductVariant>().AsNoTracking()
             .AnyAsync(v => v.Sku == sku && v.Id != exceptVariantId, cancellationToken);
 
+    public Task<bool> AnyVariantsAsync(CancellationToken cancellationToken) =>
+        Context.Set<ProductVariant>().AsNoTracking().AnyAsync(cancellationToken);
+
     public void RemoveImage(ProductImage image) => Context.Set<ProductImage>().Remove(image);
 
     public void ExpectVersion(Product product, uint version) =>

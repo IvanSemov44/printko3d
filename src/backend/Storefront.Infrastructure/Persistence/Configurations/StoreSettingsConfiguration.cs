@@ -20,5 +20,11 @@ internal sealed class StoreSettingsConfiguration : IEntityTypeConfiguration<Stor
         builder.Property(s => s.ContactPhone).HasMaxLength(50).IsRequired();
         builder.Property(s => s.LogoKey).HasMaxLength(500);
         builder.Property(s => s.PrimaryColor).HasMaxLength(20).IsRequired();
+
+        builder.Property(s => s.Version)
+            .HasColumnName("xmin")
+            .HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken();
     }
 }

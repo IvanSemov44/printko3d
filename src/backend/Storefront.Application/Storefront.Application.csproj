@@ -4,4 +4,8 @@
     <ProjectReference Include="..\Storefront.Domain\Storefront.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Storefront.UnitTests" />
+  </ItemGroup>
+
 </Project>

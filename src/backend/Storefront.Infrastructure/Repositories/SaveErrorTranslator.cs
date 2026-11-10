@@ -48,6 +48,7 @@ internal static class SaveErrorTranslator
         {
             Category => "category.version_conflict",
             Product => "product.version_conflict",
+            StoreSettings => "store_settings.version_conflict",
             _ => null,
         };
     }

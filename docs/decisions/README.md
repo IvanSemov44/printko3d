@@ -42,3 +42,4 @@
 - [0016 – Админ списъкът с категории е без страниране, а редакциите се пазят с версия на реда](0016-admin-categories-list-and-row-version.md)
 - [0017 – Структура и стил на `Storefront.Api`](0017-api-structure-and-style.md)
 - [0018 – Снимките на продукти са в S3-съвместимо хранилище зад `IImageStorage`](0018-product-images-in-s3-compatible-storage.md)
+- [0019 – Настройките на магазина се пазят с версия на реда, а валутата не се сменя, когато това би променило цените](0019-store-settings-row-version-and-currency-lock.md)

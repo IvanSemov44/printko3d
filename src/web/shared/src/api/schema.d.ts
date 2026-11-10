@@ -1820,6 +1820,158 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/admin/store-settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['StoreSettingsAdminDto'];
+            'application/json': components['schemas']['StoreSettingsAdminDto'];
+            'text/json': components['schemas']['StoreSettingsAdminDto'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateStoreSettingsRequest'];
+          'text/json': components['schemas']['UpdateStoreSettingsRequest'];
+          'application/*+json': components['schemas']['UpdateStoreSettingsRequest'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['StoreSettingsAdminDto'];
+            'application/json': components['schemas']['StoreSettingsAdminDto'];
+            'text/json': components['schemas']['StoreSettingsAdminDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/auth/login': {
     parameters: {
       query?: never;
@@ -2502,6 +2654,18 @@ export interface components {
     SetVariantActiveRequest: {
       isActive: boolean;
     };
+    StoreSettingsAdminDto: {
+      storeName: string;
+      defaultCurrency: string;
+      defaultLocale: string;
+      contactEmail: string;
+      contactPhone: string;
+      logoKey: null | string;
+      primaryColor: string;
+      isDemo: boolean;
+      /** Format: uint32 */
+      version: number | string;
+    };
     StoreSettingsDto: {
       storeName: string;
       defaultCurrency: string;
@@ -2546,6 +2710,17 @@ export interface components {
       variantStock?: null | {
         [key: string]: number | string;
       };
+    };
+    UpdateStoreSettingsRequest: {
+      storeName: string;
+      defaultCurrency: string;
+      defaultLocale: string;
+      contactEmail: string;
+      contactPhone: null | string;
+      primaryColor: string;
+      isDemo: boolean;
+      /** Format: uint32 */
+      version: number | string;
     };
     UpdateVariantRequest: {
       sku: string;
