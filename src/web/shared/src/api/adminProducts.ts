@@ -1,4 +1,4 @@
-import { adminRequest, adminSend } from './adminHttp';
+import { adminRequest, adminSend, adminUpload } from './adminHttp';
 import type { MoveDirection } from './adminCategories';
 import {
   field,
@@ -58,6 +58,17 @@ export interface AdminVariant {
   sortOrder: number;
 }
 
+/** An image of a product as the admin panel sees it. The address is built from `storageKey` with `imageUrl`. */
+export interface AdminImage {
+  id: string;
+  /** The variant the image shows, or null for the whole product. */
+  variantId: string | null;
+  storageKey: string;
+  altText: string;
+  sortOrder: number;
+  isPrimary: boolean;
+}
+
 export interface AdminProduct {
   id: string;
   categoryId: string;
@@ -73,6 +84,8 @@ export interface AdminProduct {
   /** The row version the form was loaded with. Send it back; a different value means someone else saved first. */
   version: number;
   variants: AdminVariant[];
+  /** In the order of the shop. */
+  images: AdminImage[];
 }
 
 /** What the product form can change. Images and status have their own operations. */
@@ -168,6 +181,18 @@ const readVariant: Reader<AdminVariant> = (value, path) => {
   };
 };
 
+const readImage: Reader<AdminImage> = (value, path) => {
+  const object = readObject(value, path);
+  return {
+    id: field(object, 'id', readString, path),
+    variantId: field(object, 'variantId', readNullable(readString), path),
+    storageKey: field(object, 'storageKey', readString, path),
+    altText: field(object, 'altText', readString, path),
+    sortOrder: field(object, 'sortOrder', readInteger, path),
+    isPrimary: field(object, 'isPrimary', readBoolean, path),
+  };
+};
+
 const readProduct: Reader<AdminProduct> = (value, path) => {
   const object = readObject(value, path);
   return {
@@ -184,6 +209,7 @@ const readProduct: Reader<AdminProduct> = (value, path) => {
     seoDescription: field(object, 'seoDescription', readNullable(readString), path),
     version: field(object, 'version', readInteger, path),
     variants: field(object, 'variants', readArray(readVariant), path),
+    images: field(object, 'images', readArray(readImage), path),
   };
 };
 
@@ -294,6 +320,85 @@ export async function moveVariant(
     await adminSend('POST', `${PRODUCTS_PATH}/${productId}/variants/${variantId}/move`, {
       direction,
     }),
+    'product',
+  );
+}
+
+/** The largest image the server accepts, and the types it accepts (it decides the type from the content of the file). */
+export const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+export const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
+/** The most images one product can have. */
+export const IMAGE_MAX_COUNT = 20;
+/** The longest alt text. */
+export const IMAGE_ALT_MAX_LENGTH = 300;
+
+export interface ImageUploadInput {
+  file: File;
+  altText: string;
+  /** A variant of the same product, or null for the whole product. */
+  variantId: string | null;
+}
+
+/**
+ * Uploads one image and returns the whole product. Refusals are ApiErrors: 400 `image.type_not_allowed` or
+ * `image.empty`, 413 `image.too_large`, 409 `image.limit_reached`.
+ */
+export async function uploadProductImage(
+  productId: string,
+  input: ImageUploadInput,
+): Promise<AdminProduct> {
+  const form = new FormData();
+  form.append('file', input.file);
+  form.append('altText', input.altText);
+  if (input.variantId !== null) {
+    form.append('variantId', input.variantId);
+  }
+  return readProduct(await adminUpload(`${PRODUCTS_PATH}/${productId}/images`, form), 'product');
+}
+
+/** Replaces the alt text and the variant of an image. */
+export async function updateProductImage(
+  productId: string,
+  imageId: string,
+  input: { altText: string; variantId: string | null },
+): Promise<AdminProduct> {
+  return readProduct(
+    await adminSend('PUT', `${PRODUCTS_PATH}/${productId}/images/${imageId}`, input),
+    'product',
+  );
+}
+
+/** The old primary image becomes an ordinary one. */
+export async function setPrimaryProductImage(
+  productId: string,
+  imageId: string,
+): Promise<AdminProduct> {
+  return readProduct(
+    await adminSend('PUT', `${PRODUCTS_PATH}/${productId}/images/${imageId}/primary`, {}),
+    'product',
+  );
+}
+
+export async function moveProductImage(
+  productId: string,
+  imageId: string,
+  direction: MoveDirection,
+): Promise<AdminProduct> {
+  return readProduct(
+    await adminSend('POST', `${PRODUCTS_PATH}/${productId}/images/${imageId}/move`, {
+      direction,
+    }),
+    'product',
+  );
+}
+
+/** Deletes the row and the file. If it was the primary image, the first one in order becomes primary. */
+export async function deleteProductImage(
+  productId: string,
+  imageId: string,
+): Promise<AdminProduct> {
+  return readProduct(
+    await adminSend('DELETE', `${PRODUCTS_PATH}/${productId}/images/${imageId}`, undefined),
     'product',
   );
 }

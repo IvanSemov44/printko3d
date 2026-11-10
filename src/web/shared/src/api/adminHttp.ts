@@ -16,6 +16,14 @@ export async function adminRequest(url: string, init: RequestInit): Promise<unkn
   return response.json();
 }
 
+/**
+ * An upload: the body is a form with a file. No Content-Type is set on purpose, so the browser writes it with the
+ * boundary that separates the parts.
+ */
+export function adminUpload(url: string, form: FormData): Promise<unknown> {
+  return adminRequest(url, { method: 'POST', headers: CSRF_HEADERS, body: form });
+}
+
 /** A request that changes data: JSON body and the header that protects against cross-site requests. */
 export function adminSend(method: string, url: string, body: unknown): Promise<unknown> {
   return adminRequest(url, {

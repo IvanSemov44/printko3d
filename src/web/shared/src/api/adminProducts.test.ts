@@ -2,13 +2,18 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   addVariant,
   createProduct,
+  deleteProductImage,
   getAdminProduct,
   getAdminProducts,
+  moveProductImage,
   moveVariant,
+  setPrimaryProductImage,
   setProductStatus,
   setVariantActive,
   updateProduct,
+  updateProductImage,
   updateVariant,
+  uploadProductImage,
   type ProductInput,
   type VariantInput,
 } from './adminProducts';
@@ -28,6 +33,15 @@ const VARIANT_DTO = {
   sortOrder: 0,
 };
 
+const IMAGE_DTO = {
+  id: 'i1',
+  variantId: null,
+  storageKey: 'products/p1/abc.jpg',
+  altText: 'Дракон отпред',
+  sortOrder: 0,
+  isPrimary: true,
+};
+
 const PRODUCT_DTO = {
   id: 'p1',
   categoryId: 'c1',
@@ -42,6 +56,7 @@ const PRODUCT_DTO = {
   seoDescription: null,
   version: '9',
   variants: [VARIANT_DTO],
+  images: [IMAGE_DTO],
 };
 
 const PRODUCT_INPUT: ProductInput = {
@@ -229,6 +244,82 @@ describe('admin products API', () => {
       ['PUT', '/api/v1/admin/products/p1/variants/v1', VARIANT_INPUT],
       ['PUT', '/api/v1/admin/products/p1/variants/v1/active', { isActive: false }],
       ['POST', '/api/v1/admin/products/p1/variants/v1/move', { direction: 'Up' }],
+    ]);
+  });
+
+  it('reads the images of a product, in the order the server sends them', async () => {
+    stubFetch(Response.json(PRODUCT_DTO));
+
+    const product = await getAdminProduct('p1');
+
+    expect(product.images).toEqual([
+      {
+        id: 'i1',
+        variantId: null,
+        storageKey: 'products/p1/abc.jpg',
+        altText: 'Дракон отпред',
+        sortOrder: 0,
+        isPrimary: true,
+      },
+    ]);
+  });
+
+  it('refuses an answer whose images are not a list', async () => {
+    stubFetch(Response.json({ ...PRODUCT_DTO, images: 'none' }));
+
+    await expect(getAdminProduct('p1')).rejects.toBeInstanceOf(UnexpectedResponseError);
+  });
+
+  it('uploads one image as a form with the file, the alt text and the variant', async () => {
+    const fetchMock = stubFetch(Response.json(PRODUCT_DTO, { status: 201 }));
+    const file = new File([new Uint8Array([1, 2, 3])], 'dragon.jpg', { type: 'image/jpeg' });
+
+    await uploadProductImage('p1', { file, altText: 'Дракон', variantId: 'v1' });
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe('/api/v1/admin/products/p1/images');
+    expect(init?.method).toBe('POST');
+    // The browser writes the Content-Type with the boundary; setting it by hand would break the upload.
+    expect(init?.headers).toEqual({ 'X-Requested-With': 'XMLHttpRequest' });
+    const form = init?.body;
+    expect(form).toBeInstanceOf(FormData);
+    expect((form as FormData).get('altText')).toBe('Дракон');
+    expect((form as FormData).get('variantId')).toBe('v1');
+    expect(((form as FormData).get('file') as File).name).toBe('dragon.jpg');
+  });
+
+  it('leaves the variant out of the form when the image is for the whole product', async () => {
+    const fetchMock = stubFetch(Response.json(PRODUCT_DTO, { status: 201 }));
+    const file = new File([new Uint8Array([1])], 'a.png', { type: 'image/png' });
+
+    await uploadProductImage('p1', { file, altText: 'A', variantId: null });
+
+    expect(((fetchMock.mock.calls[0] ?? [])[1]?.body as FormData).has('variantId')).toBe(false);
+  });
+
+  it('passes the code of a refused upload on', async () => {
+    stubFetch(Response.json({ code: 'image.too_large' }, { status: 413 }));
+    const file = new File([new Uint8Array([1])], 'a.jpg', { type: 'image/jpeg' });
+
+    await expect(
+      uploadProductImage('p1', { file, altText: 'A', variantId: null }),
+    ).rejects.toMatchObject({ status: 413, code: 'image.too_large' });
+  });
+
+  it('changes, sets as primary, moves and deletes an image at its own addresses', async () => {
+    const fetchMock = stubFetch(Response.json(PRODUCT_DTO));
+
+    await updateProductImage('p1', 'i1', { altText: 'Нов', variantId: null });
+    await setPrimaryProductImage('p1', 'i1');
+    await moveProductImage('p1', 'i1', 'Down');
+    await deleteProductImage('p1', 'i1');
+
+    const calls = fetchMock.mock.calls.map(([url, init]) => [init?.method, url, bodyOf(init)]);
+    expect(calls).toEqual([
+      ['PUT', '/api/v1/admin/products/p1/images/i1', { altText: 'Нов', variantId: null }],
+      ['PUT', '/api/v1/admin/products/p1/images/i1/primary', {}],
+      ['POST', '/api/v1/admin/products/p1/images/i1/move', { direction: 'Down' }],
+      ['DELETE', '/api/v1/admin/products/p1/images/i1', undefined],
     ]);
   });
 });
