@@ -362,4 +362,82 @@ describe('category page', () => {
       expect(screen.getByRole('button', { name: 'Опитай пак' })).toBeInTheDocument();
     });
   });
+
+  describe('image on the card', () => {
+    const withImage = productFixture({
+      name: 'Dragon',
+      slug: 'dragon',
+      primaryImage: { storageKey: 'products/p1/a.jpg', altText: 'Дракон отпред' },
+    });
+
+    function stubWithImages(items: unknown[], config: Record<string, unknown> = {}) {
+      return stubNetwork({
+        settings: ok(settingsFixture()),
+        categories: ok(categoriesFixture()),
+        products: () => Response.json(pageFixture(items)),
+        config,
+      });
+    }
+
+    it('shows the main image from the base address, with its alt text and a fixed size', async () => {
+      stubWithImages([withImage], { imageBaseUrl: 'https://media.example.test/bucket' });
+      renderApp('/categories/puzzles');
+
+      const list = await findProductList();
+
+      const picture = await within(list).findByRole('img', { name: 'Дракон отпред' });
+      expect(picture).toHaveAttribute('src', 'https://media.example.test/bucket/products/p1/a.jpg');
+      expect(picture).toHaveAttribute('width');
+      expect(picture).toHaveAttribute('height');
+      expect(picture).toHaveAttribute('loading', 'lazy');
+      expect(within(list).queryByTestId('image-placeholder')).not.toBeInTheDocument();
+    });
+
+    it('shows the placeholder for a product without an image', async () => {
+      stubWithImages([productFixture({ primaryImage: null })], {
+        imageBaseUrl: 'https://media.example.test/bucket',
+      });
+      renderApp('/categories/puzzles');
+
+      const list = await findProductList();
+
+      expect(within(list).getByTestId('image-placeholder')).toBeInTheDocument();
+      expect(within(list).queryByRole('img')).not.toBeInTheDocument();
+    });
+
+    it('shows the placeholder when the environment has no image address', async () => {
+      stubWithImages([withImage]);
+      renderApp('/categories/puzzles');
+
+      const list = await findProductList();
+
+      expect(within(list).getByTestId('image-placeholder')).toBeInTheDocument();
+      expect(within(list).queryByRole('img')).not.toBeInTheDocument();
+    });
+
+    it('falls back to the placeholder when the file does not load', async () => {
+      stubWithImages([withImage], { imageBaseUrl: 'https://media.example.test/bucket' });
+      renderApp('/categories/puzzles');
+      const list = await findProductList();
+
+      fireEvent.error(await within(list).findByRole('img', { name: 'Дракон отпред' }));
+
+      await waitFor(() => {
+        expect(within(list).getByTestId('image-placeholder')).toBeInTheDocument();
+      });
+      expect(within(list).queryByRole('img')).not.toBeInTheDocument();
+    });
+
+    it('does not add a second stop for the keyboard: the name of the product stays the link', async () => {
+      stubWithImages([withImage], { imageBaseUrl: 'https://media.example.test/bucket' });
+      renderApp('/categories/puzzles');
+      const list = await findProductList();
+
+      const picture = await within(list).findByRole('img', { name: 'Дракон отпред' });
+
+      expect(picture.closest('a')).toHaveAttribute('tabindex', '-1');
+      expect(picture.closest('a')).toHaveAttribute('href', '/products/dragon');
+      expect(within(list).getByRole('link', { name: 'Dragon' })).not.toHaveAttribute('tabindex');
+    });
+  });
 });

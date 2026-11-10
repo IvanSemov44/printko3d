@@ -10,11 +10,22 @@ export type FulfilmentType = components['schemas']['FulfilmentType'];
 type ProductListItemDto = components['schemas']['ProductListItemDto'];
 type ProductPageDto = components['schemas']['PagedResultOfProductListItemDto'];
 
+/** The main image of a card. `url` is null when the environment has no image storage (decision 0011). */
+export interface ProductListImage {
+  url: string | null;
+  altText: string;
+}
+
 /** A product card; the integer fields are real numbers (the generated types allow strings). */
-export type ProductListItem = Omit<ProductListItemDto, 'minPrice' | 'leadTimeDays'> & {
+export type ProductListItem = Omit<
+  ProductListItemDto,
+  'minPrice' | 'leadTimeDays' | 'primaryImage'
+> & {
   /** In the currency's smallest unit. */
   minPrice: number;
   leadTimeDays: number | null;
+  /** Null when the product has no image: the card then shows the placeholder. */
+  primaryImage: ProductListImage | null;
 };
 
 type ProductDetailsDto = components['schemas']['ProductDetailsDto'];
@@ -108,11 +119,17 @@ export async function getCategories(signal?: AbortSignal): Promise<Category[]> {
   return (await getJson('/api/v1/categories', signal)) as Category[];
 }
 
-function toProductListItem(item: ProductListItemDto): ProductListItem {
+function toProductListItem(item: ProductListItemDto, imageBaseUrl: string | null): ProductListItem {
   return {
     ...item,
     minPrice: toSafeInteger(item.minPrice),
     leadTimeDays: item.leadTimeDays === null ? null : toSafeInteger(item.leadTimeDays),
+    primaryImage: item.primaryImage
+      ? {
+          url: imageUrl(imageBaseUrl, item.primaryImage.storageKey),
+          altText: item.primaryImage.altText,
+        }
+      : null,
   };
 }
 
@@ -122,11 +139,12 @@ export async function getProducts(query: ProductQuery, signal?: AbortSignal): Pr
     page: String(query.page),
     pageSize: String(query.pageSize),
   });
-  const dto = (await getJson(`/api/v1/products?${params.toString()}`, signal)) as ProductPageDto;
+  const { body, config } = await getJsonWithConfig(`/api/v1/products?${params.toString()}`, signal);
+  const dto = body as ProductPageDto;
   const pageSize = toSafeInteger(dto.pageSize);
   const totalCount = toSafeInteger(dto.totalCount);
   return {
-    items: dto.items.map(toProductListItem),
+    items: dto.items.map((item) => toProductListItem(item, config.imageBaseUrl)),
     page: toSafeInteger(dto.page),
     pageSize,
     totalCount,

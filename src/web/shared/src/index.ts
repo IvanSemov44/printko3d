@@ -12,6 +12,7 @@ export type {
   FulfilmentType,
   ProductDetails,
   ProductImage,
+  ProductListImage,
   ProductListItem,
   ProductPage,
   ProductQuery,
