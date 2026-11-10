@@ -3,6 +3,8 @@ import { Link, Navigate, NavLink, Route, Routes } from 'react-router';
 import { t } from '../../i18n';
 import { CategoryFormPage } from '../categories/CategoryFormPage';
 import { CategoryListPage } from '../categories/CategoryListPage';
+import { ProductFormPage } from '../products/ProductFormPage';
+import { ProductListPage } from '../products/ProductListPage';
 import { useLogout } from './useAdminSession';
 
 /** What the signed-in administrator sees: who is signed in, the menu and the page of the address. */
@@ -39,11 +41,15 @@ export function SignedIn({ user }: { user: AdminUser }) {
       </button>
 
       <nav aria-label={t('nav.label')}>
+        <NavLink to="/products">{t('nav.products')}</NavLink>
         <NavLink to="/categories">{t('nav.categories')}</NavLink>
       </nav>
 
       <Routes>
         <Route index element={<Navigate to="/categories" replace />} />
+        <Route path="products" element={<ProductListPage />} />
+        <Route path="products/new" element={<ProductFormPage />} />
+        <Route path="products/:id" element={<ProductFormPage />} />
         <Route path="categories" element={<CategoryListPage />} />
         <Route path="categories/new" element={<CategoryFormPage />} />
         <Route path="categories/:id" element={<CategoryFormPage />} />

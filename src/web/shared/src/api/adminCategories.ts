@@ -1,5 +1,14 @@
-import { toSafeInteger } from '../numbers';
-import { ApiError, readErrorCode } from './client';
+import { adminRequest, adminSend } from './adminHttp';
+import {
+  field,
+  readArray,
+  readBoolean,
+  readInteger,
+  readNullable,
+  readObject,
+  readString,
+  type Reader,
+} from './decode';
 import type { components } from './schema';
 
 type CategoryAdminDto = components['schemas']['CategoryAdminDto'];
@@ -27,43 +36,31 @@ export type MoveDirection = components['schemas']['MoveDirection'];
 // Relative on purpose, like the sign-in: the panel reaches the API through its own address (decision 0014).
 const CATEGORIES_PATH = '/api/v1/admin/categories';
 
-/** Every request that changes data must carry this header, or the API answers 403 (decision 0014). */
-const CSRF_HEADERS = { 'X-Requested-With': 'XMLHttpRequest' };
-
-function toAdminCategory(dto: CategoryAdminDto): AdminCategory {
+const readAdminCategory: Reader<AdminCategory> = (value, path) => {
+  const object = readObject(value, path);
   return {
-    ...dto,
-    sortOrder: toSafeInteger(dto.sortOrder),
-    productCount: toSafeInteger(dto.productCount),
-    version: toSafeInteger(dto.version),
+    id: field(object, 'id', readString, path),
+    parentId: field(object, 'parentId', readNullable(readString), path),
+    name: field(object, 'name', readString, path),
+    slug: field(object, 'slug', readString, path),
+    description: field(object, 'description', readNullable(readString), path),
+    sortOrder: field(object, 'sortOrder', readInteger, path),
+    isActive: field(object, 'isActive', readBoolean, path),
+    productCount: field(object, 'productCount', readInteger, path),
+    version: field(object, 'version', readInteger, path),
   };
-}
+};
 
-async function request(url: string, init: RequestInit): Promise<unknown> {
-  const response = await fetch(url, init);
-  if (!response.ok) {
-    throw new ApiError(response.status, await readErrorCode(response));
-  }
-  return response.json();
-}
-
-function send(method: string, url: string, body: unknown): Promise<unknown> {
-  return request(url, {
-    method,
-    headers: { ...CSRF_HEADERS, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-}
+const readAdminCategories = readArray(readAdminCategory);
 
 /** All categories, the inactive ones too, without paging (decision 0016). */
 export async function getAdminCategories(signal?: AbortSignal): Promise<AdminCategory[]> {
-  const body = (await request(CATEGORIES_PATH, { signal })) as CategoryAdminDto[];
-  return body.map(toAdminCategory);
+  return readAdminCategories(await adminRequest(CATEGORIES_PATH, { signal }), 'categories');
 }
 
 /** A taken slug is an ApiError with status 409 and code `category.slug_taken`. */
 export async function createCategory(input: CategoryInput): Promise<AdminCategory> {
-  return toAdminCategory((await send('POST', CATEGORIES_PATH, input)) as CategoryAdminDto);
+  return readAdminCategory(await adminSend('POST', CATEGORIES_PATH, input), 'category');
 }
 
 /** Also 409 with code `category.version_conflict` when someone saved the category after `version` was read. */
@@ -72,8 +69,9 @@ export async function updateCategory(
   input: CategoryInput,
   version: number,
 ): Promise<AdminCategory> {
-  return toAdminCategory(
-    (await send('PUT', `${CATEGORIES_PATH}/${id}`, { ...input, version })) as CategoryAdminDto,
+  return readAdminCategory(
+    await adminSend('PUT', `${CATEGORIES_PATH}/${id}`, { ...input, version }),
+    'category',
   );
 }
 
@@ -83,8 +81,9 @@ export async function setCategoryActive(
   version: number,
 ): Promise<AdminCategory> {
   const action = isActive ? 'activate' : 'deactivate';
-  return toAdminCategory(
-    (await send('POST', `${CATEGORIES_PATH}/${id}/${action}`, { version })) as CategoryAdminDto,
+  return readAdminCategory(
+    await adminSend('POST', `${CATEGORIES_PATH}/${id}/${action}`, { version }),
+    'category',
   );
 }
 
@@ -94,9 +93,8 @@ export async function moveCategory(
   direction: MoveDirection,
   version: number,
 ): Promise<AdminCategory[]> {
-  const body = (await send('POST', `${CATEGORIES_PATH}/${id}/move`, {
-    direction,
-    version,
-  })) as CategoryAdminDto[];
-  return body.map(toAdminCategory);
+  return readAdminCategories(
+    await adminSend('POST', `${CATEGORIES_PATH}/${id}/move`, { direction, version }),
+    'categories',
+  );
 }

@@ -1,0 +1,26 @@
+import { ApiError, readErrorCode } from './client';
+
+/** Every request that changes data must carry this header, or the API answers 403 (decision 0014). */
+const CSRF_HEADERS = { 'X-Requested-With': 'XMLHttpRequest' };
+
+/**
+ * Sends a request to the API and returns the JSON of the answer, still unchecked (`unknown`): the caller reads it
+ * with the readers of `decode.ts`. Addresses are relative on purpose, like the sign-in: the panel reaches the API
+ * through its own address (decision 0014).
+ */
+export async function adminRequest(url: string, init: RequestInit): Promise<unknown> {
+  const response = await fetch(url, init);
+  if (!response.ok) {
+    throw new ApiError(response.status, await readErrorCode(response));
+  }
+  return response.json();
+}
+
+/** A request that changes data: JSON body and the header that protects against cross-site requests. */
+export function adminSend(method: string, url: string, body: unknown): Promise<unknown> {
+  return adminRequest(url, {
+    method,
+    headers: { ...CSRF_HEADERS, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}

@@ -1,0 +1,138 @@
+import {
+  addVariant,
+  createProduct,
+  getAdminProduct,
+  getAdminProducts,
+  getStoreMoneySettings,
+  moveVariant,
+  setProductStatus,
+  setVariantActive,
+  updateProduct,
+  updateVariant,
+  type AdminProduct,
+  type AdminProductQuery,
+  type MoveDirection,
+  type ProductInput,
+  type ProductStatus,
+  type VariantInput,
+} from '@storefront/shared';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+// The first part is "admin", so signing out removes everything loaded for the administrator.
+const PRODUCTS_KEY = ['admin', 'products'] as const;
+const LIST_KEY = [...PRODUCTS_KEY, 'list'] as const;
+const itemKey = (id: string) => [...PRODUCTS_KEY, 'item', id] as const;
+
+/** A page of the admin list. Always the API's answer: the versions in it must be current. */
+export function useAdminProducts(query: AdminProductQuery) {
+  return useQuery({
+    queryKey: [...LIST_KEY, query],
+    queryFn: ({ signal }) => getAdminProducts(query, signal),
+    // The list stays on screen while the next page loads.
+    placeholderData: (previous) => previous,
+  });
+}
+
+/** One product with its variants. No refetch in the background: the form keeps the version it was loaded with. */
+export function useAdminProduct(id: string | undefined) {
+  return useQuery({
+    queryKey: itemKey(id ?? ''),
+    queryFn: ({ signal }) => getAdminProduct(id ?? '', signal),
+    enabled: id !== undefined,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+}
+
+/** The currency and locale of the shop, for typing and showing prices. They hardly ever change. */
+export function useStoreMoney() {
+  return useQuery({
+    queryKey: ['admin', 'store-money'] as const,
+    queryFn: ({ signal }) => getStoreMoneySettings(signal),
+    staleTime: Infinity,
+  });
+}
+
+/** After a change the product in the answer replaces the one in the cache, and the lists are loaded again. */
+function useRememberProduct() {
+  const queryClient = useQueryClient();
+  return (product: AdminProduct) => {
+    queryClient.setQueryData(itemKey(product.id), product);
+    return queryClient.invalidateQueries({ queryKey: LIST_KEY });
+  };
+}
+
+/** After a failure the copy on screen may be out of date (a conflict), so it is loaded again. */
+function useForgetProduct() {
+  const queryClient = useQueryClient();
+  return (id: string) => queryClient.invalidateQueries({ queryKey: itemKey(id) });
+}
+
+export function useCreateProduct() {
+  const remember = useRememberProduct();
+  return useMutation({
+    mutationFn: (input: ProductInput) => createProduct(input),
+    onSuccess: remember,
+  });
+}
+
+export function useUpdateProduct() {
+  const remember = useRememberProduct();
+  return useMutation({
+    mutationFn: (change: { id: string; input: ProductInput; version: number }) =>
+      updateProduct(change.id, change.input, change.version),
+    onSuccess: remember,
+  });
+}
+
+export function useSetProductStatus() {
+  const remember = useRememberProduct();
+  const forget = useForgetProduct();
+  return useMutation({
+    mutationFn: (change: { id: string; status: ProductStatus; version: number }) =>
+      setProductStatus(change.id, change.status, change.version),
+    onSuccess: remember,
+    onError: (_error, change) => forget(change.id),
+  });
+}
+
+export function useAddVariant(productId: string) {
+  const remember = useRememberProduct();
+  return useMutation({
+    mutationFn: (change: { input: VariantInput; sortOrder: number }) =>
+      addVariant(productId, change.input, change.sortOrder),
+    onSuccess: remember,
+  });
+}
+
+export function useUpdateVariant(productId: string) {
+  const remember = useRememberProduct();
+  return useMutation({
+    mutationFn: (change: { variantId: string; input: VariantInput }) =>
+      updateVariant(productId, change.variantId, change.input),
+    onSuccess: remember,
+  });
+}
+
+export function useSetVariantActive(productId: string) {
+  const remember = useRememberProduct();
+  const forget = useForgetProduct();
+  return useMutation({
+    mutationFn: (change: { variantId: string; isActive: boolean }) =>
+      setVariantActive(productId, change.variantId, change.isActive),
+    onSuccess: remember,
+    // A refusal means the copy on screen is out of date (for example the last active variant).
+    onError: () => forget(productId),
+  });
+}
+
+export function useMoveVariant(productId: string) {
+  const remember = useRememberProduct();
+  const forget = useForgetProduct();
+  return useMutation({
+    mutationFn: (change: { variantId: string; direction: MoveDirection }) =>
+      moveVariant(productId, change.variantId, change.direction),
+    onSuccess: remember,
+    onError: () => forget(productId),
+  });
+}
