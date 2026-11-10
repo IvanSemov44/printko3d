@@ -21,4 +21,7 @@ public sealed class StoreSettings : Entity
     public string PrimaryColor { get; set; } = string.Empty;
 
     public bool IsDemo { get; set; }
+
+    /// <summary>PostgreSQL row version (xmin). Changes on every write; used to detect two administrators editing at once.</summary>
+    public uint Version { get; set; }
 }

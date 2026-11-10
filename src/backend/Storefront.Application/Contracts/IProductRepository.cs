@@ -14,6 +14,9 @@ public interface IProductRepository
     /// <summary>Is the SKU used by a variant other than <paramref name="exceptVariantId"/>? SKUs are unique across all products.</summary>
     Task<bool> ExistsBySkuAsync(string sku, Guid? exceptVariantId, CancellationToken cancellationToken);
 
+    /// <summary>Is there at least one variant in the shop? Prices are stored as whole numbers in the currency of the shop.</summary>
+    Task<bool> AnyVariantsAsync(CancellationToken cancellationToken);
+
     /// <summary>Marks the image for deletion at the next save.</summary>
     void RemoveImage(ProductImage image);
 

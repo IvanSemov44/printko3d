@@ -10,4 +10,7 @@ internal sealed class StoreSettingsRepository(StorefrontDbContext context)
 {
     public Task<StoreSettings?> GetAsync(bool trackChanges, CancellationToken cancellationToken) =>
         Query(trackChanges).SingleOrDefaultAsync(cancellationToken);
+
+    public void ExpectVersion(StoreSettings settings, uint version) =>
+        Context.Entry(settings).Property(s => s.Version).OriginalValue = version;
 }

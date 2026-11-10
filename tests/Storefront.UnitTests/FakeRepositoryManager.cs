@@ -49,8 +49,21 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
             throw new ConflictException("The record was changed by someone else.", "product.version_conflict");
         }
 
+        if (_storeSettings.Expected.Any(e => e.Key.Version != e.Value))
+        {
+            _storeSettings.Expected.Clear();
+            throw new ConflictException("The record was changed by someone else.", "store_settings.version_conflict");
+        }
+
         _category.Expected.Clear();
         _product.Expected.Clear();
+        _storeSettings.Expected.Clear();
+        foreach (var settings in _storeSettings.Items)
+        {
+            // Like xmin, the version changes on every write.
+            settings.Version++;
+        }
+
         SaveCount++;
         return Task.CompletedTask;
     }
@@ -90,6 +103,10 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
         public Task<StoreSettings?> GetAsync(bool trackChanges, CancellationToken cancellationToken) =>
             Task.FromResult(Items.SingleOrDefault());
+
+        public Dictionary<StoreSettings, uint> Expected { get; } = [];
+
+        public void ExpectVersion(StoreSettings settings, uint version) => Expected[settings] = version;
     }
 
     private sealed class FakeProductRepository : IProductRepository
@@ -109,6 +126,9 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
                 product.Images.Remove(image);
             }
         }
+
+        public Task<bool> AnyVariantsAsync(CancellationToken cancellationToken) =>
+            Task.FromResult(Items.Any(p => p.Variants.Count > 0));
 
         public Dictionary<Product, uint> Expected { get; } = [];
 
