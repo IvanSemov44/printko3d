@@ -6,7 +6,9 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-Frame-Options "DENY" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    add_header Content-Security-Policy "default-src 'self'; connect-src 'self' ${API_URL}; img-src 'self' data:; style-src 'self'; frame-ancestors 'none'" always;
+    # $image_src is set in /tmp/image-src.conf by 40-write-config.sh: empty, or the address that the images come from.
+    include /tmp/image-src.conf;
+    add_header Content-Security-Policy "default-src 'self'; connect-src 'self' ${API_URL}; img-src 'self' data: $image_src; style-src 'self'; frame-ancestors 'none'" always;
 
     location = /config.json {
         add_header Cache-Control "no-store";
