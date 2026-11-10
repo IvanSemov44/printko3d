@@ -167,6 +167,14 @@ describe('page meta', () => {
       expect(canonical()).toBe(`${ORIGIN}/products/dragon`);
     });
 
+    it('builds the addresses from the shop address in the config instead of the address of the page', async () => {
+      await openProduct({ config: { siteUrl: 'https://shop.test/' } });
+
+      expect(canonical()).toBe('https://shop.test/products/dragon');
+      expect(property('og:url')).toBe('https://shop.test/products/dragon');
+      expect(offer().url as string).toBe('https://shop.test/products/dragon');
+    });
+
     it('falls back to the name and the short description', async () => {
       await openProduct();
 

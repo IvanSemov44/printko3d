@@ -130,11 +130,12 @@ gitleaks git --redact --verbose
 **Първо внедряване**
 
 1. В render.com: New → Blueprint, избери репото и клона `main`. Render създава `printko3d-db`, `printko3d-api`, `printko3d-storefront` и `printko3d-admin`.
-2. Render пита за пет стойности, които не могат да са в репото, защото адресът на една услуга не е известен на друга. Попълни ги с публичните адреси на услугите (виж ги в таблото; ако имената са свободни, са от вида `https://printko3d-api.onrender.com`):
+2. Render пита за седем стойности, които не могат да са в репото, защото адресът на една услуга не е известен на друга. Попълни ги с публичните адреси на услугите (виж ги в таблото; ако имената са свободни, са от вида `https://printko3d-api.onrender.com`):
    - `API_URL` на магазина и на админ панела: адресът на API;
    - `API_UPSTREAM` на админ панела: същият адрес на API. Nginx на панела препраща `/api/` към него, така че браузърът говори само с панела и бисквитката на сесията е от един сайт (решение [0014](docs/decisions/0014-admin-session-cookie-through-panel-proxy.md));
    - `Cors__AllowedOrigins__0` на API: адресът на магазина;
-   - `Cors__AllowedOrigins__1` на API: адресът на админ панела.
+   - `Cors__AllowedOrigins__1` на API: адресът на админ панела;
+   - `SITE_URL` на магазина и `Site__Url` на API: адресът на магазина (за `canonical`, Open Graph и `sitemap.xml`, решение [0020](docs/decisions/0020-sitemap-from-api-and-soft-404.md)). Демото не се индексира: `ALLOW_INDEXING` не се задава, затова `robots.txt` забранява всичко. Само в продукция `ALLOW_INDEXING=true`.
 
    За снимките на продукти попълни още (решение [0018](docs/decisions/0018-product-images-in-s3-compatible-storage.md)): `IMAGE_BASE_URL` на магазина и на админ панела (публичният адрес на bucket-а) и `ImageStorage__Endpoint`, `ImageStorage__Region`, `ImageStorage__Bucket`, `ImageStorage__AccessKey`, `ImageStorage__SecretKey` на API. Двата ключа са тайни. Без тях демото работи, само качването на снимка връща грешка.
 

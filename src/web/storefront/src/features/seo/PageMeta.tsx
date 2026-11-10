@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router';
+import { useSiteUrl } from '../store-settings/useRuntimeConfigQuery';
 import { useStoreSettings } from '../store-settings/useStoreSettings';
 import { canonicalUrl } from './canonical';
 import { buildDescription, buildTitle } from './text';
@@ -26,13 +27,14 @@ export function PageMeta({
   type = 'website',
 }: PageMetaProps) {
   const { storeName, isDemo } = useStoreSettings();
+  const siteUrl = useSiteUrl();
   const { pathname } = useLocation();
 
   const title = buildTitle(storeName, pageTitle);
   const text = description === undefined ? undefined : buildDescription(description);
   const keepOut = noindex || isDemo;
   // A page that is kept out on purpose (missing, failed) has no canonical address. A demo store keeps it.
-  const url = noindex ? null : canonicalUrl(window.location.origin, pathname, page);
+  const url = noindex ? null : canonicalUrl(siteUrl, pathname, page);
 
   return (
     <>

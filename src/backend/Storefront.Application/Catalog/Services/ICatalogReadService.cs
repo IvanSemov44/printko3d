@@ -19,4 +19,7 @@ public interface ICatalogReadService
 
     /// <summary>Throws NotFoundException when the settings row is missing.</summary>
     Task<StoreSettingsDto> GetStoreSettingsAsync(CancellationToken cancellationToken);
+
+    /// <summary>sitemap.xml for the shop at <paramref name="siteUrl"/>: the home page, the visible categories and products.</summary>
+    Task<string> GetSitemapAsync(string siteUrl, CancellationToken cancellationToken);
 }

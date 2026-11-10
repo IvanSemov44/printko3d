@@ -28,4 +28,9 @@ internal sealed class CatalogReadService(IRepositoryManager repositories) : ICat
     public async Task<StoreSettingsDto> GetStoreSettingsAsync(CancellationToken cancellationToken) =>
         await repositories.Catalog.GetStoreSettingsAsync(cancellationToken)
             ?? throw new NotFoundException("Store settings were not found.", "store_settings.not_found");
+
+    public async Task<string> GetSitemapAsync(string siteUrl, CancellationToken cancellationToken) =>
+        SitemapBuilder.Build(
+            siteUrl,
+            await repositories.Catalog.GetSitemapEntriesAsync(SitemapBuilder.MaxEntries, cancellationToken));
 }

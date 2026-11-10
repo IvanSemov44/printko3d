@@ -2,10 +2,18 @@ export interface RuntimeConfig {
   apiUrl: string;
   /** Where product images are served from; `null` when the environment has no image storage yet. */
   imageBaseUrl: string | null;
+  /** The public address of the shop (for canonical and sharing addresses); `null` when the environment has not set it. */
+  siteUrl: string | null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
+}
+
+function optionalAddress(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() !== ''
+    ? trimTrailingSlashes(value.trim())
+    : null;
 }
 
 function trimTrailingSlashes(address: string): string {
@@ -22,9 +30,9 @@ export async function loadRuntimeConfig(signal?: AbortSignal): Promise<RuntimeCo
   if (!isRecord(body) || typeof body.apiUrl !== 'string') {
     throw new Error('Runtime config is invalid');
   }
-  const imageBaseUrl =
-    typeof body.imageBaseUrl === 'string' && body.imageBaseUrl.trim() !== ''
-      ? trimTrailingSlashes(body.imageBaseUrl.trim())
-      : null;
-  return { apiUrl: trimTrailingSlashes(body.apiUrl), imageBaseUrl };
+  return {
+    apiUrl: trimTrailingSlashes(body.apiUrl),
+    imageBaseUrl: optionalAddress(body.imageBaseUrl),
+    siteUrl: optionalAddress(body.siteUrl),
+  };
 }

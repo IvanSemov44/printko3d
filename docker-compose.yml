@@ -26,6 +26,8 @@ services:
       Database__ConnectionString: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};GSS Encryption Mode=Disable
       Cors__AllowedOrigins__0: http://localhost:${STOREFRONT_PORT:-5173}
       Cors__AllowedOrigins__1: http://localhost:${ADMIN_PORT:-5174}
+      # The public address of the shop, for the addresses in /sitemap.xml.
+      Site__Url: ${SITE_URL:-http://localhost:${STOREFRONT_PORT:-5173}}
       # Where uploaded product images are kept (decision 0018). Empty until set in .env: only uploading fails then.
       ImageStorage__Endpoint: ${IMAGE_STORAGE_ENDPOINT:-}
       ImageStorage__Region: ${IMAGE_STORAGE_REGION:-}
@@ -47,6 +49,11 @@ services:
     environment:
       API_URL: http://localhost:${API_PORT:-8080}
       IMAGE_BASE_URL: ${IMAGE_BASE_URL:-}
+      # The public address of the shop (canonical addresses, sitemap). Search engines are kept out unless ALLOW_INDEXING is true.
+      SITE_URL: ${SITE_URL:-http://localhost:${STOREFRONT_PORT:-5173}}
+      # nginx forwards /sitemap.xml to the API at this address (inside Docker the API is "api", not "localhost").
+      SITEMAP_UPSTREAM: http://api:8080
+      ALLOW_INDEXING: ${ALLOW_INDEXING:-false}
     ports:
       - "${STOREFRONT_PORT:-5173}:8080"
     depends_on:
