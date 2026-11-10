@@ -26,8 +26,16 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
     public List<StoreSettings> Settings => _storeSettings.Items;
 
+    /// <summary>When set, the next saves fail with this exception, like a database that is down.</summary>
+    public Exception? SaveFailure { get; set; }
+
     public Task SaveAsync(CancellationToken cancellationToken)
     {
+        if (SaveFailure is not null)
+        {
+            throw SaveFailure;
+        }
+
         // Like the real save: a stale version is a conflict and nothing is written.
         if (_category.Expected.Any(e => e.Key.Version != e.Value))
         {
@@ -92,6 +100,15 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
         public Task<Product?> GetByIdAsync(Guid id, bool trackChanges, CancellationToken cancellationToken) =>
             Task.FromResult(Items.SingleOrDefault(p => p.Id == id));
+
+        public void RemoveImage(ProductImage image)
+        {
+            // The real save deletes the row; here it goes at once, which is the same for the service.
+            foreach (var product in Items)
+            {
+                product.Images.Remove(image);
+            }
+        }
 
         public Dictionary<Product, uint> Expected { get; } = [];
 

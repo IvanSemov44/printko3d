@@ -18,6 +18,11 @@ internal sealed class ApiExceptionHandler(IProblemDetailsService problemDetails)
             ConflictException e => ApiProblems.Create(StatusCodes.Status409Conflict, "Conflict", e.Message, e.Code),
             InvalidCredentialsException e => ApiProblems.Create(
                 StatusCodes.Status401Unauthorized, "Sign-in failed", e.Message, "auth.invalid_credentials"),
+            FileRejectedException e => ApiProblems.Create(
+                e.TooLarge ? StatusCodes.Status413PayloadTooLarge : StatusCodes.Status400BadRequest,
+                e.TooLarge ? "File too large" : "File not accepted",
+                e.Message,
+                e.Code),
             ValidationFailedException e => ApiProblems.Validation(e.Message, e.Errors),
             _ => null,
         };

@@ -9,7 +9,7 @@ public sealed class ProductImageAndSettingsTests
     private readonly FakeRepositoryManager _repositories = new();
     private readonly ServiceManager _services;
 
-    public ProductImageAndSettingsTests() => _services = new ServiceManager(_repositories);
+    public ProductImageAndSettingsTests() => _services = new ServiceManager(_repositories, new FakeImageStorage());
 
     private async Task<Guid> CreateProductAsync(string slug = "dragon", string sku = "SKU-1")
     {

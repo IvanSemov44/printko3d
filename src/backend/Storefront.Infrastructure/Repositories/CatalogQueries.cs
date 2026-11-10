@@ -129,6 +129,11 @@ internal sealed class CatalogQueries(StorefrontDbContext context) : ICatalogQuer
                         v.SortOrder,
                     })
                     .ToList(),
+                Images = p.Images
+                    .OrderBy(i => i.SortOrder)
+                    .ThenBy(i => i.Id)
+                    .Select(i => new ProductImageDto(i.Id, i.VariantId, i.StorageKey, i.AltText, i.SortOrder, i.IsPrimary))
+                    .ToList(),
             })
             .SingleOrDefaultAsync(cancellationToken);
 
@@ -159,7 +164,8 @@ internal sealed class CatalogQueries(StorefrontDbContext context) : ICatalogQuer
                         v.Attributes,
                         v.IsActive,
                         v.SortOrder))
-                    .ToList());
+                    .ToList(),
+                row.Images);
     }
 
     public async Task<PagedResult<ProductListItemDto>> GetProductsAsync(

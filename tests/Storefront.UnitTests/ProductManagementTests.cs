@@ -11,7 +11,7 @@ public sealed class ProductManagementTests
     private readonly ServiceManager _services;
     private Guid _categoryId;
 
-    public ProductManagementTests() => _services = new ServiceManager(_repositories);
+    public ProductManagementTests() => _services = new ServiceManager(_repositories, new FakeImageStorage());
 
     private async Task<Guid> CategoryAsync()
     {

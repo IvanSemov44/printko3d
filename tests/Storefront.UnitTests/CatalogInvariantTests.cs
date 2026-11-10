@@ -9,7 +9,7 @@ public sealed class CatalogInvariantTests
     private readonly FakeRepositoryManager _repositories = new();
     private readonly ServiceManager _services;
 
-    public CatalogInvariantTests() => _services = new ServiceManager(_repositories);
+    public CatalogInvariantTests() => _services = new ServiceManager(_repositories, new FakeImageStorage());
 
     private static NewVariant Variant(
         long price = 100,
