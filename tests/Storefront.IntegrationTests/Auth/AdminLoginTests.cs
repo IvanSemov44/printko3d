@@ -11,6 +11,17 @@ namespace Storefront.IntegrationTests.Auth;
 [Collection(PostgresCollection.Name)]
 public sealed class AdminLoginTests(PostgresFixture postgres)
 {
+    private static async Task<List<HttpStatusCode>> WrongLoginsAsync(AuthApiHost host, int count)
+    {
+        var statuses = new List<HttpStatusCode>();
+        for (var i = 0; i < count; i++)
+        {
+            statuses.Add((await host.LoginRawAsync(AuthApiHost.AdminEmail, "wrong")).StatusCode);
+        }
+
+        return statuses;
+    }
+
     [Fact]
     public async Task Login_WithTheRightCredentials_ReturnsTheUserAndASessionCookie()
     {
@@ -72,13 +83,11 @@ public sealed class AdminLoginTests(PostgresFixture postgres)
     public async Task Login_AfterTooManyWrongPasswords_LocksTheAccountEvenForTheRightPassword()
     {
         await using var host = await AuthApiHost.CreateAsync(postgres, attemptsPerMinute: 100);
-        for (var i = 0; i < 5; i++)
-        {
-            Assert.Equal(HttpStatusCode.Unauthorized, (await host.LoginRawAsync(AuthApiHost.AdminEmail, "wrong")).StatusCode);
-        }
+        var wrongAttempts = await WrongLoginsAsync(host, 5);
 
         var response = await host.LoginRawAsync(AuthApiHost.AdminEmail, AuthApiHost.AdminPassword);
 
+        Assert.All(wrongAttempts, status => Assert.Equal(HttpStatusCode.Unauthorized, status));
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         Assert.Null(AuthApiHost.CookieOf(response));
     }
@@ -87,13 +96,11 @@ public sealed class AdminLoginTests(PostgresFixture postgres)
     public async Task Login_AfterTooManyRequestsFromOneClient_Returns429AsProblemDetails()
     {
         await using var host = await AuthApiHost.CreateAsync(postgres, attemptsPerMinute: 3);
-        for (var i = 0; i < 3; i++)
-        {
-            Assert.Equal(HttpStatusCode.Unauthorized, (await host.LoginRawAsync(AuthApiHost.AdminEmail, "wrong")).StatusCode);
-        }
+        var wrongAttempts = await WrongLoginsAsync(host, 3);
 
         var response = await host.LoginRawAsync(AuthApiHost.AdminEmail, AuthApiHost.AdminPassword);
 
+        Assert.All(wrongAttempts, status => Assert.Equal(HttpStatusCode.Unauthorized, status));
         Assert.Equal(HttpStatusCode.TooManyRequests, response.StatusCode);
         Assert.True(response.IsProblemJson());
     }

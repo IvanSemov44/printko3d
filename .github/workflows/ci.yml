@@ -28,6 +28,9 @@ jobs:
       # Warnings are errors via TreatWarningsAsErrors in Directory.Build.props.
       - run: dotnet build Storefront.slnx --no-restore
       - run: dotnet format Storefront.slnx --verify-no-changes --no-restore
+      # Fails when the entities and configurations changed but the migration for it is missing (B25).
+      - run: dotnet tool restore
+      - run: dotnet ef migrations has-pending-model-changes --project src/backend/Storefront.Infrastructure --no-build
       # Integration tests start PostgreSQL with Testcontainers (Docker is available on the runner).
       - run: dotnet test Storefront.slnx --no-build
 
