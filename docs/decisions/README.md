@@ -44,3 +44,5 @@
 - [0018 – Снимките на продукти са в S3-съвместимо хранилище зад `IImageStorage`](0018-product-images-in-s3-compatible-storage.md)
 - [0019 – Настройките на магазина се пазят с версия на реда, а валутата не се сменя, когато това би променило цените](0019-store-settings-row-version-and-currency-lock.md)
 - [0020 – Картата на сайта идва от API, а липсващата страница е с `noindex`](0020-sitemap-from-api-and-soft-404.md)
+- [0021 – Подредба на правилата: `CLAUDE.md`, наръчник и hooks](0021-claude-md-handbook-and-hooks.md)
+- [0022 – Преглед на код при един разработчик](0022-code-review-with-one-developer.md)

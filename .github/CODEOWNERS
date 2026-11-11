@@ -1,0 +1,10 @@
+# Чувствителни пътища: всяка промяна тук се чете от човек (docs/handbook/code-review.md, решение 0022).
+# Сега има един разработчик, затова файлът не налага втори преглед; влиза в сила, когато в защитата на `main`
+# се включи изискване за одобрение от собственик на кода.
+
+/src/backend/Storefront.Infrastructure/Persistence/Migrations/  @IvanSemov44
+/.github/                                                       @IvanSemov44
+/CLAUDE.md                                                      @IvanSemov44
+/docs/decisions/                                                @IvanSemov44
+**/Dockerfile*                                                  @IvanSemov44
+/render.yaml                                                    @IvanSemov44
