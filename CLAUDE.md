@@ -71,7 +71,7 @@
 Редът при конфликт: този файл → решенията → наръчникът → книгата ([0008](docs/decisions/0008-code-style-reference-book.md)). Кой файл кога се чете е в [README на наръчника](docs/handbook/README.md); накратко:
 
 - Функционалност: [new-feature.md](docs/handbook/new-feature.md). Бекенд и база: [backend.md](docs/handbook/backend.md), [csharp-golden-rules.md](docs/handbook/csharp-golden-rules.md), [architecture-and-data-rules.md](docs/handbook/architecture-and-data-rules.md).
-- Фронтенд: [frontend.md](docs/handbook/frontend.md), [react-golden-rules.md](docs/handbook/react-golden-rules.md). Тестове: [testing.md](docs/handbook/testing.md), [test-writing-rules.md](docs/handbook/test-writing-rules.md).
+- Фронтенд: [frontend.md](docs/handbook/frontend.md), [react-golden-rules.md](docs/handbook/react-golden-rules.md). Вид на интерфейса (цветове, шрифтове, компоненти): [design.md](docs/design.md), [0023](docs/decisions/0023-design-system.md). Тестове: [testing.md](docs/handbook/testing.md), [test-writing-rules.md](docs/handbook/test-writing-rules.md).
 - Сигурност, Docker, среди, CI: [security.md](docs/handbook/security.md), [environments.md](docs/handbook/environments.md).
 - Рефакториране, дълг, ритъм, капани, преглед: [refactoring.md](docs/handbook/refactoring.md), [tech-debt.md](docs/tech-debt.md), [cadence.md](docs/handbook/cadence.md), [pitfalls.md](docs/handbook/pitfalls.md), [code-review.md](docs/handbook/code-review.md).
 

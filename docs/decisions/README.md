@@ -46,3 +46,4 @@
 - [0020 – Картата на сайта идва от API, а липсващата страница е с `noindex`](0020-sitemap-from-api-and-soft-404.md)
 - [0021 – Подредба на правилата: `CLAUDE.md`, наръчник и hooks](0021-claude-md-handbook-and-hooks.md)
 - [0022 – Преглед на код при един разработчик](0022-code-review-with-one-developer.md)
+- [0023 – Дизайн система: `docs/design.md`](0023-design-system.md)
