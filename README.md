@@ -11,12 +11,12 @@ cp .env.example .env
 docker compose up --build
 ```
 
-| Услуга | Адрес |
-| --- | --- |
-| Магазин | http://localhost:5173 |
-| Админ панел | http://localhost:5174 |
+| Услуга              | Адрес                        |
+| ------------------- | ---------------------------- |
+| Магазин             | http://localhost:5173        |
+| Админ панел         | http://localhost:5174        |
 | API (`GET /health`) | http://localhost:8080/health |
-| PostgreSQL | `localhost:5433` |
+| PostgreSQL          | `localhost:5433`             |
 
 Магазинът и админ панелът показват дали API е достъпно. Портовете се сменят в `.env` (`API_PORT`, `STOREFRONT_PORT`, `ADMIN_PORT`, `POSTGRES_PORT`). Ако порт е зает от друга програма, например друг Vite сървър, `localhost` в браузъра може да отвори нея вместо контейнера. Тогава я спри или смени порта.
 
@@ -77,12 +77,12 @@ dotnet run --project src/backend/Storefront.Api -- create-admin
 
 Всички адреси са публични `GET` под `/api/v1`. Показват се само `Published` продукти от активни категории и само активните им варианти. Цените са цели числа в най-малката парична единица, а валутата е в `/store-settings`. OpenAPI документът е на `/openapi/v1.json` (само в среда `Development`).
 
-| Адрес | Какво връща |
-| --- | --- |
-| `/categories` | Активните категории, подредени по `sortOrder` |
-| `/products` | Страница с продукти. Параметри: `category` (слъг, обхваща и подкатегориите; непознат слъг дава празна страница), `fulfilmentType` (`InStock` или `MadeToOrder`), `sort` (`name`, `-name`, `price`, `-price`; по подразбиране `name`), `page` (1–10000), `pageSize` (1–48, по подразбиране 12) |
-| `/products/{slug}` | Един продукт с описание, варианти и всички снимки; `404`, ако не се вижда в магазина |
-| `/store-settings` | Настройките на магазина |
+| Адрес              | Какво връща                                                                                                                                                                                                                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/categories`      | Активните категории, подредени по `sortOrder`                                                                                                                                                                                                                                                 |
+| `/products`        | Страница с продукти. Параметри: `category` (слъг, обхваща и подкатегориите; непознат слъг дава празна страница), `fulfilmentType` (`InStock` или `MadeToOrder`), `sort` (`name`, `-name`, `price`, `-price`; по подразбиране `name`), `page` (1–10000), `pageSize` (1–48, по подразбиране 12) |
+| `/products/{slug}` | Един продукт с описание, варианти и всички снимки; `404`, ако не се вижда в магазина                                                                                                                                                                                                          |
+| `/store-settings`  | Настройките на магазина                                                                                                                                                                                                                                                                       |
 
 Списъците връщат `{ items, page, pageSize, totalCount, totalPages }`. Невалидни параметри дават `400`, липсващ ресурс `404`, и двата във формат `ProblemDetails` с допълнително поле `code` (`validation.failed`, `product.not_found`, `store_settings.not_found`), по което клиентът избира текста. `/categories` е без страниране (решение 0009). Снимките са само с `storageKey`, не с пълен адрес.
 
@@ -140,6 +140,7 @@ gitleaks git --redact --verbose
    За снимките на продукти попълни още (решение [0018](docs/decisions/0018-product-images-in-s3-compatible-storage.md)): `IMAGE_BASE_URL` на магазина и на админ панела (публичният адрес на bucket-а) и `ImageStorage__Endpoint`, `ImageStorage__Region`, `ImageStorage__Bucket`, `ImageStorage__AccessKey`, `ImageStorage__SecretKey` на API. Двата ключа са тайни. Без тях демото работи, само качването на снимка връща грешка.
 
    Ако имената са заети и render.com добави наставка, или грешиш адрес, поправи стойностите в Environment на услугата. Промяната на `API_URL` изисква ново внедряване.
+
 3. Приложи миграциите и зареди демо данните от компютъра си (нужни са .NET SDK и външният адрес на базата: `printko3d-db` → Connections → External Database URL). Адресът съдържа паролата, затова не го записвай в репото и не го пращай никъде.
 
    ```bash
@@ -158,6 +159,7 @@ gitleaks git --redact --verbose
    ```
 
    Командата иска паролата в терминала (или я вземи от `Admin__Password`).
+
 4. Отвори адреса на магазина: началната страница, категория и продукт, цени в евро и лента „демо версия“.
 
 **Какво да знаеш за безплатния план** (по документацията на render.com към 2026-11-08; провери я пак преди да разчиташ на нея)
@@ -177,10 +179,10 @@ gitleaks git --redact --verbose
 
 Първото внедряване е направено на 2026-11-08, от `main` чрез [`render.yaml`](render.yaml) (pull request #18):
 
-| Услуга | Адрес |
-| --- | --- |
-| Магазин | https://printko3d-storefront.onrender.com |
-| Админ панел | https://printko3d-admin.onrender.com |
+| Услуга          | Адрес                                     |
+| --------------- | ----------------------------------------- |
+| Магазин         | https://printko3d-storefront.onrender.com |
+| Админ панел     | https://printko3d-admin.onrender.com      |
 | API (`/health`) | https://printko3d-api.onrender.com/health |
 
 Какво е проверено на живо: `/health` е здрав и базата е достъпна; `migrate` приложи първата миграция, а `seed` зареди 4 категории, 16 продукта и настройките на магазина (`is_demo = true`); API връща категории, продукт и настройки; `config.json` на магазина и админ панела сочи към API; CORS отговаря за адреса на магазина; дълбок адрес като `/products/dragon-3d-puzzle` връща страницата, а не `404`. Потвърдено е и предположението, че `PORT=8080` е достатъчен и че безплатната база приема връзки отвън, за да се пуснат `migrate` и `seed` от компютъра.
@@ -196,16 +198,17 @@ gitleaks git --redact --verbose
 
 ## Документи
 
-| Файл | Съдържание |
-| --- | --- |
-| [`CLAUDE.md`](CLAUDE.md) | Правила за код и за работа с ИИ. Подава се в началото на всяка сесия с ИИ |
-| [`docs/requirements.md`](docs/requirements.md) | Обхват, взети решения и изисквания за версия 1 |
-| [`docs/data-model.md`](docs/data-model.md) | Модел на данните на каталога |
-| [`docs/project-start.md`](docs/project-start.md) | Структура на репото и задачи по ред |
-| [`docs/architecture.md`](docs/architecture.md) | Къде стои кой код и къде се слага ново нещо |
-| [`docs/tech-debt.md`](docs/tech-debt.md) | Регистър на техническия дълг |
-| [`docs/decisions/`](docs/decisions/) | Записани решения |
-| [`docs/tasks/`](docs/tasks/) | Описания на задачите за ИИ |
+| Файл                                             | Съдържание                                                                             |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| [`CLAUDE.md`](CLAUDE.md)                         | Правила за код и за работа с ИИ. Подава се в началото на всяка сесия с ИИ              |
+| [`docs/requirements.md`](docs/requirements.md)   | Обхват, взети решения и изисквания за версия 1                                         |
+| [`docs/data-model.md`](docs/data-model.md)       | Модел на данните на каталога                                                           |
+| [`docs/project-start.md`](docs/project-start.md) | Структура на репото и задачи по ред                                                    |
+| [`docs/architecture.md`](docs/architecture.md)   | Къде стои кой код и къде се слага ново нещо                                            |
+| [`docs/handbook/`](docs/handbook/README.md)      | Наръчник: ред на работа, правила за backend и frontend, тестове, рефакториране, капани |
+| [`docs/tech-debt.md`](docs/tech-debt.md)         | Регистър на техническия дълг                                                           |
+| [`docs/decisions/`](docs/decisions/)             | Записани решения                                                                       |
+| [`docs/tasks/`](docs/tasks/)                     | Описания на задачите за ИИ                                                             |
 
 ## Технологии
 
