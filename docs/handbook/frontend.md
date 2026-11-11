@@ -1,6 +1,6 @@
 # Frontend: подредба и правила за `src/web`
 
-Допълва таблицата „Frontend“ в [CLAUDE.md](../../CLAUDE.md) и картата в [architecture.md](../architecture.md). Тук е **как е подредена една функционалност** и какви са границите. Правилата за самото писане на React и TypeScript (кога `useEffect` е грешка, именуване, типове) са в `react-golden-rules.md` (част 16d-1).
+Допълва таблицата „Frontend“ в [CLAUDE.md](../../CLAUDE.md) и картата в [architecture.md](../architecture.md). Тук е **как е подредена една функционалност** и какви са границите. Правилата за самото писане на React и TypeScript (кога `useEffect` е грешка, именуване, типове) са в [react-golden-rules.md](react-golden-rules.md) (правила RC1–RC30).
 
 **Как се чете.** Всяко правило е с отговор „да“ или „не“. „Днес“ казва дали кодът го следва; „не“ е ред в [tech-debt.md](../tech-debt.md).
 
@@ -47,7 +47,7 @@
 | F12 | След промяна hook-ът **връща** `invalidateQueries` (`onSuccess: () => queryClient.invalidateQueries(...)`), за да е мутацията в движение, докато се презареди списъкът. Ако отговорът е целият нов обект, може да се пише директно с `setQueryData`. След грешка при конфликт (версия) се презарежда с `onSettled` или `onError` | Преглед на `useMutation`                                               | `useSetCategoryActive` (`onSettled`), `useMoveCategory` (`setQueryData`) | Да                                                  |
 | F13 | Отговорът на админ API се проверява с четците на `decode.ts` (`readString`, `readInteger`, `field`…) и не се кастира с `as`. Целочислените полета минават през `readInteger`, защото генерираните типове разрешават и текст                                                                                                      | `as` върху резултат от `fetch` или `response.json()` няма              | `adminCategories.ts`                                                     | **Не**: публичният `client.ts` кастира с `as` (D17) |
 | F14 | Типовете на отговорите идват от `schema.d.ts`, генериран от `openapi.json` (`npm run api:types --workspace @storefront/shared`). Файлът не се редактира на ръка                                                                                                                                                                  | `git diff` на `schema.d.ts` след промяна на API съвпада с генерирането | Да                                                                       |
-| F15 | Състояние, което може да се изчисли от props или друго състояние, не се пази като състояние. `useEffect` не е за изчисляване (виж `react-golden-rules.md`)                                                                                                                                                                       | Преглед                                                                | Да                                                                       |
+| F15 | Състояние, което може да се изчисли от props или друго състояние, не се пази като състояние. `useEffect` не е за изчисляване (виж [RC7 и RC11](react-golden-rules.md))                                                                                                                                                           | Преглед                                                                | Да                                                                       |
 
 ## Форми
 
@@ -70,6 +70,6 @@
 
 ## Какво не е тук
 
-- `useEffect`, hooks, props, именуване, типове: `react-golden-rules.md` (16d-1).
+- `useEffect`, hooks, props, именуване, типове, зареждане и грешка на екран: [react-golden-rules.md](react-golden-rules.md).
 - Как се пишат тестовете (заявки по роля, `userEvent`): `test-writing-rules.md` (16d-3). Кога: [testing.md](testing.md).
 - Ред на работа за нов екран: [new-feature.md](new-feature.md).
