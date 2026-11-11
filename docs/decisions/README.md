@@ -29,6 +29,7 @@
 - [0002 – Един магазин на инсталация](0002-single-store-per-installation.md)
 - [0003 – Магазин и админ панел като отделни приложения](0003-separate-storefront-and-admin.md)
 - [0004 – Публично GitHub репо до включване на GitHub Pro](0004-public-repository.md)
+- [0005 – Допускаме находката за minimatch в dev инструментите](0005-tolerate-minimatch-dev-alert.md)
 - [0006 – Слоеве по книгата: прости ентита, repository-та, услуги и контролери](0006-book-style-layers-and-controllers.md)
 - [0007 – Схемата на базата е в генериран документ, който се проверява](0007-generated-database-schema-document.md)
 - [0010 – TanStack Query за слоя с API заявки и генерирани типове от OpenAPI](0010-tanstack-query-for-api-layer.md)
