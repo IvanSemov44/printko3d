@@ -6,6 +6,31 @@
 
 **Източници.** [Efficient Querying](https://learn.microsoft.com/en-us/ef/core/performance/efficient-querying), [Pagination](https://learn.microsoft.com/en-us/ef/core/querying/pagination) и [Applying Migrations](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying) на EF Core; [Task asynchronous programming](https://learn.microsoft.com/en-us/dotnet/csharp/asynchronous-programming/task-asynchronous-programming-model); „Ultimate ASP.NET Core Web API“ на Code Maze (гл. 5–6 за услуги и изключения), през 0008.
 
+## Общи правила за бекенда (преместени от `CLAUDE.md`)
+
+Решение [0021](../decisions/0021-claude-md-handbook-and-hooks.md) премести тук таблицата „Backend“ от `CLAUDE.md` без промяна в смисъла. Правилата B1–B28 по-долу ги разширяват и не ги отменят.
+
+Структурата е прост модулен монолит с четири проекта: Domain, Application, Infrastructure и Api. Не се ползват CQRS и външна библиотека за посредник, докато няма реална нужда от тях. Ентитата са прости класове, достъпът до данни е през repository-та и `IRepositoryManager`, а правилата на модела са в услуги на Application; API е с контролери (решение [0006](../decisions/0006-book-style-layers-and-controllers.md)).
+
+| Тема                | Правило                                                                                                                                                    |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Зависимости         | Domain не зависи от нищо. Api не говори директно с `DbContext`, а през услуги на Application                                                               |
+| Версия и компилатор | Текущата LTS версия на .NET, включени nullable reference types, предупрежденията са грешки                                                                 |
+| API                 | REST под `/api/v1`, OpenAPI документация, еднакъв формат за страниране във всички списъци                                                                  |
+| Структура на API    | Структура на `Storefront.Api` и стил на контролерите: решение [0017](../decisions/0017-api-structure-and-style.md) и [architecture.md](../architecture.md) |
+| DTO                 | Entity обектите никога не се връщат от API. Картографирането е явно или в самата заявка                                                                    |
+| Асинхронност        | Целият път е `async`, а всяка операция приема и подава `CancellationToken`                                                                                 |
+| Валидация           | Входът се валидира на границата на API. Инвариантите на модела се пазят в услугите на Application, а тези, които могат, и в базата                         |
+| EF Core             | Конфигурация в отделен клас за всеки обект, без lazy loading, за четене `AsNoTracking` и `Select` към DTO, без N+1 заявки                                  |
+| Миграции            | Влизат в репото, имат смислено име и се прилагат върху чиста база в CI. Не се редактират след merge                                                        |
+| Ограничения         | Уникалността и външните ключове се налагат в базата, не само в кода                                                                                        |
+| Списъци             | Винаги със страниране и максимален размер на страницата                                                                                                    |
+| Грешки              | Формат `ProblemDetails`, без stack trace в продукция, без прихващане на всички изключения                                                                  |
+| Логове              | Структурирани, с идентификатор на заявката, без лични данни и тайни                                                                                        |
+| Конфигурация        | Options pattern и променливи на средата. Настройките на магазина идват от таблицата, не от кода                                                            |
+| Нови пакети         | Само след одобрение. Предпочита се вграденото в .NET, а за всеки пакет се проверява лицензът и поддръжката                                                 |
+| Стил                | `.editorconfig`, форматиране в CI, без закоментиран код и без `TODO` без свързана задача                                                                   |
+
 ## Услуги (`Application/Catalog/Services/`)
 
 | №   | Правило                                                                                                                                                                                                                  | Как се проверява                                                                                                          | Образец                                | Днес                                            |
