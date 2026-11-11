@@ -27,10 +27,12 @@ export function StoreSettingsProvider({ children }: StoreSettingsProviderProps) 
     return <StoreSettingsContext value={data}>{children}</StoreSettingsContext>;
   }
 
+  // The role goes on the text, not on <main>: a landmark that is also an alert or a status is no landmark any more.
   if (isError && !isFetching) {
     return (
-      <main className="status-screen" role="alert">
-        <p>{t('settings.error')}</p>
+      <main className="status-screen">
+        <title>{t('settings.errorTitle')}</title>
+        <p role="alert">{t('settings.error')}</p>
         <button type="button" onClick={() => void refetch()}>
           {t('settings.retry')}
         </button>
@@ -39,8 +41,9 @@ export function StoreSettingsProvider({ children }: StoreSettingsProviderProps) 
   }
 
   return (
-    <main className="status-screen" role="status">
-      {t('settings.loading')}
+    <main className="status-screen">
+      <title>{t('settings.loading')}</title>
+      <p role="status">{t('settings.loading')}</p>
     </main>
   );
 }

@@ -27,7 +27,10 @@ export function ProductDetailsView({ product }: { product: ProductDetails }) {
         <p className="product-short">{product.shortDescription}</p>
       )}
       <div className="product-layout">
-        <ProductGallery images={imagesForVariant(product.images, variant?.id)} />
+        <ProductGallery
+          images={imagesForVariant(product.images, variant?.id)}
+          fallbackAlt={product.name}
+        />
         <div className="product-info">
           {variant && (
             <>
