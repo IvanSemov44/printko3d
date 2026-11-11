@@ -71,5 +71,5 @@
 ## Какво не е тук
 
 - `useEffect`, hooks, props, именуване, типове, зареждане и грешка на екран: [react-golden-rules.md](react-golden-rules.md).
-- Как се пишат тестовете (заявки по роля, `userEvent`): `test-writing-rules.md` (16d-3). Кога: [testing.md](testing.md).
+- Как се пишат тестовете (заявки по роля, `userEvent`): [test-writing-rules.md](test-writing-rules.md). Кога: [testing.md](testing.md).
 - Ред на работа за нов екран: [new-feature.md](new-feature.md).
