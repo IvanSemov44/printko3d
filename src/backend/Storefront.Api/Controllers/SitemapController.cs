@@ -18,7 +18,7 @@ public sealed class SitemapController(IServiceManager services, IOptions<SiteOpt
     [HttpGet]
     [ProducesResponseType<string>(StatusCodes.Status200OK, "application/xml")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetSitemap(CancellationToken cancellationToken)
+    public async Task<ActionResult> GetSitemap(CancellationToken cancellationToken)
     {
         var siteUrl = site.Value.Url;
         if (siteUrl == string.Empty)
