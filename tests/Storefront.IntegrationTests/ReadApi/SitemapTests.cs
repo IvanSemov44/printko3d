@@ -58,17 +58,19 @@ public sealed class SitemapTests(PostgresFixture postgres)
     {
         await using var host = await ReadApiHost.CreateAsync(postgres, "https://shop.test");
         var figures = Category("figures");
-        await host.SeedAsync(db => AddAll(db, [figures], [Product(figures, "dragon")]));
+        var dragon = Product(figures, "dragon");
+        await host.SeedAsync(db => AddAll(db, [figures], [dragon]));
 
         var urls = await GetUrlsAsync(host);
 
+        // The save stamps UpdatedAt on the tracked entities; the sitemap shows it to the second, in UTC.
         Assert.Null(urls[0].Element(Ns + "lastmod"));
-        foreach (var url in urls.Skip(1))
-        {
-            var lastModified = DateTimeOffset.Parse(url.Element(Ns + "lastmod")!.Value, System.Globalization.CultureInfo.InvariantCulture);
-            Assert.True(DateTimeOffset.UtcNow - lastModified < TimeSpan.FromMinutes(5));
-        }
+        Assert.Equal(LastModifiedText(figures.UpdatedAt), urls[1].Element(Ns + "lastmod")!.Value);
+        Assert.Equal(LastModifiedText(dragon.UpdatedAt), urls[2].Element(Ns + "lastmod")!.Value);
     }
+
+    private static string LastModifiedText(DateTimeOffset value) =>
+        value.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", System.Globalization.CultureInfo.InvariantCulture);
 
     [Fact]
     public async Task Sitemap_Gives404_WhenTheAddressOfTheShopIsNotSet()
