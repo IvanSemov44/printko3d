@@ -17,11 +17,11 @@ internal sealed class ReadApiHost : IAsyncDisposable
     private readonly SqlCommandCounter _counter = new();
     private readonly WebApplicationFactory<Program> _factory;
 
-    private ReadApiHost(TestDatabase database)
+    private ReadApiHost(TestDatabase database, string? siteUrl)
     {
         Database = database;
         _factory = new ApiFactory(database.ConnectionString).WithWebHostBuilder(builder =>
-            builder.ConfigureServices(services =>
+            builder.UseSetting("Site:Url", siteUrl ?? string.Empty).ConfigureServices(services =>
                 services.ConfigureDbContext<StorefrontDbContext>(options => options.AddInterceptors(_counter))));
         Client = _factory.CreateClient();
     }
@@ -32,8 +32,8 @@ internal sealed class ReadApiHost : IAsyncDisposable
 
     public int SqlCommandCount => _counter.Count;
 
-    public static async Task<ReadApiHost> CreateAsync(PostgresFixture postgres) =>
-        new(await postgres.CreateDatabaseAsync());
+    public static async Task<ReadApiHost> CreateAsync(PostgresFixture postgres, string? siteUrl = null) =>
+        new(await postgres.CreateDatabaseAsync(), siteUrl);
 
     public async Task SeedAsync(Action<StorefrontDbContext> add)
     {

@@ -2,26 +2,48 @@
 set -eu
 : "${API_URL:?API_URL must be set}"
 
+# Where the files go. The defaults are the places in the image; a test can point them elsewhere.
+WEB_ROOT="${WEB_ROOT:-/usr/share/nginx/html}"
+CONF_DIR="${CONF_DIR:-/tmp}"
+
+# A value that ends up in JSON and in the nginx configuration may only hold plain address characters.
+check_address() {
+    name="$1"
+    value="$2"
+    case "$value" in
+        http://* | https://*) ;;
+        *) echo "$name must start with http:// or https://" >&2; exit 1 ;;
+    esac
+    case "$value" in
+        *[!A-Za-z0-9.:/_-]*) echo "$name contains characters that are not allowed" >&2; exit 1 ;;
+    esac
+}
+
 # Optional: the public address that the images are served from (decision 0011). It goes into config.json, where the apps
 # build the address of an image, and into the Content-Security-Policy, which would otherwise block the images.
-# The value ends up in JSON and in the nginx configuration, so only plain address characters are allowed.
 IMAGE_BASE="${IMAGE_BASE_URL:-}"
 IMAGE_BASE="${IMAGE_BASE%/}"
 if [ -n "$IMAGE_BASE" ]; then
-    case "$IMAGE_BASE" in
-        http://* | https://*) ;;
-        *) echo "IMAGE_BASE_URL must start with http:// or https://" >&2; exit 1 ;;
-    esac
-    case "$IMAGE_BASE" in
-        *[!A-Za-z0-9.:/_-]*) echo "IMAGE_BASE_URL contains characters that are not allowed" >&2; exit 1 ;;
-    esac
-    printf '{ "apiUrl": "%s", "imageBaseUrl": "%s" }\n' "$API_URL" "$IMAGE_BASE" > /usr/share/nginx/html/config.json
-else
-    printf '{ "apiUrl": "%s" }\n' "$API_URL" > /usr/share/nginx/html/config.json
+    check_address IMAGE_BASE_URL "$IMAGE_BASE"
 fi
 
+# Optional: the public address of the shop (the storefront only). It goes into config.json, where the shop builds its
+# canonical and sharing addresses, and into robots.txt, for the address of the sitemap.
+SITE="${SITE_URL:-}"
+SITE="${SITE%/}"
+if [ -n "$SITE" ]; then
+    check_address SITE_URL "$SITE"
+fi
+
+{
+    printf '{ "apiUrl": "%s"' "$API_URL"
+    if [ -n "$IMAGE_BASE" ]; then printf ', "imageBaseUrl": "%s"' "$IMAGE_BASE"; fi
+    if [ -n "$SITE" ]; then printf ', "siteUrl": "%s"' "$SITE"; fi
+    printf ' }\n'
+} > "$WEB_ROOT/config.json"
+
 # default.conf.template reads $image_src. Without an image address it is empty and the policy stays as strict as before.
-IMAGE_SRC_CONF=/tmp/image-src.conf
+IMAGE_SRC_CONF="$CONF_DIR/image-src.conf"
 if [ -n "$IMAGE_BASE" ]; then
     printf 'set $image_src "%s/";\n' "$IMAGE_BASE" > "$IMAGE_SRC_CONF"
 else
@@ -30,16 +52,11 @@ fi
 
 # Only the admin panel sets API_UPSTREAM. nginx then forwards /api/ to the API, so the browser talks to one
 # address and the session cookie belongs to one site (decision 0014). Without it the file is empty.
-PROXY_CONF=/tmp/api-proxy.conf
+PROXY_CONF="$CONF_DIR/api-proxy.conf"
+SITEMAP_CONF="$CONF_DIR/sitemap-proxy.conf"
 if [ -n "${API_UPSTREAM:-}" ]; then
     UPSTREAM="${API_UPSTREAM%/}"
-    case "$UPSTREAM" in
-        http://* | https://*) ;;
-        *) echo "API_UPSTREAM must start with http:// or https://" >&2; exit 1 ;;
-    esac
-    case "$UPSTREAM" in
-        *[!A-Za-z0-9.:/_-]*) echo "API_UPSTREAM contains characters that are not allowed" >&2; exit 1 ;;
-    esac
+    check_address API_UPSTREAM "$UPSTREAM"
     {
         printf 'location /api/ {\n'
         printf '    proxy_pass %s;\n' "$UPSTREAM"
@@ -52,6 +69,36 @@ if [ -n "${API_UPSTREAM:-}" ]; then
         printf '    client_max_body_size 6m;\n'
         printf '}\n'
     } > "$PROXY_CONF"
+    # The admin panel has no sitemap.
+    : > "$SITEMAP_CONF"
 else
     : > "$PROXY_CONF"
+    # The storefront serves /sitemap.xml from the API (the API builds it from the catalog), so a robot sees the
+    # shop's own address.
+    # SITEMAP_UPSTREAM is the address of the API as the container reaches it. Without it, the public one: that is enough on
+    # render.com, but not in Docker, where "localhost" is the container itself.
+    API_ADDRESS="${SITEMAP_UPSTREAM:-$API_URL}"
+    API_ADDRESS="${API_ADDRESS%/}"
+    check_address SITEMAP_UPSTREAM "$API_ADDRESS"
+    {
+        printf 'location = /sitemap.xml {\n'
+        printf '    proxy_pass %s/sitemap.xml;\n' "$API_ADDRESS"
+        printf '    proxy_http_version 1.1;\n'
+        printf '    proxy_set_header Host $proxy_host;\n'
+        printf '    proxy_ssl_server_name on;\n'
+        printf '    proxy_read_timeout 90s;\n'
+        printf '}\n'
+    } > "$SITEMAP_CONF"
+fi
+
+# robots.txt. Search engines are kept out unless ALLOW_INDEXING=true, so a demo or a local copy is never indexed by
+# accident. The admin panel is always kept out.
+if [ "${ALLOW_INDEXING:-}" = "true" ] && [ -z "${API_UPSTREAM:-}" ]; then
+    if [ -z "$SITE" ]; then
+        echo "ALLOW_INDEXING=true needs SITE_URL, for the address of the sitemap" >&2
+        exit 1
+    fi
+    printf 'User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n' "$SITE" > "$WEB_ROOT/robots.txt"
+else
+    printf 'User-agent: *\nDisallow: /\n' > "$WEB_ROOT/robots.txt"
 fi

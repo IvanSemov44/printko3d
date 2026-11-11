@@ -23,4 +23,7 @@ public interface ICatalogQueries
     Task<ProductAdminDto?> GetAdminProductAsync(Guid id, CancellationToken cancellationToken);
 
     Task<StoreSettingsDto?> GetStoreSettingsAsync(CancellationToken cancellationToken);
+
+    /// <summary>Addresses for the sitemap: the categories the shop shows, then the visible products. At most <paramref name="limit"/>.</summary>
+    Task<IReadOnlyList<SitemapEntryDto>> GetSitemapEntriesAsync(int limit, CancellationToken cancellationToken);
 }

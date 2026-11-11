@@ -22,6 +22,7 @@ public sealed partial class ClosedByDefaultTests(PostgresFixture postgres)
         "GET health",
         "POST api/v1/auth/login",
         "GET openapi/{documentName}.json",
+        "GET sitemap.xml",
     ];
 
     [Fact]

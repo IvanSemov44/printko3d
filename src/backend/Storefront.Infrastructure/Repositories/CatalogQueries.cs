@@ -319,6 +319,28 @@ internal sealed class CatalogQueries(StorefrontDbContext context) : ICatalogQuer
                 s.IsDemo))
             .FirstOrDefaultAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<SitemapEntryDto>> GetSitemapEntriesAsync(int limit, CancellationToken cancellationToken)
+    {
+        // Slugs are plain, but a path is built for an address, so each part is escaped.
+        var categories = await VisibleCategories()
+            .OrderBy(c => c.Slug)
+            .Take(limit)
+            .Select(c => new { c.Slug, c.UpdatedAt })
+            .ToListAsync(cancellationToken);
+
+        var products = await VisibleProducts()
+            .OrderBy(p => p.Slug)
+            .Take(limit - categories.Count)
+            .Select(p => new { p.Slug, p.UpdatedAt })
+            .ToListAsync(cancellationToken);
+
+        return
+        [
+            .. categories.Select(c => new SitemapEntryDto("/categories/" + Uri.EscapeDataString(c.Slug), c.UpdatedAt)),
+            .. products.Select(p => new SitemapEntryDto("/products/" + Uri.EscapeDataString(p.Slug), p.UpdatedAt)),
+        ];
+    }
+
     /// <summary>
     /// What the shop may show: published, with at least one active variant, in an active category
     /// whose parent (if any) is active too.

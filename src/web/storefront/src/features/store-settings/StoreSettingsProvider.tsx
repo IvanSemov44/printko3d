@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react';
 import { t } from '../../i18n';
 import { StoreSettingsContext } from './StoreSettingsContext';
 import { applyTheme } from './theme';
+import { useRuntimeConfigQuery } from './useRuntimeConfigQuery';
 import { useStoreSettingsQuery } from './useStoreSettingsQuery';
 
 interface StoreSettingsProviderProps {
@@ -9,7 +10,12 @@ interface StoreSettingsProviderProps {
 }
 
 export function StoreSettingsProvider({ children }: StoreSettingsProviderProps) {
-  const { data, isError, isFetching, refetch } = useStoreSettingsQuery();
+  const settings = useStoreSettingsQuery();
+  const config = useRuntimeConfigQuery();
+  const { data } = settings;
+  const isError = settings.isError || config.isError;
+  const isFetching = settings.isFetching || config.isFetching;
+  const refetch = () => Promise.all([settings.refetch(), config.refetch()]);
 
   useEffect(() => {
     if (data) {
@@ -17,7 +23,7 @@ export function StoreSettingsProvider({ children }: StoreSettingsProviderProps) 
     }
   }, [data]);
 
-  if (data) {
+  if (data && config.data) {
     return <StoreSettingsContext value={data}>{children}</StoreSettingsContext>;
   }
 

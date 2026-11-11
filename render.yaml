@@ -28,6 +28,9 @@ services:
         fromDatabase:
           name: printko3d-db
           property: connectionString
+      # The public address of the storefront, for the addresses in /sitemap.xml (the same as SITE_URL of the storefront).
+      - key: Site__Url
+        sync: false
       # The public addresses of the storefront and the admin panel, for example https://printko3d-storefront.onrender.com
       - key: Cors__AllowedOrigins__0
         sync: false
@@ -65,6 +68,10 @@ services:
         sync: false
       # The public address that the images are read from (decision 0011), the same in the shop and in the panel.
       - key: IMAGE_BASE_URL
+        sync: false
+      # The public address of the shop, for canonical addresses and robots.txt. ALLOW_INDEXING is not set here: the demo is kept
+      # out of search engines.
+      - key: SITE_URL
         sync: false
 
   - type: web

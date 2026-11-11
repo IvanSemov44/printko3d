@@ -16,6 +16,7 @@ describe('loadRuntimeConfig', () => {
     await expect(loadRuntimeConfig()).resolves.toEqual({
       apiUrl: 'http://api.test',
       imageBaseUrl: null,
+      siteUrl: null,
     });
   });
 
@@ -43,5 +44,23 @@ describe('loadRuntimeConfig', () => {
     stubConfig({}, 500);
 
     await expect(loadRuntimeConfig()).rejects.toThrow('500');
+  });
+});
+
+describe('loadRuntimeConfig: shop address', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('reads the public address of the shop without trailing slashes', async () => {
+    stubConfig({ apiUrl: 'http://api.test', siteUrl: 'https://shop.test/' });
+
+    await expect(loadRuntimeConfig()).resolves.toMatchObject({ siteUrl: 'https://shop.test' });
+  });
+
+  it.each([[undefined], [''], ['  '], [7]])('treats %j as no shop address', async (value) => {
+    stubConfig({ apiUrl: 'http://api.test', siteUrl: value });
+
+    await expect(loadRuntimeConfig()).resolves.toMatchObject({ siteUrl: null });
   });
 });

@@ -28,6 +28,11 @@ internal static class ApiSetup
         builder.Services.AddScoped<HealthService>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddApiCors(builder.Configuration);
+        builder.Services
+            .AddOptions<SiteOptions>()
+            .Bind(builder.Configuration.GetSection(SiteOptions.SectionName))
+            .Validate(SiteOptions.IsValid, "Site:Url must be an http(s) address without a path, for example https://shop.example.")
+            .ValidateOnStart();
     }
 
     /// <summary>The order matters: errors first, then CORS, the limiter, the CSRF check, and who you are before what you may do.</summary>
