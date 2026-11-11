@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   categoriesFixture,
+  findContent,
   pageFixture,
   productFixture,
   renderApp,
@@ -37,7 +38,7 @@ function lastPageRequested(fetchMock: ReturnType<typeof stub>): string | null {
 
 /** The product list is the only list inside the main content. */
 async function findProductList(): Promise<HTMLElement> {
-  return within(await screen.findByRole('main')).findByRole('list');
+  return within(await findContent()).findByRole('list');
 }
 
 const threePages = (url: URL) => {

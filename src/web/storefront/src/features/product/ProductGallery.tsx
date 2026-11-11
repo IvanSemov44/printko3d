@@ -9,7 +9,14 @@ const LARGE_SIZE = 800;
 const THUMBNAIL_SIZE = 96;
 
 /** The large image plus, when there are several, thumbnails as toggle buttons (keyboard and screen reader friendly). */
-export function ProductGallery({ images }: { images: ProductImage[] }) {
+/** `fallbackAlt` (the name of the product) is the text of a picture that has none of its own. */
+export function ProductGallery({
+  images,
+  fallbackAlt,
+}: {
+  images: ProductImage[];
+  fallbackAlt: string;
+}) {
   const t = useT();
   const [chosenId, setChosenId] = useState<string | null>(null);
   const [failedIds, setFailedIds] = useState<ReadonlySet<string>>(new Set());
@@ -26,7 +33,7 @@ export function ProductGallery({ images }: { images: ProductImage[] }) {
         {current ? (
           <StoredImage
             image={current}
-            alt={current.altText}
+            alt={current.altText !== '' ? current.altText : fallbackAlt}
             size={LARGE_SIZE}
             isLarge
             failed={failedIds.has(current.id)}

@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   categoriesFixture,
+  findContent,
   imageFixture,
   productDetailsFixture,
   renderApp,
@@ -37,7 +38,7 @@ function location(): string {
 }
 
 async function findMain(): Promise<HTMLElement> {
-  return screen.findByRole('main');
+  return findContent();
 }
 
 async function findOffer(): Promise<HTMLElement> {

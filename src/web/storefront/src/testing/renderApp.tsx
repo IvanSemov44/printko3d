@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { MemoryRouter, useLocation, useNavigationType } from 'react-router';
 import { vi } from 'vitest';
 import { App } from '../App';
@@ -181,4 +181,18 @@ export function renderApp(initialPath = '/') {
       </MemoryRouter>
     </QueryClientProvider>,
   );
+}
+
+/**
+ * The content area of the layout. The screen before the shop is there (settings loading) is a `main` too, so a test that
+ * wants the page waits for this one, which has the id that the skip link points to.
+ */
+export async function findContent(): Promise<HTMLElement> {
+  return waitFor(() => {
+    const content = document.getElementById('content');
+    if (content === null) {
+      throw new Error('The layout is not shown yet');
+    }
+    return content;
+  });
 }

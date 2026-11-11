@@ -18,11 +18,17 @@ function CardImage({ product }: { product: ProductListItem }) {
   const showImage = image !== null && image.url !== null && !failed;
 
   return (
-    <Link to={`/products/${product.slug}`} tabIndex={-1} className="product-card-image">
+    // Without a picture the link has nothing to read out, and the name below leads to the same page: hide it.
+    <Link
+      to={`/products/${product.slug}`}
+      tabIndex={-1}
+      className="product-card-image"
+      aria-hidden={showImage ? undefined : true}
+    >
       {showImage ? (
         <img
           src={image.url ?? undefined}
-          alt={image.altText}
+          alt={image.altText !== '' ? image.altText : product.name}
           width={IMAGE_SIZE}
           height={IMAGE_SIZE}
           loading="lazy"
