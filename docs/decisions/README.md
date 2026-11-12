@@ -48,3 +48,4 @@
 - [0021 – Подредба на правилата: `CLAUDE.md`, наръчник и hooks](0021-claude-md-handbook-and-hooks.md)
 - [0022 – Преглед на код при един разработчик](0022-code-review-with-one-developer.md)
 - [0023 – Дизайн система: `docs/design.md`](0023-design-system.md)
+- [0024 – TypeScript 7 за build на приложенията, 5.9 за linter-а](0024-two-typescript-versions.md)
