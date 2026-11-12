@@ -1,5 +1,5 @@
 import { formatMoney, type ProductDetails, type ProductVariant } from '@storefront/shared';
-import { describeAvailability } from '../catalog/availability';
+import { availabilityKind, describeAvailability } from '../catalog/availability';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 
 interface ProductOfferProps {
@@ -37,7 +37,13 @@ export function ProductOffer({ product, variant }: ProductOfferProps) {
         <span className="visually-hidden">{t('product.price')} </span>
         {money(variant.price)}
       </p>
-      <p>{availability}</p>
+      <p>
+        <span
+          className={`badge badge-${availabilityKind({ fulfilmentType: product.fulfilmentType, isAvailable: variant.isAvailable })}`}
+        >
+          {availability}
+        </span>
+      </p>
     </div>
   );
 }

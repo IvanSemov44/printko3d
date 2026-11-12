@@ -29,14 +29,15 @@ describe('names of links and pictures', () => {
     vi.unstubAllGlobals();
   });
 
-  it('gives a product without a picture one link, not a second one with nothing to read', async () => {
+  it('gives a product without a picture one link named after the product', async () => {
     stub({ products: [productFixture()] });
     renderApp('/categories/puzzles');
     const list = await within(await findContent()).findByRole('list');
 
     const links = within(list).getAllByRole('link');
 
-    expect(links.map((link) => link.textContent)).toEqual(['Dragon']);
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/products/dragon']);
+    expect(links[0]).toHaveAccessibleName(expect.stringContaining('Dragon'));
   });
 
   it('names the picture of a card after the product when the picture has no text of its own', async () => {
@@ -47,8 +48,8 @@ describe('names of links and pictures', () => {
     const list = await within(await findContent()).findByRole('list');
 
     expect(within(list).getByRole('img', { name: 'Dragon' })).toBeInTheDocument();
-    // The picture is a link too, and the picture has the name of the product.
-    expect(within(list).getAllByRole('link', { name: 'Dragon' })).toHaveLength(2);
+    // The picture is inside the one link of the card.
+    expect(within(list).getAllByRole('link', { name: /Dragon/ })).toHaveLength(1);
   });
 
   it('keeps the text of the picture when it has one', async () => {

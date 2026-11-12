@@ -1,6 +1,6 @@
 import type { Category } from '@storefront/shared';
 import { useEffect, useRef } from 'react';
-import { Navigate, useSearchParams } from 'react-router';
+import { Link, Navigate, useSearchParams } from 'react-router';
 import { LoadingStatus } from '../layout/LoadingStatus';
 import { PageMeta } from '../seo/PageMeta';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
@@ -37,7 +37,14 @@ export function CategoryProducts({ category }: { category: Category }) {
     const last = data.totalPages;
     content = <Navigate replace to={{ search: last === 1 ? '' : `?page=${String(last)}` }} />;
   } else if (data.totalPages === 0) {
-    content = <p>{t('catalog.empty')}</p>;
+    content = (
+      <div className="empty-state">
+        <p>{t('catalog.empty')}</p>
+        <Link to="/" className="button">
+          {t('catalog.emptyAction')}
+        </Link>
+      </div>
+    );
   } else {
     content = (
       <>

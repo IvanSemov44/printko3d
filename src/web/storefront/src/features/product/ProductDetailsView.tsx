@@ -3,6 +3,7 @@ import { PageMeta } from '../seo/PageMeta';
 import { ProductStructuredData } from '../seo/ProductStructuredData';
 import { ProductGallery } from './ProductGallery';
 import { ProductOffer } from './ProductOffer';
+import { ProductSpecs } from './ProductSpecs';
 import { useSelectedVariant } from './useSelectedVariant';
 import { VariantPicker } from './VariantPicker';
 import { defaultImage, imagesForVariant } from './variantSelection';
@@ -22,25 +23,26 @@ export function ProductDetailsView({ product }: { product: ProductDetails }) {
         type="product"
       />
       <ProductStructuredData product={product} />
-      <h1>{product.name}</h1>
-      {product.shortDescription !== '' && (
-        <p className="product-short">{product.shortDescription}</p>
-      )}
       <div className="product-layout">
         <ProductGallery
           images={imagesForVariant(product.images, variant?.id)}
           fallbackAlt={product.name}
         />
         <div className="product-info">
+          <h1>{product.name}</h1>
+          {product.shortDescription !== '' && (
+            <p className="product-short">{product.shortDescription}</p>
+          )}
           {variant && (
             <>
-              <VariantPicker variants={product.variants} selected={variant} onSelect={select} />
               <ProductOffer product={product} variant={variant} />
+              <VariantPicker variants={product.variants} selected={variant} onSelect={select} />
             </>
           )}
           {product.description !== '' && (
             <p className="product-description">{product.description}</p>
           )}
+          {variant && <ProductSpecs variant={variant} />}
         </div>
       </div>
     </article>
