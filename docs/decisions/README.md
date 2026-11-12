@@ -50,3 +50,4 @@
 - [0023 – Дизайн система: `docs/design.md`](0023-design-system.md)
 - [0024 – TypeScript 7 за build на приложенията, 5.9 за linter-а](0024-two-typescript-versions.md)
 - [0025 – React Compiler е включен в build на магазина и на админ панела](0025-react-compiler-in-the-build.md)
+- [0026 – `@storefront/shared` се чете от изходния код през `resolve.alias`](0026-shared-alias-for-windows-links.md)
