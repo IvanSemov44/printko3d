@@ -41,7 +41,7 @@ describe('moving between pages (a single-page app does not reload, so the page h
   it('moves the focus to the content and announces the heading of the new page', async () => {
     stub();
     renderApp('/');
-    await screen.findByRole('heading', { level: 1, name: 'Начало' });
+    await screen.findByRole('heading', { level: 1, name: 'Направено слой по слой' });
 
     fireEvent.click(
       within(await screen.findByRole('navigation', { name: 'Категории' })).getByRole('link', {
@@ -75,7 +75,7 @@ describe('moving between pages (a single-page app does not reload, so the page h
 
     fireEvent.click(screen.getByRole('link', { name: 'Test Shop' }));
     await waitFor(() => {
-      expect(announcement()).toBe('Начало');
+      expect(announcement()).toBe('Направено слой по слой');
     });
   });
 

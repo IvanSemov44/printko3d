@@ -565,3 +565,54 @@ h1:focus {
 .pagination a {
   color: inherit;
 }
+
+.hero {
+  margin: 0 0 3rem;
+  padding: 2rem 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0 5px,
+    rgba(28, 26, 23, 0.04) 5px 6px
+  );
+}
+
+.hero h1 {
+  max-width: 20ch;
+  margin-bottom: 1rem;
+}
+
+.hero-eyebrow {
+  margin: 0 0 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+.hero-text {
+  max-width: 36rem;
+  margin: 0 0 1.5rem;
+  font-size: 1.125rem;
+}
+
+.home-section {
+  margin: 0 0 3rem;
+}
+
+.home-section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.home-section-header h2 {
+  margin: 0;
+}
+
+@media (min-width: 48rem) {
+  .hero {
+    padding: 4rem 3rem;
+  }
+}
