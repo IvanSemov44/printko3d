@@ -1,4 +1,4 @@
-import { adminRequest, adminSend } from './adminHttp';
+import { apiRequest, apiSend } from './http';
 import {
   field,
   readArray,
@@ -55,12 +55,12 @@ const readAdminCategories = readArray(readAdminCategory);
 
 /** All categories, the inactive ones too, without paging (decision 0016). */
 export async function getAdminCategories(signal?: AbortSignal): Promise<AdminCategory[]> {
-  return readAdminCategories(await adminRequest(CATEGORIES_PATH, { signal }), 'categories');
+  return readAdminCategories(await apiRequest(CATEGORIES_PATH, { signal }), 'categories');
 }
 
 /** A taken slug is an ApiError with status 409 and code `category.slug_taken`. */
 export async function createCategory(input: CategoryInput): Promise<AdminCategory> {
-  return readAdminCategory(await adminSend('POST', CATEGORIES_PATH, input), 'category');
+  return readAdminCategory(await apiSend('POST', CATEGORIES_PATH, input), 'category');
 }
 
 /** Also 409 with code `category.version_conflict` when someone saved the category after `version` was read. */
@@ -70,7 +70,7 @@ export async function updateCategory(
   version: number,
 ): Promise<AdminCategory> {
   return readAdminCategory(
-    await adminSend('PUT', `${CATEGORIES_PATH}/${id}`, { ...input, version }),
+    await apiSend('PUT', `${CATEGORIES_PATH}/${id}`, { ...input, version }),
     'category',
   );
 }
@@ -82,7 +82,7 @@ export async function setCategoryActive(
 ): Promise<AdminCategory> {
   const action = isActive ? 'activate' : 'deactivate';
   return readAdminCategory(
-    await adminSend('POST', `${CATEGORIES_PATH}/${id}/${action}`, { version }),
+    await apiSend('POST', `${CATEGORIES_PATH}/${id}/${action}`, { version }),
     'category',
   );
 }
@@ -94,7 +94,7 @@ export async function moveCategory(
   version: number,
 ): Promise<AdminCategory[]> {
   return readAdminCategories(
-    await adminSend('POST', `${CATEGORIES_PATH}/${id}/move`, { direction, version }),
+    await apiSend('POST', `${CATEGORIES_PATH}/${id}/move`, { direction, version }),
     'categories',
   );
 }

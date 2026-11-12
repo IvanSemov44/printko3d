@@ -1,4 +1,4 @@
-import { adminRequest, adminSend, adminUpload } from './adminHttp';
+import { apiRequest, apiSend, apiUpload } from './http';
 import type { MoveDirection } from './adminCategories';
 import {
   field,
@@ -231,19 +231,19 @@ export async function getAdminProducts(
   params.set('page', String(query.page));
   params.set('pageSize', String(query.pageSize));
   return readPage(
-    await adminRequest(`${PRODUCTS_PATH}?${params.toString()}`, { signal }),
+    await apiRequest(`${PRODUCTS_PATH}?${params.toString()}`, { signal }),
     'products',
   );
 }
 
 /** One product with all its variants, the inactive ones too. An unknown id is an ApiError with status 404. */
 export async function getAdminProduct(id: string, signal?: AbortSignal): Promise<AdminProduct> {
-  return readProduct(await adminRequest(`${PRODUCTS_PATH}/${id}`, { signal }), 'product');
+  return readProduct(await apiRequest(`${PRODUCTS_PATH}/${id}`, { signal }), 'product');
 }
 
 /** A new product is a draft without variants. A taken slug is an ApiError with status 409 and code `product.slug_taken`. */
 export async function createProduct(input: ProductInput): Promise<AdminProduct> {
-  return readProduct(await adminSend('POST', PRODUCTS_PATH, input), 'product');
+  return readProduct(await apiSend('POST', PRODUCTS_PATH, input), 'product');
 }
 
 /** Also 409 with code `product.version_conflict` when someone saved the product after `version` was read. */
@@ -253,7 +253,7 @@ export async function updateProduct(
   version: number,
 ): Promise<AdminProduct> {
   return readProduct(
-    await adminSend('PUT', `${PRODUCTS_PATH}/${id}`, { ...input, version }),
+    await apiSend('PUT', `${PRODUCTS_PATH}/${id}`, { ...input, version }),
     'product',
   );
 }
@@ -265,7 +265,7 @@ export async function setProductStatus(
   version: number,
 ): Promise<AdminProduct> {
   return readProduct(
-    await adminSend('PUT', `${PRODUCTS_PATH}/${id}/status`, { status, version }),
+    await apiSend('PUT', `${PRODUCTS_PATH}/${id}/status`, { status, version }),
     'product',
   );
 }
@@ -277,7 +277,7 @@ export async function addVariant(
   sortOrder: number,
 ): Promise<AdminProduct> {
   return readProduct(
-    await adminSend('POST', `${PRODUCTS_PATH}/${productId}/variants`, {
+    await apiSend('POST', `${PRODUCTS_PATH}/${productId}/variants`, {
       ...input,
       isActive: true,
       sortOrder,
@@ -292,7 +292,7 @@ export async function updateVariant(
   input: VariantInput,
 ): Promise<AdminProduct> {
   return readProduct(
-    await adminSend('PUT', `${PRODUCTS_PATH}/${productId}/variants/${variantId}`, input),
+    await apiSend('PUT', `${PRODUCTS_PATH}/${productId}/variants/${variantId}`, input),
     'product',
   );
 }
@@ -304,7 +304,7 @@ export async function setVariantActive(
   isActive: boolean,
 ): Promise<AdminProduct> {
   return readProduct(
-    await adminSend('PUT', `${PRODUCTS_PATH}/${productId}/variants/${variantId}/active`, {
+    await apiSend('PUT', `${PRODUCTS_PATH}/${productId}/variants/${variantId}/active`, {
       isActive,
     }),
     'product',
@@ -317,7 +317,7 @@ export async function moveVariant(
   direction: MoveDirection,
 ): Promise<AdminProduct> {
   return readProduct(
-    await adminSend('POST', `${PRODUCTS_PATH}/${productId}/variants/${variantId}/move`, {
+    await apiSend('POST', `${PRODUCTS_PATH}/${productId}/variants/${variantId}/move`, {
       direction,
     }),
     'product',
@@ -353,7 +353,7 @@ export async function uploadProductImage(
   if (input.variantId !== null) {
     form.append('variantId', input.variantId);
   }
-  return readProduct(await adminUpload(`${PRODUCTS_PATH}/${productId}/images`, form), 'product');
+  return readProduct(await apiUpload(`${PRODUCTS_PATH}/${productId}/images`, form), 'product');
 }
 
 /** Replaces the alt text and the variant of an image. */
@@ -363,7 +363,7 @@ export async function updateProductImage(
   input: { altText: string; variantId: string | null },
 ): Promise<AdminProduct> {
   return readProduct(
-    await adminSend('PUT', `${PRODUCTS_PATH}/${productId}/images/${imageId}`, input),
+    await apiSend('PUT', `${PRODUCTS_PATH}/${productId}/images/${imageId}`, input),
     'product',
   );
 }
@@ -374,7 +374,7 @@ export async function setPrimaryProductImage(
   imageId: string,
 ): Promise<AdminProduct> {
   return readProduct(
-    await adminSend('PUT', `${PRODUCTS_PATH}/${productId}/images/${imageId}/primary`, {}),
+    await apiSend('PUT', `${PRODUCTS_PATH}/${productId}/images/${imageId}/primary`, {}),
     'product',
   );
 }
@@ -385,7 +385,7 @@ export async function moveProductImage(
   direction: MoveDirection,
 ): Promise<AdminProduct> {
   return readProduct(
-    await adminSend('POST', `${PRODUCTS_PATH}/${productId}/images/${imageId}/move`, {
+    await apiSend('POST', `${PRODUCTS_PATH}/${productId}/images/${imageId}/move`, {
       direction,
     }),
     'product',
@@ -398,7 +398,7 @@ export async function deleteProductImage(
   imageId: string,
 ): Promise<AdminProduct> {
   return readProduct(
-    await adminSend('DELETE', `${PRODUCTS_PATH}/${productId}/images/${imageId}`, undefined),
+    await apiSend('DELETE', `${PRODUCTS_PATH}/${productId}/images/${imageId}`, undefined),
     'product',
   );
 }

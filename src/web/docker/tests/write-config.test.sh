@@ -49,6 +49,9 @@ expect_file "config.json is as before" "$OUT/html/config.json" '{ "apiUrl": "htt
 expect_file "robots.txt keeps everybody out by default" "$OUT/html/robots.txt" 'User-agent: *\nDisallow: /'
 expect_contains "sitemap goes to the API" "$OUT/conf/sitemap-proxy.conf" "proxy_pass http://api.test/sitemap.xml;"
 expect_empty "no admin proxy for the storefront" "$OUT/conf/api-proxy.conf"
+expect_contains "cart goes to the API" "$OUT/conf/cart-proxy.conf" "proxy_pass http://api.test;"
+expect_contains "only the cart is forwarded" "$OUT/conf/cart-proxy.conf" 'location ~ ^/api/v1/cart(/|$) {'
+if grep -qF "admin" "$OUT/conf/cart-proxy.conf"; then echo "FAIL cart proxy must not mention admin"; FAILED=1; fi
 
 run_case "indexing allowed" 0 API_URL=http://api.test SITE_URL=https://shop.test/ ALLOW_INDEXING=true IMAGE_BASE_URL=http://img.test/
 expect_file "config.json has all addresses" "$OUT/html/config.json" '{ "apiUrl": "http://api.test", "imageBaseUrl": "http://img.test", "siteUrl": "https://shop.test" }'
@@ -65,10 +68,12 @@ run_case "site address must be plain" 1 API_URL=http://api.test 'SITE_URL=https:
 
 run_case "sitemap upstream differs from the public address of the API" 0 API_URL=http://localhost:8080 SITEMAP_UPSTREAM=http://api:8080/
 expect_contains "sitemap goes to the address the container can reach" "$OUT/conf/sitemap-proxy.conf" "proxy_pass http://api:8080/sitemap.xml;"
+expect_contains "cart goes to the address the container can reach" "$OUT/conf/cart-proxy.conf" "proxy_pass http://api:8080;"
 
 run_case "admin panel" 0 API_URL=http://api.test API_UPSTREAM=http://api:8080/ ALLOW_INDEXING=true SITE_URL=https://shop.test
 expect_file "admin panel is never indexed" "$OUT/html/robots.txt" 'User-agent: *\nDisallow: /'
 expect_empty "admin panel has no sitemap" "$OUT/conf/sitemap-proxy.conf"
+expect_empty "admin panel has no cart proxy" "$OUT/conf/cart-proxy.conf"
 expect_contains "admin panel forwards /api/" "$OUT/conf/api-proxy.conf" "proxy_pass http://api:8080;"
 
 if [ "$FAILED" -eq 0 ]; then
