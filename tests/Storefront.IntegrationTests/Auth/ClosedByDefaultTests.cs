@@ -15,6 +15,11 @@ public sealed partial class ClosedByDefaultTests(PostgresFixture postgres)
     // The complete list of addresses that need no sign-in. A new address that is open must be added here on purpose.
     private static readonly string[] OpenAddresses =
     [
+        "DELETE api/v1/cart",
+        "DELETE api/v1/cart/items/{variantId:guid}",
+        "GET api/v1/cart",
+        "POST api/v1/cart/items",
+        "PUT api/v1/cart/items/{variantId:guid}",
         "GET api/v1/categories",
         "GET api/v1/products",
         "GET api/v1/products/{slug}",

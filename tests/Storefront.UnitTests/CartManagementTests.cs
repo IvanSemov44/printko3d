@@ -88,22 +88,25 @@ public sealed class CartManagementTests
     }
 
     [Theory]
-    [InlineData(1, true)]
-    [InlineData(20, true)]
-    [InlineData(21, false)]
-    public async Task Add_AcceptsAtMostTwentyUnitsOfOneVariant(int quantity, bool isAccepted)
+    [InlineData(1)]
+    [InlineData(20)]
+    public async Task Add_AcceptsOneToTwentyUnitsOfOneVariant(int quantity)
     {
         var variantId = OrderableVariant();
 
-        var attempt = Service().AddItemAsync(null, variantId, quantity, default);
+        await Service().AddItemAsync(null, variantId, quantity, default);
 
-        if (isAccepted)
-        {
-            await attempt;
-            return;
-        }
+        Assert.Equal(quantity, Assert.Single(Assert.Single(_repositories.Carts).Items).Quantity);
+    }
 
-        var error = await Assert.ThrowsAsync<RuleViolationException>(() => attempt);
+    [Fact]
+    public async Task Add_RejectsTwentyOneUnitsOfOneVariant_AndCreatesNoCart()
+    {
+        var variantId = OrderableVariant();
+
+        var error = await Assert.ThrowsAsync<RuleViolationException>(
+            () => Service().AddItemAsync(null, variantId, 21, default));
+
         Assert.Equal("cart.quantity_too_high", error.Code);
         Assert.Empty(_repositories.Carts);
     }
@@ -145,28 +148,36 @@ public sealed class CartManagementTests
         Assert.Equal(0, _repositories.SaveCount);
     }
 
-    [Theory]
-    [InlineData(49, true)]
-    [InlineData(50, false)]
-    public async Task Add_AcceptsAtMostFiftyDifferentVariants(int existingLines, bool isAccepted)
+    private async Task<(CartService Service, string? Token)> CartWithLinesAsync(int lines)
     {
         var service = Service();
         string? token = null;
-        for (var i = 0; i < existingLines; i++)
+        for (var i = 0; i < lines; i++)
         {
             token = (await service.AddItemAsync(token, OrderableVariant(), 1, default)).Token;
         }
 
-        var attempt = service.AddItemAsync(token, OrderableVariant(), 1, default);
+        return (service, token);
+    }
 
-        if (isAccepted)
-        {
-            await attempt;
-            Assert.Equal(50, Assert.Single(_repositories.Carts).Items.Count);
-            return;
-        }
+    [Fact]
+    public async Task Add_AcceptsTheFiftiethDifferentVariant()
+    {
+        var (service, token) = await CartWithLinesAsync(49);
 
-        var error = await Assert.ThrowsAsync<RuleViolationException>(() => attempt);
+        await service.AddItemAsync(token, OrderableVariant(), 1, default);
+
+        Assert.Equal(50, Assert.Single(_repositories.Carts).Items.Count);
+    }
+
+    [Fact]
+    public async Task Add_RejectsTheFiftyFirstDifferentVariant_AndKeepsFiftyLines()
+    {
+        var (service, token) = await CartWithLinesAsync(50);
+
+        var error = await Assert.ThrowsAsync<RuleViolationException>(
+            () => service.AddItemAsync(token, OrderableVariant(), 1, default));
+
         Assert.Equal("cart.too_many_items", error.Code);
         Assert.Equal(50, Assert.Single(_repositories.Carts).Items.Count);
     }

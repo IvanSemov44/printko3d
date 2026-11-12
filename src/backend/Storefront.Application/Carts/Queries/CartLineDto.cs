@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Storefront.Application.Catalog.Queries;
 
 namespace Storefront.Application.Carts.Queries;
@@ -13,4 +14,4 @@ public sealed record CartLineDto(
     long UnitPrice,
     int Quantity,
     long LinePrice,
-    CartLineState State);
+    [property: JsonConverter(typeof(JsonStringEnumConverter<CartLineState>))] CartLineState State);

@@ -16,6 +16,8 @@ internal sealed class ApiExceptionHandler(IProblemDetailsService problemDetails)
         {
             NotFoundException e => ApiProblems.Create(StatusCodes.Status404NotFound, "Not found", e.Message, e.Code),
             ConflictException e => ApiProblems.Create(StatusCodes.Status409Conflict, "Conflict", e.Message, e.Code),
+            RuleViolationException e => ApiProblems.Create(
+                StatusCodes.Status422UnprocessableEntity, "Request not allowed", e.Message, e.Code),
             InvalidCredentialsException e => ApiProblems.Create(
                 StatusCodes.Status401Unauthorized, "Sign-in failed", e.Message, "auth.invalid_credentials"),
             FileRejectedException e => ApiProblems.Create(
