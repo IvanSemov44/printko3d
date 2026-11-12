@@ -1,3 +1,4 @@
 {
-  "dotnet.defaultSolution": "Storefront.slnx"
+  "dotnet.defaultSolution": "Storefront.slnx",
+  "terminal.integrated.defaultProfile.windows": "PowerShell"
 }
