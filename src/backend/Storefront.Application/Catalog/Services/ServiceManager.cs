@@ -1,3 +1,4 @@
+using Storefront.Application.Carts;
 using Storefront.Application.Contracts;
 
 namespace Storefront.Application.Catalog;
@@ -9,6 +10,7 @@ public sealed class ServiceManager(IRepositoryManager repositories, IImageStorag
 
     private readonly Lazy<IStoreSettingsService> _storeSettings = new(() => new StoreSettingsService(repositories));
     private readonly Lazy<ICatalogReadService> _catalog = new(() => new CatalogReadService(repositories));
+    private readonly Lazy<ICartService> _cart = new(() => new CartService(repositories));
 
     public ICategoryService Category => _category.Value;
 
@@ -17,4 +19,6 @@ public sealed class ServiceManager(IRepositoryManager repositories, IImageStorag
     public IStoreSettingsService StoreSettings => _storeSettings.Value;
 
     public ICatalogReadService Catalog => _catalog.Value;
+
+    public ICartService Cart => _cart.Value;
 }
