@@ -27,7 +27,13 @@ public sealed class CartApiTests(PostgresFixture postgres)
     private static string? CookieOf(HttpResponseMessage response) => SetCookieHeaderOf(response)?.Split(';')[0];
 
     private static async Task<Guid> SeedVariantAsync(
-        AuthApiHost host, string slug = "dragon", string sku = "DRG-001", ProductStatus status = ProductStatus.Published)
+        AuthApiHost host,
+        string slug = "dragon",
+        string sku = "DRG-001",
+        ProductStatus status = ProductStatus.Published,
+        int stock = 100,
+        FulfilmentType fulfilmentType = FulfilmentType.InStock,
+        int? leadTimeDays = null)
     {
         await using var context = host.Database.CreateContext();
         var category = await context.Categories.FirstOrDefaultAsync();
@@ -37,9 +43,10 @@ public sealed class CartApiTests(PostgresFixture postgres)
             context.Add(category);
         }
 
-        var product = CatalogData.Product(category.Id, slug);
+        var product = CatalogData.Product(category.Id, slug, fulfilmentType, leadTimeDays);
         product.Status = status;
         var variant = CatalogData.Variant(product, sku);
+        variant.StockQuantity = stock;
         context.Add(product);
         await context.SaveChangesAsync();
         return variant.Id;
@@ -210,6 +217,55 @@ public sealed class CartApiTests(PostgresFixture postgres)
         Assert.True(response.IsProblemJson());
         Assert.Equal("cart.quantity_too_high", (await JsonOf(response)).GetProperty("code").GetString());
         Assert.Null(SetCookieHeaderOf(response));
+    }
+
+    [Fact]
+    public async Task Add_MoreThanIsInStock_Is422_WithTheCode_AndSetsNoCookie()
+    {
+        await using var host = await AuthApiHost.CreateAsync(postgres);
+        var variantId = await SeedVariantAsync(host, stock: 2);
+
+        var response = await AddAsync(host, variantId, 3);
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        Assert.True(response.IsProblemJson());
+        Assert.Equal("cart.quantity_exceeds_stock", (await JsonOf(response)).GetProperty("code").GetString());
+        Assert.Null(SetCookieHeaderOf(response));
+    }
+
+    [Fact]
+    public async Task SetQuantity_AboveTheStock_Is422_WithTheCode()
+    {
+        await using var host = await AuthApiHost.CreateAsync(postgres);
+        var variantId = await SeedVariantAsync(host, stock: 2);
+        var cookie = CookieOf(await AddAsync(host, variantId, 1))!;
+
+        var response = await host.SendAsync(
+            HttpMethod.Put, $"{ItemsUrl}/{variantId}", new { quantity = 3 }, cookie);
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        Assert.Equal("cart.quantity_exceeds_stock", (await JsonOf(response)).GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task TheLine_CarriesTheFulfilmentTheLeadTimeAndTheLimitOfTheStepper()
+    {
+        await using var host = await AuthApiHost.CreateAsync(postgres);
+        var stocked = await SeedVariantAsync(host, stock: 4);
+        var madeToOrder = await SeedVariantAsync(
+            host, "vase", "VAS-001", fulfilmentType: FulfilmentType.MadeToOrder, leadTimeDays: 7);
+        var cookie = CookieOf(await AddAsync(host, stocked, 1))!;
+        await AddAsync(host, madeToOrder, 1, cookie);
+
+        var lines = (await JsonOf(await host.SendAsync(HttpMethod.Get, CartUrl, cookie: cookie))).GetProperty("lines");
+
+        var first = lines[0];
+        Assert.Equal("InStock", first.GetProperty("fulfilmentType").GetString());
+        Assert.Equal(4, first.GetProperty("availableQuantity").GetInt32());
+        var second = lines[1];
+        Assert.Equal("MadeToOrder", second.GetProperty("fulfilmentType").GetString());
+        Assert.Equal(7, second.GetProperty("leadTimeDays").GetInt32());
+        Assert.Equal(JsonValueKind.Null, second.GetProperty("availableQuantity").ValueKind);
     }
 
     [Fact]

@@ -167,7 +167,7 @@ public sealed class CartServiceDatabaseTests(PostgresFixture postgres)
     [Fact]
     public async Task ChangesPersist_AndRefreshUpdatedAtOfTheCart()
     {
-        await using var setup = await CreateAsync();
+        await using var setup = await CreateAsync(stock: 10);
         var change = await InScopeAsync(setup, s => s.Cart.AddItemAsync(null, setup.VariantId, 2, default));
         var before = await CartUpdatedAtAsync(setup);
 

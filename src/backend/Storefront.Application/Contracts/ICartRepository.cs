@@ -9,8 +9,8 @@ public interface ICartRepository
     /// <summary>Finds the cart by the SHA-256 hash of the cookie token, with its lines. Null when there is none.</summary>
     Task<Cart?> GetByTokenHashAsync(byte[] tokenHash, bool trackChanges, CancellationToken cancellationToken);
 
-    /// <summary>Can the variant be put in a cart? It must exist, be active and belong to a published product.</summary>
-    Task<bool> IsVariantOrderableAsync(Guid variantId, CancellationToken cancellationToken);
+    /// <summary>Reads what the cart needs to judge a variant (orderable, fulfilment, stock) in one query. Null when the variant does not exist.</summary>
+    Task<VariantSupply?> GetSupplyAsync(Guid variantId, CancellationToken cancellationToken);
 
     /// <summary>Marks the line as new for the next save.</summary>
     void AddItem(CartItem item);
