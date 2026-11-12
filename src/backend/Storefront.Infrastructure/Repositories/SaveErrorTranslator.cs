@@ -20,6 +20,8 @@ internal static class SaveErrorTranslator
         ["ux_product_images_one_primary_per_product"] =
             ("Another image became the primary one at the same moment. Reload and try again.", "image.primary_conflict"),
         ["IX_product_variants_sku"] = ("The SKU is already used.", "variant.sku_taken"),
+        ["IX_cart_items_cart_id_variant_id"] =
+            ("The variant was added to the cart at the same moment. Try again.", "cart.item_conflict"),
     };
 
     private const string ChangedByOthers = "The record was changed by someone else. Reload it and try again.";

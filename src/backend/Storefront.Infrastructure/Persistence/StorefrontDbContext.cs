@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Storefront.Domain;
+using Storefront.Domain.Carts;
 using Storefront.Domain.Catalog;
 using Storefront.Infrastructure.Identity;
 using Storefront.Infrastructure.Persistence.Configurations;
@@ -22,6 +23,10 @@ public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> op
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
 
     public DbSet<StoreSettings> StoreSettings => Set<StoreSettings>();
+
+    public DbSet<Cart> Carts => Set<Cart>();
+
+    public DbSet<CartItem> CartItems => Set<CartItem>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
