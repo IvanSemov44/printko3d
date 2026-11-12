@@ -54,6 +54,8 @@ describe('design tokens', () => {
     ['ink-muted', 'surface-alt', 4.5],
     ['secondary', 'bg', 4.5],
     ['secondary', 'surface', 4.5],
+    ['secondary', 'surface-alt', 4.5],
+    ['ink', 'surface-alt', 4.5],
     ['on-primary', 'primary', 4.5],
     ['on-primary', 'primary-hover', 4.5],
     ['on-secondary', 'secondary', 4.5],

@@ -93,6 +93,23 @@
   --shadow-stack: 4px 4px 0 var(--color-ink);
   --shadow-stack-pressed: 2px 2px 0 var(--color-ink);
   --lift: translate(-2px, -2px);
+
+  --gutter: 1rem;
+  --content-width: 75rem;
+  --header-height: 3.5rem;
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --gutter: 2rem;
+    --header-height: 4rem;
+  }
 }
 
 *,
@@ -170,11 +187,6 @@ h3 {
 :focus-visible {
   outline: 3px solid var(--color-secondary);
   outline-offset: 2px;
-}
-
-/* Teal on the primary-coloured header would not be readable, so it uses the text colour of the primary. */
-.site-header :focus-visible {
-  outline-color: var(--color-on-primary);
 }
 
 a {
@@ -298,21 +310,27 @@ button:disabled,
 }
 
 .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 1.5rem;
-  padding: 0.75rem 1rem;
-  background: var(--color-primary);
-  color: var(--color-on-primary);
+  column-gap: 1.5rem;
+  min-height: var(--header-height);
+  padding-block: 0.25rem;
+  padding-inline: max(var(--gutter), calc((100% - var(--content-width)) / 2 + var(--gutter)));
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
 }
 
 .site-name {
   display: inline-flex;
-  font-family: var(--font-display);
   align-items: center;
   min-height: 2.75rem;
-  font-size: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
   font-weight: 700;
   text-decoration: none;
 }
@@ -320,7 +338,7 @@ button:disabled,
 .category-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1rem;
+  gap: 0 1.25rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -330,18 +348,26 @@ button:disabled,
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
+  border-bottom: 3px solid transparent;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.category-nav a:hover {
+  border-bottom-color: var(--color-border);
 }
 
 .category-nav a[aria-current='page'] {
+  border-bottom-color: var(--color-primary);
   font-weight: 700;
 }
 
 main {
   flex: 1;
   width: 100%;
-  max-width: 60rem;
+  max-width: var(--content-width);
   margin: 0 auto;
-  padding: 1.5rem 1rem;
+  padding: 2rem var(--gutter) 4rem;
 }
 
 main:focus {
@@ -353,9 +379,28 @@ main:focus {
 }
 
 .site-footer {
-  padding: 1rem;
-  background: var(--color-surface-alt);
+  margin-top: 2rem;
+  padding-block: 2rem;
+  padding-inline: max(var(--gutter), calc((100% - var(--content-width)) / 2 + var(--gutter)));
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-surface-alt);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0 5px,
+    rgba(28, 26, 23, 0.04) 5px 6px
+  );
   overflow-wrap: anywhere;
+}
+
+.site-footer-name {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.site-footer a {
+  color: var(--color-secondary);
 }
 
 .site-footer p {
