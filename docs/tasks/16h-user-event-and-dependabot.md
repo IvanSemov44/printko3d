@@ -14,7 +14,7 @@
 - `@testing-library/user-event` е в `devDependencies` на `src/web`; `package-lock.json` е от `npm`.
 - Поне три теста (по един в `storefront`, `admin`) ползват `userEvent` вместо `fireEvent`, без отслабване на проверките; [testing.md](../handbook/testing.md) казва, че нови тестове са с `userEvent`.
 - `.github/dependabot.yml` е за `npm` (`/src/web`), `nuget` (`/`), `github-actions` (`/`) и `docker` (`/src/backend`, `/src/web/docker`), седмично, с групи за малки версии и префикс `build(deps)`.
-- D28 е обновен, не е платен до край; D51 записва локалния проблем с тестовете.
+- D28 е обновен, не е платен до край; D51 записва локалния проблем с тестовете (платен със задача 16j).
 - `eslint-plugin-jsx-a11y`: резултатът от проверката е записан (по-горе); решението е отворен въпрос.
 - `lint`, `format:check`, тестовете и `build` минават; CI е зелен.
 
