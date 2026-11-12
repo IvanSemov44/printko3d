@@ -1,12 +1,26 @@
 import { ApiStatus, useApiHealth, type AdminUser } from '@storefront/shared';
+import { lazy, Suspense } from 'react';
 import { Link, Navigate, NavLink, Route, Routes } from 'react-router';
+import { PageLoadBoundary } from '../../components/PageLoadBoundary';
 import { t } from '../../i18n';
-import { CategoryFormPage } from '../categories/CategoryFormPage';
-import { CategoryListPage } from '../categories/CategoryListPage';
-import { ProductFormPage } from '../products/ProductFormPage';
-import { ProductListPage } from '../products/ProductListPage';
-import { SettingsPage } from '../settings/SettingsPage';
 import { useLogout } from './useAdminSession';
+
+// Each group of pages is its own file, loaded when the first page of the group is opened.
+const ProductListPage = lazy(() =>
+  import('../products/ProductListPage').then((m) => ({ default: m.ProductListPage })),
+);
+const ProductFormPage = lazy(() =>
+  import('../products/ProductFormPage').then((m) => ({ default: m.ProductFormPage })),
+);
+const CategoryListPage = lazy(() =>
+  import('../categories/CategoryListPage').then((m) => ({ default: m.CategoryListPage })),
+);
+const CategoryFormPage = lazy(() =>
+  import('../categories/CategoryFormPage').then((m) => ({ default: m.CategoryFormPage })),
+);
+const SettingsPage = lazy(() =>
+  import('../settings/SettingsPage').then((m) => ({ default: m.SettingsPage })),
+);
 
 /** What the signed-in administrator sees: who is signed in, the menu and the page of the address. */
 export function SignedIn({ user }: { user: AdminUser }) {
@@ -47,25 +61,29 @@ export function SignedIn({ user }: { user: AdminUser }) {
         <NavLink to="/settings">{t('nav.settings')}</NavLink>
       </nav>
 
-      <Routes>
-        <Route index element={<Navigate to="/categories" replace />} />
-        <Route path="products" element={<ProductListPage />} />
-        <Route path="products/new" element={<ProductFormPage />} />
-        <Route path="products/:id" element={<ProductFormPage />} />
-        <Route path="categories" element={<CategoryListPage />} />
-        <Route path="categories/new" element={<CategoryFormPage />} />
-        <Route path="categories/:id" element={<CategoryFormPage />} />
-        <Route path="settings" element={<SettingsPage />} />
-        <Route
-          path="*"
-          element={
-            <>
-              <p>{t('nav.notFound')}</p>
-              <Link to="/categories">{t('categories.backToList')}</Link>
-            </>
-          }
-        />
-      </Routes>
+      <PageLoadBoundary>
+        <Suspense fallback={<p role="status">{t('auth.loading')}</p>}>
+          <Routes>
+            <Route index element={<Navigate to="/categories" replace />} />
+            <Route path="products" element={<ProductListPage />} />
+            <Route path="products/new" element={<ProductFormPage />} />
+            <Route path="products/:id" element={<ProductFormPage />} />
+            <Route path="categories" element={<CategoryListPage />} />
+            <Route path="categories/new" element={<CategoryFormPage />} />
+            <Route path="categories/:id" element={<CategoryFormPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route
+              path="*"
+              element={
+                <>
+                  <p>{t('nav.notFound')}</p>
+                  <Link to="/categories">{t('categories.backToList')}</Link>
+                </>
+              }
+            />
+          </Routes>
+        </Suspense>
+      </PageLoadBoundary>
     </>
   );
 }
