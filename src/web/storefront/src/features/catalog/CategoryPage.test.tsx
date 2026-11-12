@@ -71,11 +71,13 @@ describe('category page', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Puzzles' })).toBeInTheDocument();
     const items = within(await findProductList()).getAllByRole('listitem');
     expect(items).toHaveLength(2);
-    expect(within(items[0]).getByRole('link', { name: 'Dragon' })).toHaveAttribute(
+    const [dragon] = items;
+    if (dragon === undefined) throw new Error('The list has no items');
+    expect(within(dragon).getByRole('link', { name: 'Dragon' })).toHaveAttribute(
       'href',
       '/products/dragon',
     );
-    expect(within(items[0]).getByText('A printed dragon')).toBeInTheDocument();
+    expect(within(dragon).getByText('A printed dragon')).toBeInTheDocument();
     expect(productRequests(fetchMock)[0]?.get('category')).toBe('puzzles');
     expect(productRequests(fetchMock)[0]?.get('pageSize')).toBe('12');
   });
