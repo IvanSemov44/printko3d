@@ -23,6 +23,7 @@
   "nav.label": "Основно меню",
   "nav.categories": "Категории",
   "nav.notFound": "Страницата не е намерена.",
+  "nav.pageFailed": "Страницата не можа да се покаже. Опитай отново или презареди.",
   "categories.title": "Категории",
   "categories.new": "Нова категория",
   "categories.newTitle": "Нова категория",
