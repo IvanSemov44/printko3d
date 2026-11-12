@@ -1,6 +1,10 @@
+using Microsoft.Extensions.Options;
 using Storefront.Api.Auth;
+using Storefront.Api.Background;
 using Storefront.Api.Errors;
+using Storefront.Application.Carts;
 using Storefront.Application.Catalog;
+using Storefront.Application.Contracts;
 using Storefront.Application.Health;
 using Storefront.Infrastructure;
 
@@ -28,6 +32,7 @@ internal static class ApiSetup
         builder.Services.AddScoped<HealthService>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddApiCors(builder.Configuration);
+        builder.AddCartCleanup();
         builder.Services
             .AddOptions<SiteOptions>()
             .Bind(builder.Configuration.GetSection(SiteOptions.SectionName))
@@ -64,5 +69,20 @@ internal static class ApiSetup
                 .WithOrigins(allowedOrigins)
                 .WithMethods(HttpMethods.Get)
                 .AllowAnyHeader()));
+    }
+
+    /// <summary>The daily cleanup of old carts (decision 0027), with its settings checked at startup.</summary>
+    private static void AddCartCleanup(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .AddOptions<CartCleanupOptions>()
+            .Bind(builder.Configuration.GetSection(CartCleanupOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        builder.Services.AddScoped<ICartCleanupService>(services => new CartCleanupService(
+            services.GetRequiredService<IRepositoryManager>(),
+            services.GetRequiredService<TimeProvider>(),
+            services.GetRequiredService<IOptions<CartCleanupOptions>>().Value.BatchSize));
+        builder.Services.AddHostedService<CartCleanupWorker>();
     }
 }

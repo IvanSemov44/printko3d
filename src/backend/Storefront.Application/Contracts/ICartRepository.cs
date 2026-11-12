@@ -23,4 +23,11 @@ public interface ICartRepository
 
     /// <summary>Makes the next save refresh <c>UpdatedAt</c> of the cart, because changing a line does not change the cart row.</summary>
     void Touch(Cart cart);
+
+    /// <summary>
+    /// Deletes up to <paramref name="batchSize"/> carts last changed before <paramref name="cutoff"/> (only the empty ones when
+    /// <paramref name="onlyEmpty"/>), with their lines, and returns how many it deleted. A cart changed while the batch
+    /// is deleted is kept.
+    /// </summary>
+    Task<int> DeleteStaleAsync(DateTimeOffset cutoff, bool onlyEmpty, int batchSize, CancellationToken cancellationToken);
 }

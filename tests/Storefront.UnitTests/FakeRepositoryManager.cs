@@ -36,6 +36,8 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
     public ICartQueries CartQueries => _cartQueries;
 
+    public int CartDeleteCalls => _cart.DeleteCalls;
+
     public ICatalogQueries Catalog => throw new NotSupportedException("Read queries are covered by the integration tests.");
 
     public List<StoreSettings> Settings => _storeSettings.Items;
@@ -152,6 +154,22 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
         public void RemoveItems(Cart cart) => cart.Items.Clear();
 
         public void Touch(Cart cart) => Touched.Add(cart);
+
+        public int DeleteCalls { get; private set; }
+
+        public Task<int> DeleteStaleAsync(
+            DateTimeOffset cutoff, bool onlyEmpty, int batchSize, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            DeleteCalls++;
+            var stale = Items
+                .Where(c => c.UpdatedAt < cutoff && (!onlyEmpty || c.Items.Count == 0))
+                .OrderBy(c => c.UpdatedAt)
+                .Take(batchSize)
+                .ToList();
+            Items.RemoveAll(stale.Contains);
+            return Task.FromResult(stale.Count);
+        }
     }
 
     private sealed class FakeCartQueries(FakeCartRepository carts) : ICartQueries
