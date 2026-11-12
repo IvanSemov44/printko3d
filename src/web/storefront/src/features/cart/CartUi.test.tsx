@@ -11,44 +11,8 @@ import {
   stubNetwork,
   variantFixture,
 } from '../../testing/renderApp';
+import { fakeServer } from '../../testing/fakeCartServer';
 import { plain } from '../../testing/text';
-
-/** A cart that behaves like the server: a change gives back the whole cart, and the sums are the server's. */
-function fakeServer(options: { initial?: Record<string, unknown>[]; failWith?: Response } = {}) {
-  let lines = options.initial ?? [];
-  const requests: { method: string; url: string; headers: Headers; body: unknown }[] = [];
-  const cart = (url: string, init?: RequestInit) => {
-    const method = init?.method ?? 'GET';
-    const body = typeof init?.body === 'string' ? (JSON.parse(init.body) as unknown) : undefined;
-    requests.push({ method, url, headers: new Headers(init?.headers), body });
-    if (options.failWith && method !== 'GET') {
-      return options.failWith.clone();
-    }
-    const variantId = url.split('/items/')[1];
-    if (method === 'POST') {
-      const asked = body as { variantId: string; quantity: number };
-      lines = [
-        ...lines.filter((line) => line['variantId'] !== asked.variantId),
-        cartLineFixture({
-          variantId: asked.variantId,
-          quantity: asked.quantity,
-          linePrice: 1250 * asked.quantity,
-        }),
-      ];
-    } else if (method === 'PUT' && variantId) {
-      const asked = body as { quantity: number };
-      lines = lines.map((line) =>
-        line['variantId'] === variantId
-          ? { ...line, quantity: asked.quantity, linePrice: 1250 * asked.quantity }
-          : line,
-      );
-    } else if (method === 'DELETE' && variantId) {
-      lines = lines.filter((line) => line['variantId'] !== variantId);
-    }
-    return Response.json(cartFixture(lines));
-  };
-  return { cart, requests };
-}
 
 function stub(server: ReturnType<typeof fakeServer>, product: Record<string, unknown> = {}) {
   return stubNetwork({
