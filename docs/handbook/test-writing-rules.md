@@ -244,9 +244,9 @@ expect(api.writes()).toEqual([{ method: 'POST', url: BASE, body: { slug: 'figuri
 
 ### TW14. Страницата има проверка с `axe`
 
-**Правило:** Всяка страница на магазина има тест с `axe` (`storefront/src/testing/axe.ts`), който проверява, че няма нарушения на WCAG 2.1 AA (цел от [frontend.md](frontend.md), „Достъпност“). `axe` не заменя ръчната проверка с клавиатура и четец на екран, а хваща очевидното. Нарушение не се скрива с изключение без причина.
+**Правило:** Всяка страница на магазина и на админ панела има тест с `axe` (`storefront/src/testing/axe.ts` и `admin/src/testing/axe.ts`), който проверява, че няма нарушения на WCAG 2.1 AA (цел от [frontend.md](frontend.md), „Достъпност“). `axe` не заменя ръчната проверка с клавиатура и четец на екран, а хваща очевидното. Нарушение не се скрива с изключение без причина.
 
-**Образец:** `storefront/src/accessibility.test.tsx`. **Днес:** Да за магазина; **Не** за админ панела (D43).
+**Образец:** `storefront/src/accessibility.test.tsx` и `admin/src/accessibility.test.tsx`. **Днес:** Да.
 
 ## 5. Backend
 
@@ -376,6 +376,5 @@ Assert.Equal(slug, Assert.Single(_repositories.Categories).Slug);
 
 - TW5: цикли с `Assert` вътре в теста (D41).
 - TW9: класове и `querySelector` вместо роля и етикет (D42).
-- TW14: няма проверка с `axe` в админ панела (D43).
 - TW18: `SitemapTests` сравнява с `DateTimeOffset.UtcNow` (D44).
 - TW21: C# тестови файлове над 500 реда (D40).

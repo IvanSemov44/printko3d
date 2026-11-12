@@ -239,7 +239,7 @@
   "images.noPreview": "Няма преглед",
   "images.moveUp": "Премести снимка „{alt}“ нагоре",
   "images.moveDown": "Премести снимка „{alt}“ надолу",
-  "images.setPrimary": "Направи снимка „{alt}“ основна",
+  "images.setPrimary": "Направи основна снимката „{alt}“",
   "images.setPrimaryShort": "Направи основна",
   "images.edit": "Редакция на снимка „{alt}“",
   "images.editShort": "Редакция",
