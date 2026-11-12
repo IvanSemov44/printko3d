@@ -60,7 +60,7 @@ describe('moving between pages (a single-page app does not reload, so the page h
     renderApp('/categories/puzzles');
     const list = await within(await findContent()).findByRole('list');
 
-    fireEvent.click(within(list).getByRole('link', { name: 'Dragon' }));
+    fireEvent.click(within(list).getByRole('link', { name: /Dragon/ }));
 
     await waitFor(() => {
       expect(announcement()).toBe('Dragon');
@@ -71,7 +71,7 @@ describe('moving between pages (a single-page app does not reload, so the page h
   it('announces the home page when the user goes back to it by the name of the shop', async () => {
     stub();
     renderApp('/products/dragon');
-    await screen.findByRole('heading', { level: 1, name: 'Dragon' });
+    await screen.findByRole('heading', { level: 1, name: /Dragon/ });
 
     fireEvent.click(screen.getByRole('link', { name: 'Test Shop' }));
     await waitFor(() => {

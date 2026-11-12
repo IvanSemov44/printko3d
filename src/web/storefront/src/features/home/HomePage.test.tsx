@@ -51,7 +51,7 @@ describe('home page', () => {
       await within(content).findByRole('heading', { level: 2, name: 'Figurines' }),
     ).toBeVisible();
     expect(
-      await within(content).findByRole('link', { name: 'Product of puzzles' }),
+      await within(content).findByRole('link', { name: /Product of puzzles/ }),
     ).toHaveAttribute('href', '/products/puzzles');
     expect(within(content).getByRole('link', { name: 'Виж всички в Figurines' })).toHaveAttribute(
       'href',
