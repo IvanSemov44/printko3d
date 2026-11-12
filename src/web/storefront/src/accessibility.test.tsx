@@ -83,19 +83,19 @@ describe('accessibility (axe, WCAG 2.1 A and AA)', () => {
   describe('home page', () => {
     it('has no violations', async () => {
       stub();
-      await expectAccessible('/', 'Начало');
+      await expectAccessible('/', 'Направено слой по слой');
     });
 
     it('has none in a demo store (with the banner)', async () => {
       stub({ settings: () => Response.json(settingsFixture({ isDemo: true })) });
-      await expectAccessible('/', 'Начало');
+      await expectAccessible('/', 'Направено слой по слой');
     });
 
     it('has none without contacts in the footer', async () => {
       stub({
         settings: () => Response.json(settingsFixture({ contactEmail: '', contactPhone: '' })),
       });
-      await expectAccessible('/', 'Начало');
+      await expectAccessible('/', 'Направено слой по слой');
     });
   });
 

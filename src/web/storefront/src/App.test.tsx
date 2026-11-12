@@ -35,7 +35,9 @@ describe('App', () => {
       expect(links[0]).toHaveAttribute('href', '/categories/puzzles');
 
       const main = screen.getByRole('main');
-      expect(within(main).getByRole('heading', { level: 1, name: 'Начало' })).toBeInTheDocument();
+      expect(
+        within(main).getByRole('heading', { level: 1, name: 'Направено слой по слой' }),
+      ).toBeInTheDocument();
 
       const footer = screen.getByRole('contentinfo');
       expect(within(footer).getByText('Test Shop')).toBeInTheDocument();
@@ -77,7 +79,9 @@ describe('App', () => {
       });
       renderApp();
 
-      expect(await screen.findByRole('heading', { name: 'Начало' })).toBeInTheDocument();
+      expect(
+        await screen.findByRole('heading', { name: 'Направено слой по слой' }),
+      ).toBeInTheDocument();
       expect(screen.queryByRole('navigation', { name: 'Категории' })).not.toBeInTheDocument();
     });
 
@@ -249,7 +253,9 @@ describe('App', () => {
       stubHappyPath({ defaultLocale: 'de-DE' });
       renderApp();
 
-      expect(await screen.findByRole('heading', { name: 'Начало' })).toBeInTheDocument();
+      expect(
+        await screen.findByRole('heading', { name: 'Направено слой по слой' }),
+      ).toBeInTheDocument();
     });
   });
 });

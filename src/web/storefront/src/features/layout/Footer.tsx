@@ -11,7 +11,7 @@ export function Footer() {
 
   return (
     <footer className="site-footer">
-      <p>{storeName}</p>
+      <p className="site-footer-name">{storeName}</p>
       {hasContacts && (
         <address aria-label={t('layout.footerNav')}>
           {contactEmail !== '' && (

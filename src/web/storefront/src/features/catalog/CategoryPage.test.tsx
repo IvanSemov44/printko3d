@@ -73,7 +73,7 @@ describe('category page', () => {
     expect(items).toHaveLength(2);
     const [dragon] = items;
     if (dragon === undefined) throw new Error('The list has no items');
-    expect(within(dragon).getByRole('link', { name: 'Dragon' })).toHaveAttribute(
+    expect(within(dragon).getByRole('link', { name: /Dragon/ })).toHaveAttribute(
       'href',
       '/products/dragon',
     );
@@ -197,7 +197,7 @@ describe('category page', () => {
       });
       renderApp('/categories/puzzles?page=5');
 
-      expect(await screen.findByRole('link', { name: 'Dragon' })).toBeInTheDocument();
+      expect(await screen.findByRole('link', { name: /Dragon/ })).toBeInTheDocument();
       expect(lastPageRequested(fetchMock)).toBe('1');
     });
 
@@ -276,7 +276,7 @@ describe('category page', () => {
       stub(() => Response.json(pageFixture([productFixture()])));
       renderApp('/categories/puzzles');
 
-      await screen.findByRole('link', { name: 'Dragon' });
+      await screen.findByRole('link', { name: /Dragon/ });
       expect(screen.queryByRole('navigation', { name: 'Страниране' })).not.toBeInTheDocument();
     });
   });
@@ -323,7 +323,7 @@ describe('category page', () => {
       expect(screen.getByRole('status')).toHaveTextContent('Зареждане…');
 
       release();
-      expect(await screen.findByRole('link', { name: 'Dragon' })).toBeInTheDocument();
+      expect(await screen.findByRole('link', { name: /Dragon/ })).toBeInTheDocument();
       expect(screen.queryByRole('status')).not.toBeInTheDocument();
     });
 
@@ -347,7 +347,7 @@ describe('category page', () => {
       failing = false;
       fireEvent.click(screen.getByRole('button', { name: 'Опитай пак' }));
 
-      expect(await screen.findByRole('link', { name: 'Dragon' })).toBeInTheDocument();
+      expect(await screen.findByRole('link', { name: /Dragon/ })).toBeInTheDocument();
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
 
@@ -431,16 +431,20 @@ describe('category page', () => {
       expect(within(list).queryByRole('img')).not.toBeInTheDocument();
     });
 
-    it('does not add a second stop for the keyboard: the name of the product stays the link', async () => {
+    it('makes the whole card one link, with no link inside another and one stop for the keyboard', async () => {
       stubWithImages([withImage], { imageBaseUrl: 'https://media.example.test/bucket' });
       renderApp('/categories/puzzles');
       const list = await findProductList();
 
       const picture = await within(list).findByRole('img', { name: 'Дракон отпред' });
 
-      expect(picture.closest('a')).toHaveAttribute('tabindex', '-1');
-      expect(picture.closest('a')).toHaveAttribute('href', '/products/dragon');
-      expect(within(list).getByRole('link', { name: 'Dragon' })).not.toHaveAttribute('tabindex');
+      const links = within(list).getAllByRole('link');
+      expect(links).toHaveLength(1);
+      expect(picture.closest('a')).toBe(links[0]);
+      expect(links[0]).toHaveAttribute('href', '/products/dragon');
+      expect(links[0]).toHaveAccessibleName(expect.stringContaining('Dragon'));
+      expect(links[0]).not.toHaveAttribute('tabindex');
+      expect(links[0]?.querySelector('a')).toBeNull();
     });
   });
 });
