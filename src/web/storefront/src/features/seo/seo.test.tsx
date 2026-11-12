@@ -1,4 +1,5 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   categoriesFixture,
@@ -150,7 +151,7 @@ describe('page meta', () => {
       expect(document.title).toBe('Puzzles – Test Shop');
 
       const nav = await screen.findByRole('navigation', { name: 'Страниране' });
-      fireEvent.click(within(nav).getByRole('link', { name: 'Следваща' }));
+      await userEvent.setup().click(within(nav).getByRole('link', { name: 'Следваща' }));
 
       await waitFor(() => {
         expect(document.title).toBe('Puzzles – Страница 2 – Test Shop');

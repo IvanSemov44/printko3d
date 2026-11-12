@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PageLoadBoundary } from './PageLoadBoundary';
 
@@ -23,7 +24,7 @@ describe('PageLoadBoundary', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('says so and reloads on the button when the page cannot be shown', () => {
+  it('says so and reloads on the button when the page cannot be shown', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const reload = vi.fn();
     vi.stubGlobal('location', { reload });
@@ -35,7 +36,7 @@ describe('PageLoadBoundary', () => {
     );
 
     expect(screen.getByRole('alert')).toHaveTextContent('Страницата не можа да се покаже');
-    fireEvent.click(screen.getByRole('button', { name: 'Опитай отново' }));
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Опитай отново' }));
     expect(reload).toHaveBeenCalledOnce();
   });
 });

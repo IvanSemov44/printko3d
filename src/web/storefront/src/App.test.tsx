@@ -1,4 +1,5 @@
-import { fireEvent, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { categoriesFixture, renderApp, settingsFixture, stubNetwork } from './testing/renderApp';
 
@@ -131,7 +132,7 @@ describe('App', () => {
       expect(alert).not.toHaveTextContent('secret');
 
       failing = false;
-      fireEvent.click(screen.getByRole('button', { name: 'Опитай пак' }));
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Опитай пак' }));
 
       expect(await screen.findByRole('banner')).toBeInTheDocument();
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
