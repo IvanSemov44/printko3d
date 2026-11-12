@@ -4,7 +4,7 @@
 
 **Формат.** Всяко правило е в една рамка: **правило** (отговор „да“ или „не“) → **лош пример** → **добър пример** → **образец** от репото или от документацията. Колоната „Днес“ казва дали кодът го следва; „не“ е ред в [tech-debt.md](../tech-debt.md). Номерата са `RC1`, `RC2`… (React code), за да не се бъркат с `F` (подредба), `T` (тестове) и `R` (рефакториране).
 
-**Версии.** React 19, TypeScript със `strict`, TanStack Query 5, React Router 8. Проектът **не ползва React Compiler** (`@vitejs/plugin-react` без компилатор), затова правилата за `useMemo` и `useCallback` са за ръчна работа. добави библиотеката
+**Версии.** React 19, TypeScript със `strict`, TanStack Query 5, React Router 8. Проектът **ползва React Compiler** в build-а на магазина и админ панела (решение [0025](../decisions/0025-react-compiler-in-the-build.md)), затова `useMemo` и `useCallback` са изход за прецизен контрол, не правило по подразбиране. Тестовете се пускат без компилатор. добави библиотеката
 
 **Източници.** [Thinking in React](https://react.dev/learn/thinking-in-react), [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect), [Rules of Hooks](https://react.dev/reference/rules/rules-of-hooks), [Rules of React](https://react.dev/reference/rules), [Rendering Lists](https://react.dev/learn/rendering-lists), [Preserving and Resetting State](https://react.dev/learn/preserving-and-resetting-state), [useMemo](https://react.dev/reference/react/useMemo) и [useCallback](https://react.dev/reference/react/useCallback) на react.dev; [Queries](https://tanstack.com/query/latest/docs/framework/react/guides/queries) на TanStack Query; [Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) и [`satisfies`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html) на TypeScript; [Bulletproof React](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md) само за подредбата по функционалности.
 
@@ -256,9 +256,9 @@ type Upload =
 
 **Налага се:** `react-hooks/exhaustive-deps`. **Днес:** Да (няма `eslint-disable` в кода).
 
-### RC16. `useMemo` и `useCallback` само с причина в коментар
+### RC16. `useMemo` и `useCallback` само когато има причина, с коментар
 
-**Правило:** Използват се, когато резултатът е зависимост на друг hook или се подава на компонент, обвит в `memo`, или изчислението е измерено като скъпо (над около 1 ms, [useMemo](https://react.dev/reference/react/useMemo)). Причината е в коментар на един ред. Без измерване и без причина не се слагат.
+**Правило:** React Compiler мемоизира компонентите и hooks при build, затова нов код не слага `useMemo` и `useCallback` по подразбиране. Слагат се само когато резултатът е зависимост на друг hook или се подава на компонент, обвит в `memo`, и компилаторът не го покрива, или изчислението е измерено като скъпо (над около 1 ms, [useMemo](https://react.dev/reference/react/useMemo)). Причината е в коментар на един ред. Без измерване и без причина не се слагат.
 
 ```ts
 // Лошо
@@ -274,7 +274,7 @@ const announce = useCallback(() => {
 }, []);
 ```
 
-**Днес:** **Не**: три места без коментар за причината (`useRouteChange`, `useSelectedVariant`, `useT` в `store-settings/useStoreSettings.ts`).
+**Налага се:** `react-hooks/preserve-manual-memoization` и `react-hooks/exhaustive-deps` (проверяват коректността, не причината). **Днес:** **Не**: три места без коментар за причината (`useRouteChange`, `useSelectedVariant`, `useT` в `store-settings/useStoreSettings.ts`); махат се или получават причина при първа промяна на файла (D36).
 
 ## 5. Props и композиция
 

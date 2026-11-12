@@ -49,3 +49,4 @@
 - [0022 – Преглед на код при един разработчик](0022-code-review-with-one-developer.md)
 - [0023 – Дизайн система: `docs/design.md`](0023-design-system.md)
 - [0024 – TypeScript 7 за build на приложенията, 5.9 за linter-а](0024-two-typescript-versions.md)
+- [0025 – React Compiler е включен в build на магазина и на админ панела](0025-react-compiler-in-the-build.md)
