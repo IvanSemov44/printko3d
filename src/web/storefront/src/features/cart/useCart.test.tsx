@@ -172,4 +172,42 @@ describe('cart hooks', () => {
       expect(result.current.busy).toBe(false);
     });
   });
+
+  it('sends changes to the cart one after the other, so an older answer cannot come last', async () => {
+    const answers: ((response: Response) => void)[] = [];
+    const { fetchMock, queryClient, wrapper } = setup(
+      () =>
+        new Promise<Response>((resolve) => {
+          answers.push(resolve);
+        }),
+    );
+    const { result } = renderHook(
+      () => ({ first: useSetCartQuantity('v1'), second: useRemoveFromCart('v2') }),
+      { wrapper },
+    );
+
+    let both: Promise<unknown> = Promise.resolve();
+    act(() => {
+      both = Promise.all([
+        result.current.first.mutateAsync(2),
+        result.current.second.mutateAsync(),
+      ]);
+    });
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+    // The second change has not been sent while the first is on its way.
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      answers[0]?.(Response.json(cartBody(2)));
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+      });
+      answers[1]?.(Response.json(cartBody(0)));
+      await both;
+    });
+
+    expect(queryClient.getQueryData(CART_KEY)).toMatchObject({ itemCount: 0, lines: [] });
+  });
 });

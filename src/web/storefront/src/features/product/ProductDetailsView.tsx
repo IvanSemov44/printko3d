@@ -1,4 +1,6 @@
 import type { ProductDetails } from '@storefront/shared';
+import { AddToCartButton } from '../cart/AddToCartButton';
+import { availabilityKind } from '../catalog/availability';
 import { PageMeta } from '../seo/PageMeta';
 import { ProductStructuredData } from '../seo/ProductStructuredData';
 import { ProductGallery } from './ProductGallery';
@@ -37,6 +39,15 @@ export function ProductDetailsView({ product }: { product: ProductDetails }) {
             <>
               <ProductOffer product={product} variant={variant} />
               <VariantPicker variants={product.variants} selected={variant} onSelect={select} />
+              <AddToCartButton
+                variantId={variant.id}
+                canBuy={
+                  availabilityKind({
+                    fulfilmentType: product.fulfilmentType,
+                    isAvailable: variant.isAvailable,
+                  }) !== 'soldOut'
+                }
+              />
             </>
           )}
           {product.description !== '' && (

@@ -46,6 +46,7 @@ describe('cart API', () => {
     const cart = await getCart();
 
     expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/v1/cart');
+    expect(fetchMock.mock.calls[0]?.[1]?.credentials).toBe('same-origin');
     expect(headersOf(fetchMock.mock.calls[0]?.[1]).has('X-Requested-With')).toBe(false);
     expect(cart.itemCount).toBe(2);
     expect(cart.total).toBe(2500);

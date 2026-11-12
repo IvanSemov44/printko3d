@@ -9,7 +9,8 @@ const CSRF_HEADERS = { 'X-Requested-With': 'XMLHttpRequest' };
  * through its own address (decisions 0014 and 0027).
  */
 export async function apiRequest(url: string, init: RequestInit): Promise<unknown> {
-  const response = await fetch(url, init);
+  // The cookie of the cart belongs to this address, so it goes along; a cookie never goes to another address.
+  const response = await fetch(url, { credentials: 'same-origin', ...init });
   if (!response.ok) {
     // The fields are read from a copy first, so the original body is still there for the code.
     const fields = await readErrorFields(response);

@@ -6,7 +6,7 @@ import {
   type Cart,
 } from '@storefront/shared';
 import { useIsMutating, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CART_KEY, CLEAR_MUTATION_KEY, lineMutationKey } from './cartKeys';
+import { CART_KEY, CART_MUTATION_SCOPE, CLEAR_MUTATION_KEY, lineMutationKey } from './cartKeys';
 
 /**
  * Keeps the cache equal to the server. A good answer is the new cart. A failed change may mean the cart is not what
@@ -27,6 +27,7 @@ export function useAddToCart(variantId: string) {
   return useMutation({
     mutationKey: lineMutationKey(variantId),
     mutationFn: (quantity: number) => addCartItem(variantId, quantity),
+    scope: CART_MUTATION_SCOPE,
     onSuccess: cache.replace,
     onError: cache.reload,
   });
@@ -37,6 +38,7 @@ export function useSetCartQuantity(variantId: string) {
   return useMutation({
     mutationKey: lineMutationKey(variantId),
     mutationFn: (quantity: number) => setCartItemQuantity(variantId, quantity),
+    scope: CART_MUTATION_SCOPE,
     onSuccess: cache.replace,
     onError: cache.reload,
   });
@@ -47,6 +49,7 @@ export function useRemoveFromCart(variantId: string) {
   return useMutation({
     mutationKey: lineMutationKey(variantId),
     mutationFn: () => removeCartItem(variantId),
+    scope: CART_MUTATION_SCOPE,
     onSuccess: cache.replace,
     onError: cache.reload,
   });
@@ -57,6 +60,7 @@ export function useClearCart() {
   return useMutation({
     mutationKey: CLEAR_MUTATION_KEY,
     mutationFn: () => clearCart(),
+    scope: CART_MUTATION_SCOPE,
     onSuccess: cache.replace,
     onError: cache.reload,
   });

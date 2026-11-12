@@ -1,4 +1,6 @@
 import { Outlet } from 'react-router';
+import { CartPanelHost } from '../cart/CartPanelHost';
+import { CartPanelProvider } from '../cart/CartPanelProvider';
 import { DemoBanner } from './DemoBanner';
 import { Footer } from './Footer';
 import { Header } from './Header';
@@ -8,7 +10,7 @@ import { useRouteChange } from './useRouteChange';
 export function Layout() {
   const { mainRef, announcement } = useRouteChange();
   return (
-    <>
+    <CartPanelProvider>
       <SkipLink />
       <DemoBanner />
       <Header />
@@ -25,6 +27,7 @@ export function Layout() {
         </div>
       </main>
       <Footer />
-    </>
+      <CartPanelHost />
+    </CartPanelProvider>
   );
 }
