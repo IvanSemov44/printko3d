@@ -11,7 +11,7 @@ COPY shared shared
 COPY ${APP} ${APP}
 RUN npm run build --workspace @storefront/${APP}
 
-FROM nginxinc/nginx-unprivileged:1.29.3-alpine AS runtime
+FROM nginxinc/nginx-unprivileged:1.31.7-alpine AS runtime
 ARG APP
 COPY --from=build --chown=101:101 /web/${APP}/dist /usr/share/nginx/html
 COPY docker/default.conf.template /etc/nginx/templates/default.conf.template

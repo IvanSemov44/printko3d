@@ -22,6 +22,10 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "build(deps)"
+    ignore:
+      # The EF tool must match the EF Core packages (.NET 10); raise it together with them.
+      - dependency-name: "dotnet-ef"
+        update-types: ["version-update:semver-major"]
     groups:
       dotnet-minor-and-patch:
         update-types: [minor, patch]
