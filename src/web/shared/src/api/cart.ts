@@ -9,6 +9,7 @@ import {
   readString,
   type Reader,
 } from './decode';
+import type { FulfilmentType } from './client';
 import { apiDelete, apiRequest, apiSend } from './http';
 
 type CartLineStateDto = components['schemas']['CartLineState'];
@@ -22,6 +23,8 @@ const LINE_STATES: readonly CartLineState[] = [
   'Inactive',
   'Archived',
 ];
+
+const FULFILMENT_TYPES: readonly FulfilmentType[] = ['InStock', 'MadeToOrder'];
 
 /** The image of a line; the address is built from the key with `imageUrl`, as for the catalog. */
 export interface CartLineImage {
@@ -42,6 +45,11 @@ export interface CartLine {
   quantity: number;
   linePrice: number;
   state: CartLineState;
+  fulfilmentType: FulfilmentType;
+  /** The days a made-to-order line takes to make; null when the shop gave none. */
+  leadTimeDays: number | null;
+  /** The most pieces the buyer can take (the stock of an in-stock line); null for a made-to-order line. */
+  availableQuantity: number | null;
 }
 
 /** The cart as the server counts it. The shop shows these numbers and never adds them up itself. */
@@ -72,6 +80,9 @@ const readLine: Reader<CartLine> = (value, path) => {
     quantity: field(object, 'quantity', readInteger, path),
     linePrice: field(object, 'linePrice', readInteger, path),
     state: field(object, 'state', readOneOf(LINE_STATES), path),
+    fulfilmentType: field(object, 'fulfilmentType', readOneOf(FULFILMENT_TYPES), path),
+    leadTimeDays: field(object, 'leadTimeDays', readNullable(readInteger), path),
+    availableQuantity: field(object, 'availableQuantity', readNullable(readInteger), path),
   };
 };
 

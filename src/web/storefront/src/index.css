@@ -1094,6 +1094,23 @@ body:has(.cart-panel[open]) {
   font-size: 0.875rem;
 }
 
+.cart-line-availability {
+  margin-top: 0.25rem;
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
+}
+
+.cart-made-to-order-note {
+  margin: 0 0 1rem;
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
+}
+
+.cart-line-gone .cart-line-media,
+.cart-line-gone .cart-line-total {
+  opacity: 0.5;
+}
+
 .cart-line-note {
   margin-top: 0.25rem;
   color: var(--color-warning);

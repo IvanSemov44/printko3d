@@ -17,6 +17,9 @@ const DTO = {
       quantity: 2,
       linePrice: 2500,
       state: 'Available',
+      fulfilmentType: 'InStock',
+      leadTimeDays: null,
+      availableQuantity: 4,
     },
   ],
   itemCount: 2,
@@ -57,6 +60,40 @@ describe('cart API', () => {
       state: 'Available',
       image: { storageKey: 'products/vaza.webp', altText: 'Синя ваза' },
     });
+  });
+
+  it('reads how a line is fulfilled and how many pieces can be taken', async () => {
+    stubFetch({
+      ...DTO,
+      lines: [
+        DTO.lines[0],
+        {
+          ...DTO.lines[0],
+          fulfilmentType: 'MadeToOrder',
+          leadTimeDays: '7',
+          availableQuantity: null,
+        },
+      ],
+    });
+
+    const cart = await getCart();
+
+    expect(cart.lines[0]).toMatchObject({
+      fulfilmentType: 'InStock',
+      leadTimeDays: null,
+      availableQuantity: 4,
+    });
+    expect(cart.lines[1]).toMatchObject({
+      fulfilmentType: 'MadeToOrder',
+      leadTimeDays: 7,
+      availableQuantity: null,
+    });
+  });
+
+  it('refuses a line with an unknown way of fulfilment', async () => {
+    stubFetch({ ...DTO, lines: [{ ...DTO.lines[0], fulfilmentType: 'Magic' }] });
+
+    await expect(getCart()).rejects.toThrow(/lines\[0\]\.fulfilmentType/);
   });
 
   it('reads a line without an image', async () => {

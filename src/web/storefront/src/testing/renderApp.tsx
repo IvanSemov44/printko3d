@@ -136,6 +136,9 @@ export function cartLineFixture(overrides: Record<string, unknown> = {}) {
     quantity: 1,
     linePrice: 1250,
     state: 'Available',
+    fulfilmentType: 'InStock',
+    leadTimeDays: null,
+    availableQuantity: 20,
     ...overrides,
   };
 }
