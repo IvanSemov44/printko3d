@@ -1,5 +1,5 @@
 # Build context is the repository root: docker build -f src/backend/Dockerfile .
-FROM mcr.microsoft.com/dotnet/sdk:10.0.100-alpine3.22 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0.103-alpine3.22 AS build
 WORKDIR /repo
 COPY global.json Directory.Build.props ./
 COPY src/backend/Storefront.Domain/*.csproj src/backend/Storefront.Domain/
