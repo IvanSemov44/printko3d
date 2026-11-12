@@ -345,7 +345,7 @@ describe('Images section: buttons for people who use a keyboard or a screen read
     for (const name of [
       'Премести снимка „Отзад“ нагоре',
       'Премести снимка „Отзад“ надолу',
-      'Направи снимка „Отзад“ основна',
+      'Направи основна снимката „Отзад“',
       'Редакция на снимка „Отзад“',
       'Изтрий снимка „Отзад“',
     ]) {
@@ -359,7 +359,7 @@ describe('Images section: buttons for people who use a keyboard or a screen read
 
     expect(button('Премести снимка „Отпред“ нагоре')).toBeDisabled();
     expect(button('Премести снимка „Отстрани“ надолу')).toBeDisabled();
-    expect(button('Направи снимка „Отпред“ основна')).toBeDisabled();
+    expect(button('Направи основна снимката „Отпред“')).toBeDisabled();
     expect(button('Премести снимка „Отзад“ нагоре')).toBeEnabled();
   });
 
@@ -429,7 +429,7 @@ describe('Images section: primary image', () => {
     const api = fakeApi(threeImages());
     await openSection();
 
-    fireEvent.click(button('Направи снимка „Отзад“ основна'));
+    fireEvent.click(button('Направи основна снимката „Отзад“'));
 
     await waitFor(() => {
       const second = within(list()).getAllByRole('listitem')[1];

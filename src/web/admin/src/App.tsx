@@ -34,6 +34,7 @@ export function App() {
 
   return (
     <main>
+      <title>{t('app.title')}</title>
       <h1>{t('app.title')}</h1>
       {content}
     </main>
