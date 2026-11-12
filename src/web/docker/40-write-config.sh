@@ -54,6 +54,7 @@ fi
 # address and the session cookie belongs to one site (decision 0014). Without it the file is empty.
 PROXY_CONF="$CONF_DIR/api-proxy.conf"
 SITEMAP_CONF="$CONF_DIR/sitemap-proxy.conf"
+CART_CONF="$CONF_DIR/cart-proxy.conf"
 if [ -n "${API_UPSTREAM:-}" ]; then
     UPSTREAM="${API_UPSTREAM%/}"
     check_address API_UPSTREAM "$UPSTREAM"
@@ -71,6 +72,7 @@ if [ -n "${API_UPSTREAM:-}" ]; then
     } > "$PROXY_CONF"
     # The admin panel has no sitemap.
     : > "$SITEMAP_CONF"
+    : > "$CART_CONF"
 else
     : > "$PROXY_CONF"
     # The storefront serves /sitemap.xml from the API (the API builds it from the catalog), so a robot sees the
@@ -89,6 +91,17 @@ else
         printf '    proxy_read_timeout 90s;\n'
         printf '}\n'
     } > "$SITEMAP_CONF"
+    # The cart cookie belongs to the shop's own address, so the browser reaches the cart through it (decision 0027).
+    # Only the cart is forwarded, never the admin addresses. With no URI in proxy_pass, nginx keeps the path as it came.
+    {
+        printf 'location ~ ^/api/v1/cart(/|$) {\n'
+        printf '    proxy_pass %s;\n' "$API_ADDRESS"
+        printf '    proxy_http_version 1.1;\n'
+        printf '    proxy_set_header Host $proxy_host;\n'
+        printf '    proxy_ssl_server_name on;\n'
+        printf '    proxy_read_timeout 90s;\n'
+        printf '}\n'
+    } > "$CART_CONF"
 fi
 
 # robots.txt. Search engines are kept out unless ALLOW_INDEXING=true, so a demo or a local copy is never indexed by

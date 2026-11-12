@@ -1,4 +1,4 @@
-import { adminRequest, adminSend } from './adminHttp';
+import { apiRequest, apiSend } from './http';
 import { field, readBoolean, readInteger, readNullable, readObject, readString } from './decode';
 
 /** The two settings the admin forms need to show and read prices. */
@@ -13,7 +13,7 @@ export interface StoreMoneySettings {
  */
 export async function getStoreMoneySettings(signal?: AbortSignal): Promise<StoreMoneySettings> {
   const object = readObject(
-    await adminRequest('/api/v1/store-settings', { signal }),
+    await apiRequest('/api/v1/store-settings', { signal }),
     'storeSettings',
   );
   return {
@@ -59,7 +59,7 @@ function readAdminStoreSettings(value: unknown): AdminStoreSettings {
 }
 
 export async function getAdminStoreSettings(signal?: AbortSignal): Promise<AdminStoreSettings> {
-  return readAdminStoreSettings(await adminRequest(SETTINGS_PATH, { signal }));
+  return readAdminStoreSettings(await apiRequest(SETTINGS_PATH, { signal }));
 }
 
 /**
@@ -70,5 +70,5 @@ export async function updateStoreSettings(
   input: StoreSettingsInput,
   version: number,
 ): Promise<AdminStoreSettings> {
-  return readAdminStoreSettings(await adminSend('PUT', SETTINGS_PATH, { ...input, version }));
+  return readAdminStoreSettings(await apiSend('PUT', SETTINGS_PATH, { ...input, version }));
 }

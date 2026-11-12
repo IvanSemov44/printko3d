@@ -87,3 +87,5 @@ export type {
   StoreSettingsInput,
 } from './api/adminSettings';
 export type { TranslationParams } from './i18n';
+export { addCartItem, clearCart, getCart, removeCartItem, setCartItemQuantity } from './api/cart';
+export type { Cart, CartLine, CartLineImage, CartLineState } from './api/cart';

@@ -124,6 +124,31 @@ export function pageFixture(
   };
 }
 
+export function cartLineFixture(overrides: Record<string, unknown> = {}) {
+  return {
+    variantId: 'v1',
+    productName: 'Dragon',
+    productSlug: 'dragon',
+    variantName: 'Small',
+    sku: 'DRG-S',
+    image: null,
+    unitPrice: 1250,
+    quantity: 1,
+    linePrice: 1250,
+    state: 'Available',
+    ...overrides,
+  };
+}
+
+/** The cart as the server counts it: the sums come from the lines given. */
+export function cartFixture(lines: Record<string, unknown>[] = []) {
+  return {
+    lines,
+    itemCount: lines.reduce((sum, line) => sum + Number(line['quantity']), 0),
+    total: lines.reduce((sum, line) => sum + Number(line['linePrice']), 0),
+  };
+}
+
 export type Responder = () => Response | Promise<Response>;
 
 /** Fakes the network at the HTTP boundary: /config.json plus the API paths. Products get the parsed request address. */
@@ -133,12 +158,17 @@ export function stubNetwork(routes: {
   products?: (url: URL) => Response | Promise<Response>;
   /** Gets the slug from /api/v1/products/{slug}. */
   product?: (slug: string) => Response | Promise<Response>;
+  /** Gets every request to /api/v1/cart. Without it the cart is empty, so a page that only shows the header works. */
+  cart?: (url: string, init?: RequestInit) => Response | Promise<Response>;
   /** Extra fields for /config.json, for example imageBaseUrl. */
   config?: Record<string, unknown>;
 }) {
-  const fetchMock = vi.fn((url: string): Promise<Response> => {
+  const fetchMock = vi.fn((url: string, init?: RequestInit): Promise<Response> => {
     if (url === '/config.json') {
       return Promise.resolve(Response.json({ apiUrl: 'http://api.test', ...routes.config }));
+    }
+    if (url.startsWith('/api/v1/cart')) {
+      return Promise.resolve(routes.cart ? routes.cart(url, init) : Response.json(cartFixture()));
     }
     if (url === 'http://api.test/api/v1/store-settings') {
       return Promise.resolve(routes.settings());

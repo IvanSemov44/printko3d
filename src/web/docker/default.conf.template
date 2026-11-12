@@ -20,6 +20,9 @@ server {
     # Empty for the admin panel. For the storefront it forwards /sitemap.xml to the API (written by 40-write-config.sh).
     include /tmp/sitemap-proxy.conf;
 
+    # Empty for the admin panel. For the storefront it forwards the cart to the API (written by 40-write-config.sh).
+    include /tmp/cart-proxy.conf;
+
     location / {
         try_files $uri $uri/ /index.html;
     }

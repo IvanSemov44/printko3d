@@ -15,6 +15,16 @@ export default defineConfig({
       '@storefront/shared': fileURLToPath(new URL('../shared/src/index.ts', import.meta.url)),
     },
   },
+  server: {
+    // The cart cookie belongs to the shop's own address (decision 0027), so `npm run dev` forwards the cart to the API
+    // like nginx does in the image. Only the cart; the address of the API is `API_DEV_URL` or the port of docker compose.
+    proxy: {
+      '/api/v1/cart': {
+        target: process.env['API_DEV_URL'] ?? 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test-setup.ts'],
