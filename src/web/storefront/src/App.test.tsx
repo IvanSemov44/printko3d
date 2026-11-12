@@ -195,7 +195,7 @@ describe('App', () => {
       renderApp();
 
       expect(await screen.findByRole('banner')).toBeInTheDocument();
-      expect(document.documentElement.style.getPropertyValue('--color-primary')).toBe('#2f5d8a');
+      expect(document.documentElement.style.getPropertyValue('--color-primary')).toBe('#f25a18');
     });
 
     it('puts the store name in the document title', async () => {
