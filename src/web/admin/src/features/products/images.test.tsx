@@ -432,9 +432,9 @@ describe('Images section: primary image', () => {
     fireEvent.click(button('Направи снимка „Отзад“ основна'));
 
     await waitFor(() => {
-      expect(
-        within(within(list()).getAllByRole('listitem')[1]).getByText('Основна'),
-      ).toBeInTheDocument();
+      const second = within(list()).getAllByRole('listitem')[1];
+      if (second === undefined) throw new Error('The list has no second item');
+      expect(within(second).getByText('Основна')).toBeInTheDocument();
     });
     expect(within(list()).getAllByText('Основна')).toHaveLength(1);
     expect(api.writes().map((call) => [call.method, call.url])).toEqual([
@@ -542,9 +542,9 @@ describe('Images section: delete', () => {
     await waitFor(() => {
       expect(altTexts()).toEqual(['Отзад', 'Отстрани']);
     });
-    expect(
-      within(within(list()).getAllByRole('listitem')[0]).getByText('Основна'),
-    ).toBeInTheDocument();
+    const [first] = within(list()).getAllByRole('listitem');
+    if (first === undefined) throw new Error('The list has no items');
+    expect(within(first).getByText('Основна')).toBeInTheDocument();
   });
 
   it('does not warn about a primary image when an ordinary one is deleted', async () => {
@@ -573,6 +573,7 @@ describe('Images section: upload', () => {
       expect(altTexts()).toEqual(['Нов дракон']);
     });
     const [call] = api.writes();
+    if (call === undefined) throw new Error('The upload was not sent');
     expect(call.method).toBe('POST');
     expect(call.url).toBe(`${BASE}/images`);
     const form = call.body as FormData;

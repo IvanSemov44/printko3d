@@ -69,6 +69,7 @@ async function expectAccessible(path: string, heading: string, shows?: () => Pro
 
 const cards = async () => {
   const [productList] = await within(await findContent()).findAllByRole('list');
+  if (productList === undefined) throw new Error('The page has no list');
   return within(productList).getAllByRole('listitem');
 };
 
