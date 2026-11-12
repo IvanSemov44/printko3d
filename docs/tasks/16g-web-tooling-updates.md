@@ -12,7 +12,7 @@
 ## Критерии за приемане
 
 - Малките версии са обновени в обхвата на `^` (`vite`, `@vitejs/plugin-react`, `prettier`, `typescript-eslint`). `@types/node` е `^26`. `jsdom` остава на 30 (31 е нова голяма версия).
-- В `src/web/tsconfig.base.json` са общите настройки (`target`, `strict`, `noUncheckedIndexedAccess`, `noUnused*`, `erasableSyntaxOnly`, `verbatimModuleSyntax`, `noEmit`, `skipLibCheck`). `storefront`, `admin` и `shared` го разширяват и държат само това, което е тяхно (`lib`, `types`, `jsx`, `module`, `tsBuildInfoFile`).
+- В `src/web/shared/tsconfig.base.json` са общите настройки (`target`, `strict`, `noUncheckedIndexedAccess`, `noUnused*`, `erasableSyntaxOnly`, `verbatimModuleSyntax`, `noEmit`, `skipLibCheck`). `storefront`, `admin` и `shared` го разширяват и държат само това, което е тяхно (`lib`, `types`, `jsx`, `module`, `tsBuildInfoFile`).
 - `noUncheckedIndexedAccess` е включен и кодът минава без `!` и без `as`; тестовете, които четат елемент от масив, проверяват, че го има.
 - `typescript ~5.9.3` е записан в `devDependencies` на корена (явно, не по случайност), а приложенията остават на `~7.0.2`. Решение 0024 казва защо и кога се обединяват.
 - `src/web/.npmrc` със `engine-strict=true`.
