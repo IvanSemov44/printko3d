@@ -11,7 +11,7 @@ COPY src/backend src/backend
 RUN dotnet publish src/backend/Storefront.Api/Storefront.Api.csproj \
     -c Release --no-restore -o /app
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0.0-alpine3.22 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0.3-alpine3.22 AS runtime
 WORKDIR /app
 COPY --from=build /app .
 ENV ASPNETCORE_HTTP_PORTS=8080
