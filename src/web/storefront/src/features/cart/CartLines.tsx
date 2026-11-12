@@ -1,6 +1,7 @@
 import type { Cart } from '@storefront/shared';
 import { useT } from '../store-settings/useStoreSettings';
 import { CartLineItem } from './CartLineItem';
+import { CartNoticeBar } from './CartNoticeBar';
 
 /** The lines of the cart, in the order the server gives them. The server allows at most 50 lines, so there is no paging. */
 export function CartLines({ cart, onNavigate }: { cart: Cart; onNavigate?: () => void }) {
@@ -8,6 +9,7 @@ export function CartLines({ cart, onNavigate }: { cart: Cart; onNavigate?: () =>
   const hasMadeToOrder = cart.lines.some((line) => line.fulfilmentType === 'MadeToOrder');
   return (
     <>
+      <CartNoticeBar />
       {hasMadeToOrder && <p className="cart-made-to-order-note">{t('cart.madeToOrderNote')}</p>}
       <ul className="cart-lines" aria-label={t('cart.lines')}>
         {cart.lines.map((line) => (
