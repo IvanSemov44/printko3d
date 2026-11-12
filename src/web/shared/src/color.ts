@@ -1,5 +1,5 @@
 /** Used when the store settings contain no valid primary colour. */
-export const DEFAULT_PRIMARY_COLOR = '#2f5d8a';
+export const DEFAULT_PRIMARY_COLOR = '#f25a18';
 
 const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
@@ -51,4 +51,27 @@ export function primaryColorContrast(color: string): number {
 
 export function hasEnoughPrimaryColorContrast(color: string): boolean {
   return isHexColor(color) && primaryColorContrast(color) >= MIN_PRIMARY_COLOR_CONTRAST;
+}
+
+function mixWithBlack(hex: string, amount: number): string {
+  const channel = (start: number) =>
+    Math.round(parseInt(hex.slice(start, start + 2), 16) * (1 - amount))
+      .toString(16)
+      .padStart(2, '0');
+  return `#${channel(1)}${channel(3)}${channel(5)}`;
+}
+
+/**
+ * A darker shade of the primary colour for hover and pressed states. It is darkened by up to 12 %, less when more
+ * would drop the text on it (`readableTextColor` of the primary colour) below 4.5:1.
+ */
+export function primaryHoverColor(primary: string): string {
+  const text = readableTextColor(primary);
+  for (const amount of [0.12, 0.09, 0.06, 0.03]) {
+    const candidate = mixWithBlack(primary, amount);
+    if (contrastRatio(candidate, text) >= 4.5) {
+      return candidate;
+    }
+  }
+  return primary;
 }

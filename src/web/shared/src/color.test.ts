@@ -6,6 +6,7 @@ import {
   isHexColor,
   normalizePrimaryColor,
   primaryColorContrast,
+  primaryHoverColor,
   readableTextColor,
 } from './color';
 
@@ -57,6 +58,8 @@ describe('primary colour contrast limit (shared with the API)', () => {
     ['#ffffff', false],
     ['#000000', true],
     ['#2f5d8a', true],
+    ['#f25a18', true],
+    ['#ff6b2c', false],
   ])('%s against white is accepted: %s', (color, accepted) => {
     expect(hasEnoughPrimaryColorContrast(color)).toBe(accepted);
   });
@@ -66,9 +69,38 @@ describe('primary colour contrast limit (shared with the API)', () => {
     expect(primaryColorContrast('#000000')).toBeCloseTo(21, 2);
     expect(primaryColorContrast('#949494')).toBeCloseTo(3.03, 2);
     expect(primaryColorContrast('#2f5d8a')).toBeCloseTo(6.877, 2);
+    expect(primaryColorContrast('#f25a18')).toBeCloseTo(3.359, 2);
+    expect(primaryColorContrast('#ff6b2c')).toBeCloseTo(2.841, 2);
   });
 
   it('refuses a value that is not #RRGGBB', () => {
     expect(hasEnoughPrimaryColorContrast('#000')).toBe(false);
+  });
+});
+
+describe('default primary colour', () => {
+  it('is accepted by the same contrast limit as a colour from the settings', () => {
+    expect(hasEnoughPrimaryColorContrast(DEFAULT_PRIMARY_COLOR)).toBe(true);
+    expect(readableTextColor(DEFAULT_PRIMARY_COLOR)).toBe('#000000');
+  });
+});
+
+describe('primaryHoverColor', () => {
+  it.each(['#f25a18', '#ffe066', '#00ff00', '#767676', '#2f5d8a', '#0a1f44', '#949494', '#000000'])(
+    'is not lighter than %s and keeps the text readable and the colour 3:1 from white',
+    (primary) => {
+      const hover = primaryHoverColor(primary);
+      const text = readableTextColor(primary);
+      expect(contrastRatio(hover, text)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(hover, '#ffffff')).toBeGreaterThanOrEqual(
+        Math.min(primaryColorContrast(primary), 3.0),
+      );
+      expect(primaryColorContrast(hover)).toBeGreaterThanOrEqual(primaryColorContrast(primary));
+    },
+  );
+
+  it('is darker for the default colour', () => {
+    expect(primaryHoverColor('#f25a18')).not.toBe('#f25a18');
+    expect(primaryHoverColor('#f25a18')).toMatch(/^#[0-9a-f]{6}$/);
   });
 });

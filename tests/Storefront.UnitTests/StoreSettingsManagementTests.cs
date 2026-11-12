@@ -237,6 +237,8 @@ public sealed class StoreSettingsManagementTests
     [InlineData("#000000", "#ffffff", 21.0)]
     [InlineData("#949494", "#ffffff", 3.0303)]
     [InlineData("#2f5d8a", "#ffffff", 6.877)]
+    [InlineData("#f25a18", "#ffffff", 3.359)]
+    [InlineData("#ff6b2c", "#ffffff", 2.841)]
     public void ContrastRatio_MatchesTheValuesOfTheStorefrontFormula(string first, string second, double expected)
     {
         var ratio = ColorContrast.Ratio(first, second);

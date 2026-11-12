@@ -43,7 +43,7 @@ public static class DemoCatalog
         DefaultLocale: "bg",
         ContactEmail: "demo@example.com",
         ContactPhone: "+359 000 000 000",
-        PrimaryColor: "#2563EB",
+        PrimaryColor: "#F25A18",
         IsDemo: true);
 
     private const string Puzzles = "3d-puzzles";

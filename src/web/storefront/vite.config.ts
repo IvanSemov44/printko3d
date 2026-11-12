@@ -18,5 +18,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test-setup.ts'],
+    // designTokens.test.ts reads index.css as text.
+    css: { include: [/index\.css/] },
   },
 });

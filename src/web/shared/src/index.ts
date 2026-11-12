@@ -27,6 +27,7 @@ export {
   isHexColor,
   normalizePrimaryColor,
   primaryColorContrast,
+  primaryHoverColor,
   readableTextColor,
 } from './color';
 export { imageUrl } from './images';
