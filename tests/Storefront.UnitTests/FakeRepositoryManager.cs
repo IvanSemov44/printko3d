@@ -1,5 +1,6 @@
 using Storefront.Application.Contracts;
 using Storefront.Application.Exceptions;
+using Storefront.Domain.Carts;
 using Storefront.Domain.Catalog;
 
 namespace Storefront.UnitTests;
@@ -9,6 +10,7 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
     private readonly FakeCategoryRepository _category = new();
     private readonly FakeProductRepository _product = new();
     private readonly FakeStoreSettingsRepository _storeSettings = new();
+    private readonly FakeCartRepository _cart = new();
 
     public List<Category> Categories => _category.Items;
 
@@ -22,12 +24,17 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
     public IStoreSettingsRepository StoreSettings => _storeSettings;
 
+    public ICartRepository Cart => _cart;
+
+    public List<Cart> Carts => _cart.Items;
+
     public ICatalogQueries Catalog => throw new NotSupportedException("Read queries are covered by the integration tests.");
 
     public List<StoreSettings> Settings => _storeSettings.Items;
 
     /// <summary>When set, the next saves fail with this exception, like a database that is down.</summary>
     public Exception? SaveFailure { get; set; }
+
 
     public Task SaveAsync(CancellationToken cancellationToken)
     {
@@ -107,6 +114,20 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
         public Dictionary<StoreSettings, uint> Expected { get; } = [];
 
         public void ExpectVersion(StoreSettings settings, uint version) => Expected[settings] = version;
+    }
+
+    private sealed class FakeCartRepository : ICartRepository
+    {
+        public List<Cart> Items { get; } = [];
+
+        public void Create(Cart cart) => Items.Add(cart);
+
+        public Task<Cart?> GetByTokenHashAsync(byte[] tokenHash, bool trackChanges, CancellationToken cancellationToken) =>
+            Task.FromResult(Items.SingleOrDefault(c => c.TokenHash.SequenceEqual(tokenHash)));
+
+        public void RemoveItem(CartItem item) => Items.ForEach(c => c.Items.Remove(item));
+
+        public void RemoveItems(Cart cart) => cart.Items.Clear();
     }
 
     private sealed class FakeProductRepository : IProductRepository

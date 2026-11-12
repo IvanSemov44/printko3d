@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261110160407_StoreSettingsRowVersion`
+Последна миграция: `20261112120245_AddCarts`
 
 ## Връзки
 
@@ -16,6 +16,8 @@ erDiagram
     admin_roles ||--o{ admin_user_roles : "role_id"
     admin_users ||--o{ admin_user_roles : "user_id"
     admin_users ||--o{ admin_user_tokens : "user_id"
+    carts ||--o{ cart_items : "cart_id"
+    product_variants ||--o{ cart_items : "variant_id"
     categories |o--o{ categories : "parent_id"
     products ||--o{ product_images : "product_id"
     product_variants |o--o{ product_images : "variant_id"
@@ -181,6 +183,56 @@ erDiagram
 | --- | --- |
 | EmailIndex | `CREATE INDEX "EmailIndex" ON public.admin_users USING btree (normalized_email)` |
 | UserNameIndex | `CREATE UNIQUE INDEX "UserNameIndex" ON public.admin_users USING btree (normalized_user_name)` |
+
+### cart_items
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| cart_id | uuid | не |  |
+| variant_id | uuid | не |  |
+| quantity | integer | не |  |
+| created_at | timestamp with time zone | не |  |
+| updated_at | timestamp with time zone | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_cart_items | първичен ключ | `PRIMARY KEY (id)` |
+| FK_cart_items_carts_cart_id | външен ключ | `FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE` |
+| FK_cart_items_product_variants_variant_id | външен ключ | `FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE RESTRICT` |
+| ck_cart_items_quantity | проверка | `CHECK (((quantity >= 1) AND (quantity <= 20)))` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_cart_items_cart_id_variant_id | `CREATE UNIQUE INDEX "IX_cart_items_cart_id_variant_id" ON public.cart_items USING btree (cart_id, variant_id)` |
+| IX_cart_items_variant_id | `CREATE INDEX "IX_cart_items_variant_id" ON public.cart_items USING btree (variant_id)` |
+
+### carts
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| token_hash | bytea | не |  |
+| created_at | timestamp with time zone | не |  |
+| updated_at | timestamp with time zone | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_carts | първичен ключ | `PRIMARY KEY (id)` |
+| ck_carts_token_hash_length | проверка | `CHECK ((octet_length(token_hash) = 32))` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_carts_token_hash | `CREATE UNIQUE INDEX "IX_carts_token_hash" ON public.carts USING btree (token_hash)` |
+| IX_carts_updated_at | `CREATE INDEX "IX_carts_updated_at" ON public.carts USING btree (updated_at)` |
 
 ### categories
 
