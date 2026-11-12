@@ -1,3 +1,4 @@
+using Storefront.Application.Carts.Queries;
 using Storefront.Application.Contracts;
 using Storefront.Application.Exceptions;
 using Storefront.Domain.Carts;
@@ -11,6 +12,7 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
     private readonly FakeProductRepository _product = new();
     private readonly FakeStoreSettingsRepository _storeSettings = new();
     private readonly FakeCartRepository _cart = new();
+    private readonly FakeCartQueries _cartQueries;
 
     public List<Category> Categories => _category.Items;
 
@@ -28,12 +30,20 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
     public List<Cart> Carts => _cart.Items;
 
+    public HashSet<Guid> OrderableVariants => _cart.OrderableVariants;
+
+    public List<Cart> TouchedCarts => _cart.Touched;
+
+    public ICartQueries CartQueries => _cartQueries;
+
     public ICatalogQueries Catalog => throw new NotSupportedException("Read queries are covered by the integration tests.");
 
     public List<StoreSettings> Settings => _storeSettings.Items;
 
     /// <summary>When set, the next saves fail with this exception, like a database that is down.</summary>
     public Exception? SaveFailure { get; set; }
+
+    public FakeRepositoryManager() => _cartQueries = new FakeCartQueries(_cart);
 
 
     public Task SaveAsync(CancellationToken cancellationToken)
@@ -120,14 +130,41 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
     {
         public List<Cart> Items { get; } = [];
 
+        public HashSet<Guid> OrderableVariants { get; } = [];
+
+        public List<Cart> Touched { get; } = [];
+
         public void Create(Cart cart) => Items.Add(cart);
 
         public Task<Cart?> GetByTokenHashAsync(byte[] tokenHash, bool trackChanges, CancellationToken cancellationToken) =>
             Task.FromResult(Items.SingleOrDefault(c => c.TokenHash.SequenceEqual(tokenHash)));
 
+        public Task<bool> IsVariantOrderableAsync(Guid variantId, CancellationToken cancellationToken) =>
+            Task.FromResult(OrderableVariants.Contains(variantId));
+
+        // The service also adds the line to the cart, like the change tracker does with the real database.
+        public void AddItem(CartItem item)
+        {
+        }
+
         public void RemoveItem(CartItem item) => Items.ForEach(c => c.Items.Remove(item));
 
         public void RemoveItems(Cart cart) => cart.Items.Clear();
+
+        public void Touch(Cart cart) => Touched.Add(cart);
+    }
+
+    private sealed class FakeCartQueries(FakeCartRepository carts) : ICartQueries
+    {
+        // Prices, names and states are covered by the integration tests; here only the lines and the counts matter.
+        public Task<CartDto> GetAsync(byte[] tokenHash, CancellationToken cancellationToken)
+        {
+            var cart = carts.Items.SingleOrDefault(c => c.TokenHash.SequenceEqual(tokenHash));
+            var lines = (cart?.Items ?? []).Select(i => new CartLineDto(
+                i.VariantId, "Product", "product", "Variant", "SKU", null, 100, i.Quantity, 100 * i.Quantity,
+                CartLineState.Available)).ToList();
+            return Task.FromResult(CartDto.From(lines));
+        }
     }
 
     private sealed class FakeProductRepository : IProductRepository

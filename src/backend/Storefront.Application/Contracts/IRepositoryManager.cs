@@ -10,6 +10,8 @@ public interface IRepositoryManager
 
     ICartRepository Cart { get; }
 
+    ICartQueries CartQueries { get; }
+
     ICatalogQueries Catalog { get; }
 
     Task SaveAsync(CancellationToken cancellationToken);

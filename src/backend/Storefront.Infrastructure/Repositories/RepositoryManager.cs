@@ -11,6 +11,7 @@ internal sealed class RepositoryManager(StorefrontDbContext context) : IReposito
     private readonly Lazy<IStoreSettingsRepository> _storeSettings = new(() => new StoreSettingsRepository(context));
 
     private readonly Lazy<ICartRepository> _cart = new(() => new CartRepository(context));
+    private readonly Lazy<ICartQueries> _cartQueries = new(() => new CartQueries(context));
 
     private readonly Lazy<ICatalogQueries> _catalog = new(() => new CatalogQueries(context));
 
@@ -23,6 +24,8 @@ internal sealed class RepositoryManager(StorefrontDbContext context) : IReposito
     public IStoreSettingsRepository StoreSettings => _storeSettings.Value;
 
     public ICartRepository Cart => _cart.Value;
+
+    public ICartQueries CartQueries => _cartQueries.Value;
 
 
     public async Task SaveAsync(CancellationToken cancellationToken)
