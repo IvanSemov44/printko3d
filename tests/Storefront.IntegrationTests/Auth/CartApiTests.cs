@@ -97,7 +97,7 @@ public sealed class CartApiTests(PostgresFixture postgres)
 
         var response = await AddAsync(host, variantId, 2);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var line = (await JsonOf(response)).GetProperty("lines")[0];
         Assert.Equal(variantId, line.GetProperty("variantId").GetGuid());
         Assert.Equal(2, line.GetProperty("quantity").GetInt32());
@@ -135,7 +135,7 @@ public sealed class CartApiTests(PostgresFixture postgres)
 
         var response = await AddAsync(host, variantId, 1, unknown);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.NotEqual(unknown, CookieOf(response));
         await using var context = host.Database.CreateContext();
         Assert.Single(await context.Carts.ToListAsync());
@@ -152,23 +152,27 @@ public sealed class CartApiTests(PostgresFixture postgres)
 
         var set = await host.SendAsync(HttpMethod.Put, $"{ItemsUrl}/{first}", new { quantity = 9 }, cookie);
         var remove = await host.SendAsync(HttpMethod.Delete, $"{ItemsUrl}/{second}", cookie: cookie);
-        var afterRemove = await JsonOf(remove);
+        var afterRemove = await JsonOf(await host.SendAsync(HttpMethod.Get, CartUrl, cookie: cookie));
         var clear = await host.SendAsync(HttpMethod.Delete, CartUrl, cookie: cookie);
+        var afterClear = await JsonOf(await host.SendAsync(HttpMethod.Get, CartUrl, cookie: cookie));
 
+        Assert.Equal(HttpStatusCode.OK, set.StatusCode);
         Assert.Equal(9, (await JsonOf(set)).GetProperty("lines")[0].GetProperty("quantity").GetInt32());
+        Assert.Equal(HttpStatusCode.NoContent, remove.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, clear.StatusCode);
         Assert.Equal(1, afterRemove.GetProperty("lines").GetArrayLength());
-        Assert.Equal(0, (await JsonOf(clear)).GetProperty("lines").GetArrayLength());
+        Assert.Equal(0, afterClear.GetProperty("lines").GetArrayLength());
         Assert.All([set, remove, clear], response => Assert.Equal(cookie, CookieOf(response)));
     }
 
     [Fact]
-    public async Task Clear_WithoutACart_IsAnEmptyCart_WithNoCookie()
+    public async Task Clear_WithoutACart_Is204_WithNoCookie()
     {
         await using var host = await AuthApiHost.CreateAsync(postgres);
 
         var response = await host.SendAsync(HttpMethod.Delete, CartUrl);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Null(SetCookieHeaderOf(response));
     }
 
@@ -194,6 +198,64 @@ public sealed class CartApiTests(PostgresFixture postgres)
     }
 
     [Fact]
+    public async Task AddOfANewLine_Is201_WithTheAddressOfTheLine_AndTheCartInTheBody()
+    {
+        await using var host = await AuthApiHost.CreateAsync(postgres);
+        var variantId = await SeedVariantAsync(host);
+
+        var response = await AddAsync(host, variantId, 2);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.EndsWith($"/api/v1/cart/items/{variantId}", response.Headers.Location!.AbsolutePath, StringComparison.Ordinal);
+        Assert.Equal(2, (await JsonOf(response)).GetProperty("itemCount").GetInt32());
+    }
+
+    [Fact]
+    public async Task AddToALineThatIsAlreadyThere_Is200_WithNoLocation()
+    {
+        await using var host = await AuthApiHost.CreateAsync(postgres);
+        var variantId = await SeedVariantAsync(host);
+        var cookie = CookieOf(await AddAsync(host, variantId, 1))!;
+
+        var again = await AddAsync(host, variantId, 2, cookie);
+
+        Assert.Equal(HttpStatusCode.OK, again.StatusCode);
+        Assert.Null(again.Headers.Location);
+        Assert.Equal(3, (await JsonOf(again)).GetProperty("lines")[0].GetProperty("quantity").GetInt32());
+    }
+
+    [Fact]
+    public async Task TheAddressOfANewLine_ReturnsThatLine()
+    {
+        await using var host = await AuthApiHost.CreateAsync(postgres);
+        var variantId = await SeedVariantAsync(host);
+        var created = await AddAsync(host, variantId, 4);
+        var cookie = CookieOf(created)!;
+
+        var line = await host.SendAsync(HttpMethod.Get, created.Headers.Location!.PathAndQuery, cookie: cookie);
+
+        Assert.Equal(HttpStatusCode.OK, line.StatusCode);
+        var body = await JsonOf(line);
+        Assert.Equal(variantId, body.GetProperty("variantId").GetGuid());
+        Assert.Equal(4, body.GetProperty("quantity").GetInt32());
+    }
+
+    [Fact]
+    public async Task GetLine_ThatIsNotThere_OrOfAnotherShopper_Is404()
+    {
+        await using var host = await AuthApiHost.CreateAsync(postgres);
+        var variantId = await SeedVariantAsync(host);
+        var cookie = CookieOf(await AddAsync(host, variantId, 1))!;
+        var stranger = $"{CookieName}={CartToken.Create()}";
+
+        var missing = await host.SendAsync(HttpMethod.Get, $"{ItemsUrl}/{Guid.NewGuid()}", cookie: cookie);
+        var noCookie = await host.SendAsync(HttpMethod.Get, $"{ItemsUrl}/{variantId}");
+        var other = await host.SendAsync(HttpMethod.Get, $"{ItemsUrl}/{variantId}", cookie: stranger);
+
+        Assert.All([missing, noCookie, other], response => Assert.Equal(HttpStatusCode.NotFound, response.StatusCode));
+    }
+
+    [Fact]
     public async Task Add_TwentyUnits_IsAccepted()
     {
         await using var host = await AuthApiHost.CreateAsync(postgres);
@@ -201,7 +263,7 @@ public sealed class CartApiTests(PostgresFixture postgres)
 
         var response = await AddAsync(host, variantId, 20);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Equal(20, (await JsonOf(response)).GetProperty("lines")[0].GetProperty("quantity").GetInt32());
     }
 

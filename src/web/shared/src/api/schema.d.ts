@@ -2202,16 +2202,12 @@ export interface paths {
       };
       requestBody?: never;
       responses: {
-        /** @description OK */
-        200: {
+        /** @description No Content */
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'text/plain': components['schemas']['CartDto'];
-            'application/json': components['schemas']['CartDto'];
-            'text/json': components['schemas']['CartDto'];
-          };
+          content?: never;
         };
         /** @description Forbidden */
         403: {
@@ -2231,29 +2227,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/cart/items': {
+  '/api/v1/cart/items/{variantId}': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get?: never;
-    put?: never;
-    post: {
+    get: {
       parameters: {
         query?: never;
         header?: never;
-        path?: never;
+        path: {
+          variantId: string;
+        };
         cookie?: never;
       };
-      requestBody: {
-        content: {
-          'application/json': components['schemas']['AddCartItemRequest'];
-          'text/json': components['schemas']['AddCartItemRequest'];
-          'application/*+json': components['schemas']['AddCartItemRequest'];
-        };
-      };
+      requestBody?: never;
       responses: {
         /** @description OK */
         200: {
@@ -2261,31 +2251,9 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'text/plain': components['schemas']['CartDto'];
-            'application/json': components['schemas']['CartDto'];
-            'text/json': components['schemas']['CartDto'];
-          };
-        };
-        /** @description Bad Request */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'text/plain': components['schemas']['ProblemDetails'];
-            'application/json': components['schemas']['ProblemDetails'];
-            'text/json': components['schemas']['ProblemDetails'];
-          };
-        };
-        /** @description Forbidden */
-        403: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'text/plain': components['schemas']['ProblemDetails'];
-            'application/json': components['schemas']['ProblemDetails'];
-            'text/json': components['schemas']['ProblemDetails'];
+            'text/plain': components['schemas']['CartLineDto'];
+            'application/json': components['schemas']['CartLineDto'];
+            'text/json': components['schemas']['CartLineDto'];
           };
         };
         /** @description Not Found */
@@ -2299,44 +2267,8 @@ export interface paths {
             'text/json': components['schemas']['ProblemDetails'];
           };
         };
-        /** @description Conflict */
-        409: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'text/plain': components['schemas']['ProblemDetails'];
-            'application/json': components['schemas']['ProblemDetails'];
-            'text/json': components['schemas']['ProblemDetails'];
-          };
-        };
-        /** @description Unprocessable Entity */
-        422: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'text/plain': components['schemas']['ProblemDetails'];
-            'application/json': components['schemas']['ProblemDetails'];
-            'text/json': components['schemas']['ProblemDetails'];
-          };
-        };
       };
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/cart/items/{variantId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
     put: {
       parameters: {
         query?: never;
@@ -2423,16 +2355,12 @@ export interface paths {
       };
       requestBody?: never;
       responses: {
-        /** @description OK */
-        200: {
+        /** @description No Content */
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'text/plain': components['schemas']['CartDto'];
-            'application/json': components['schemas']['CartDto'];
-            'text/json': components['schemas']['CartDto'];
-          };
+          content?: never;
         };
         /** @description Forbidden */
         403: {
@@ -2458,6 +2386,115 @@ export interface paths {
         };
       };
     };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/cart/items': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['AddCartItemRequest'];
+          'text/json': components['schemas']['AddCartItemRequest'];
+          'application/*+json': components['schemas']['AddCartItemRequest'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['CartDto'];
+            'application/json': components['schemas']['CartDto'];
+            'text/json': components['schemas']['CartDto'];
+          };
+        };
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['CartDto'];
+            'application/json': components['schemas']['CartDto'];
+            'text/json': components['schemas']['CartDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unprocessable Entity */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;

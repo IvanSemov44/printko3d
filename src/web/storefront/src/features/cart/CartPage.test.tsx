@@ -155,7 +155,7 @@ describe('cart page', () => {
     });
 
     it('sends one request even if "Yes" is pressed twice', async () => {
-      let answer: (response: Response) => void = () => undefined;
+      let answer: () => void = () => undefined;
       const server = fakeServer({ initial: LINES });
       const deletes: string[] = [];
       stubNetwork({
@@ -164,8 +164,12 @@ describe('cart page', () => {
         cart: (url, init) => {
           if (init?.method === 'DELETE') {
             deletes.push(url);
+            // The server's own answer (204) is held back until the test lets it go.
+            const held = server.cart(url, init);
             return new Promise<Response>((resolve) => {
-              answer = resolve;
+              answer = () => {
+                resolve(held);
+              };
             });
           }
           return server.cart(url, init);
@@ -179,7 +183,7 @@ describe('cart page', () => {
       fireEvent.click(yes);
       await within(page).findByRole('button', { name: 'Изчиства се…' });
       fireEvent.click(yes);
-      answer(Response.json({ lines: [], itemCount: 0, total: 0 }));
+      answer();
 
       expect(await within(page).findByText('Количката е празна')).toBeInTheDocument();
       expect(deletes).toHaveLength(1);

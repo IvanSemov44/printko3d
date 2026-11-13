@@ -122,10 +122,13 @@ export async function setCartItemQuantity(
   return readCart(await apiSend('PUT', itemUrl(variantId), { quantity }, signal));
 }
 
+/** The API answers 204 without a body, so the new state of the cart is read with a GET (rule 6 of decision 0017). */
 export async function removeCartItem(variantId: string, signal?: AbortSignal): Promise<Cart> {
-  return readCart(await apiDelete(itemUrl(variantId), signal));
+  await apiDelete(itemUrl(variantId), signal);
+  return getCart(signal);
 }
 
 export async function clearCart(signal?: AbortSignal): Promise<Cart> {
-  return readCart(await apiDelete(CART_URL, signal));
+  await apiDelete(CART_URL, signal);
+  return getCart(signal);
 }

@@ -1,6 +1,9 @@
 import { cartFixture, cartLineFixture } from './renderApp';
 
-/** A cart that behaves like the server: a change gives back the whole cart, and the sums are the server's. */
+/**
+ * A cart that behaves like the server: a change gives back the whole cart, and the sums are the server's. As in the API,
+ * an add of a new line answers 201, a removal answers 204 without a body, and the new state is read with a GET.
+ */
 export function fakeServer(
   options: { initial?: Record<string, unknown>[]; failWith?: Response } = {},
 ) {
@@ -14,8 +17,10 @@ export function fakeServer(
       return options.failWith.clone();
     }
     const variantId = url.split('/items/')[1];
+    let status = 200;
     if (method === 'POST') {
       const asked = body as { variantId: string; quantity: number };
+      status = lines.some((line) => line['variantId'] === asked.variantId) ? 200 : 201;
       lines = [
         ...lines.filter((line) => line['variantId'] !== asked.variantId),
         cartLineFixture({
@@ -38,8 +43,9 @@ export function fakeServer(
     } else if (method === 'DELETE') {
       // With an address of a line it removes the line; without one it clears the cart.
       lines = variantId ? lines.filter((line) => line['variantId'] !== variantId) : [];
+      return new Response(null, { status: 204 });
     }
-    return Response.json(cartFixture(lines));
+    return Response.json(cartFixture(lines), { status });
   };
   return { cart, requests };
 }

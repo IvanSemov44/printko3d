@@ -207,7 +207,12 @@ describe('cart hooks', () => {
       await waitFor(() => {
         expect(fetchMock).toHaveBeenCalledTimes(2);
       });
-      answers[1]?.(Response.json(cartBody(0)));
+      // The removal answers 204 without a body; the new state of the cart is then read with a GET.
+      answers[1]?.(new Response(null, { status: 204 }));
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenCalledTimes(3);
+      });
+      answers[2]?.(Response.json(cartBody(0)));
       await both;
     });
 
