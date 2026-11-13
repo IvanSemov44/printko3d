@@ -56,3 +56,4 @@
 - [0029 – Вариантите, снимките и редовете на количката са без собствена версия на реда](0029-variants-images-and-cart-lines-have-no-row-version.md)
 - [0030 – Слетите клонове се трият автоматично](0030-merged-branches-are-deleted-automatically.md)
 - [0031 – Имейлът е зад `IEmailSender`, с MailKit и локален прихващач Mailpit](0031-email-behind-iemailsender-with-mailkit.md)
+- [0032 – Поръчката пази копия и има случаен номер, а гостът няма `Customer`](0032-guest-order-keeps-copies-and-a-random-number.md)

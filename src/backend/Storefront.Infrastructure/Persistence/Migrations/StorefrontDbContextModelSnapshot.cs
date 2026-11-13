@@ -626,6 +626,201 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Storefront.Domain.Orders.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
+                        .HasColumnName("currency");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("customer_name");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)")
+                        .HasColumnName("email");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("integer")
+                        .HasColumnName("number");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("phone");
+
+                    b.Property<string>("ShippingCity")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("shipping_city");
+
+                    b.Property<string>("ShippingCountry")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasColumnName("shipping_country");
+
+                    b.Property<string>("ShippingPostalCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("shipping_postal_code");
+
+                    b.Property<string>("ShippingStreet")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("shipping_street");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset>("TermsAcceptedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("terms_accepted_at");
+
+                    b.Property<string>("TermsVersion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("terms_version");
+
+                    b.Property<long>("TotalAmount")
+                        .HasColumnType("bigint")
+                        .HasColumnName("total_amount");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Number")
+                        .IsUnique();
+
+                    b.ToTable("orders", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_orders_currency", "char_length(currency) = 3");
+
+                            t.HasCheckConstraint("ck_orders_number", "number BETWEEN 10000000 AND 99999999");
+
+                            t.HasCheckConstraint("ck_orders_shipping_country", "char_length(shipping_country) = 2");
+
+                            t.HasCheckConstraint("ck_orders_status", "status IN ('New')");
+
+                            t.HasCheckConstraint("ck_orders_total_amount", "total_amount >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("Storefront.Domain.Orders.OrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("FulfilmentType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("fulfilment_type");
+
+                    b.Property<int?>("LeadTimeDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("lead_time_days");
+
+                    b.Property<long>("LineTotal")
+                        .HasColumnType("bigint")
+                        .HasColumnName("line_total");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("product_name");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("sku");
+
+                    b.Property<long>("UnitPrice")
+                        .HasColumnType("bigint")
+                        .HasColumnName("unit_price");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("VariantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("variant_id");
+
+                    b.Property<string>("VariantName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("variant_name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("VariantId");
+
+                    b.ToTable("order_items", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_order_items_fulfilment_type", "fulfilment_type IN ('InStock', 'MadeToOrder')");
+
+                            t.HasCheckConstraint("ck_order_items_lead_time_positive", "lead_time_days IS NULL OR lead_time_days > 0");
+
+                            t.HasCheckConstraint("ck_order_items_line_total", "line_total = unit_price * quantity");
+
+                            t.HasCheckConstraint("ck_order_items_quantity", "quantity >= 1");
+
+                            t.HasCheckConstraint("ck_order_items_unit_price", "unit_price >= 0");
+                        });
+                });
+
             modelBuilder.Entity("Storefront.Infrastructure.Identity.AdminUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -812,6 +1007,21 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Storefront.Domain.Orders.OrderItem", b =>
+                {
+                    b.HasOne("Storefront.Domain.Orders.Order", null)
+                        .WithMany("Items")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Storefront.Domain.Catalog.ProductVariant", null)
+                        .WithMany()
+                        .HasForeignKey("VariantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Storefront.Domain.Carts.Cart", b =>
                 {
                     b.Navigation("Items");
@@ -822,6 +1032,11 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Variants");
+                });
+
+            modelBuilder.Entity("Storefront.Domain.Orders.Order", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

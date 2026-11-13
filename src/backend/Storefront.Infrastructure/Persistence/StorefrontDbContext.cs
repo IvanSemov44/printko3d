@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Storefront.Domain;
 using Storefront.Domain.Carts;
 using Storefront.Domain.Catalog;
+using Storefront.Domain.Orders;
 using Storefront.Infrastructure.Identity;
 using Storefront.Infrastructure.Persistence.Configurations;
 
@@ -27,6 +28,10 @@ public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> op
     public DbSet<Cart> Carts => Set<Cart>();
 
     public DbSet<CartItem> CartItems => Set<CartItem>();
+
+    public DbSet<Order> Orders => Set<Order>();
+
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
