@@ -1,4 +1,5 @@
 using Storefront.Application.Carts;
+using Storefront.Application.Orders;
 
 namespace Storefront.Application.Catalog;
 
@@ -13,4 +14,6 @@ public interface IServiceManager
     ICatalogReadService Catalog { get; }
 
     ICartService Cart { get; }
+
+    IOrderService Orders { get; }
 }

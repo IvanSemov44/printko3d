@@ -6,6 +6,7 @@ using Storefront.Application.Carts;
 using Storefront.Application.Catalog;
 using Storefront.Application.Contracts;
 using Storefront.Application.Health;
+using Storefront.Application.Orders;
 using Storefront.Infrastructure;
 
 namespace Storefront.Api.Setup;
@@ -33,6 +34,7 @@ internal static class ApiSetup
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddApiCors(builder.Configuration);
         builder.AddCartCleanup();
+        builder.AddOrders();
         builder.Services
             .AddOptions<SiteOptions>()
             .Bind(builder.Configuration.GetSection(SiteOptions.SectionName))
@@ -69,6 +71,20 @@ internal static class ApiSetup
                 .WithOrigins(allowedOrigins)
                 .WithMethods(HttpMethods.Get)
                 .AllowAnyHeader()));
+    }
+
+    /// <summary>Placing an order (decision 0032): the number generator and the settings, checked at startup.</summary>
+    private static void AddOrders(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .AddOptions<OrderOptions>()
+            .Bind(builder.Configuration.GetSection(OrderOptions.SectionName))
+            .Validate(
+                options => options.TermsVersion.Length is > 0 and <= 50,
+                "Checkout:TermsVersion must be between 1 and 50 characters.")
+            .ValidateOnStart();
+        builder.Services.AddSingleton(services => services.GetRequiredService<IOptions<OrderOptions>>().Value);
+        builder.Services.AddSingleton<IOrderNumberGenerator, RandomOrderNumberGenerator>();
     }
 
     /// <summary>The daily cleanup of old carts (decision 0027), with its settings checked at startup.</summary>

@@ -12,6 +12,8 @@ public interface IRepositoryManager
 
     ICartQueries CartQueries { get; }
 
+    IOrderRepository Order { get; }
+
     ICatalogQueries Catalog { get; }
 
     Task SaveAsync(CancellationToken cancellationToken);

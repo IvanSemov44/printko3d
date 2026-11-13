@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Storefront.Application.Exceptions;
+using Storefront.Domain.Carts;
 using Storefront.Domain.Catalog;
 
 namespace Storefront.Infrastructure.Repositories;
@@ -22,14 +23,24 @@ internal static class SaveErrorTranslator
         ["IX_product_variants_sku"] = ("The SKU is already used.", "variant.sku_taken"),
         ["IX_cart_items_cart_id_variant_id"] =
             ("The variant was added to the cart at the same moment. Try again.", "cart.item_conflict"),
+        // Backstop only: the order service looks for a free number first.
+        ["IX_orders_number"] = ("The order number is taken. Try again.", "order.number_taken"),
     };
 
     private const string ChangedByOthers = "The record was changed by someone else. Reload it and try again.";
+
+    private const string CartChangedAtTheSameMoment = "The cart was changed at the same moment. Open it and try again.";
 
     public static Exception? Translate(DbUpdateException exception)
     {
         if (exception is DbUpdateConcurrencyException concurrency)
         {
+            // A line of the cart that is already gone: the same cart was used twice at the same moment.
+            if (concurrency.Entries.Any(entry => entry.Entity is CartItem))
+            {
+                return new ConflictException(CartChangedAtTheSameMoment, "cart.changed");
+            }
+
             return ConcurrencyCode(concurrency) is { } code ? new ConflictException(ChangedByOthers, code) : null;
         }
 
