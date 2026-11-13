@@ -50,7 +50,7 @@ expect_file "robots.txt keeps everybody out by default" "$OUT/html/robots.txt" '
 expect_contains "sitemap goes to the API" "$OUT/conf/sitemap-proxy.conf" "proxy_pass http://api.test/sitemap.xml;"
 expect_empty "no admin proxy for the storefront" "$OUT/conf/api-proxy.conf"
 expect_contains "cart goes to the API" "$OUT/conf/cart-proxy.conf" "proxy_pass http://api.test;"
-expect_contains "only the cart is forwarded" "$OUT/conf/cart-proxy.conf" 'location ~ ^/api/v1/cart(/|$) {'
+expect_contains "only the cart and the orders are forwarded" "$OUT/conf/cart-proxy.conf" 'location ~ ^/api/v1/(cart|orders)(/|$) {'
 if grep -qF "admin" "$OUT/conf/cart-proxy.conf"; then echo "FAIL cart proxy must not mention admin"; FAILED=1; fi
 
 run_case "indexing allowed" 0 API_URL=http://api.test SITE_URL=https://shop.test/ ALLOW_INDEXING=true IMAGE_BASE_URL=http://img.test/
