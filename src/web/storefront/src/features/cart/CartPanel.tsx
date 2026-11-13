@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 import { CartLines } from './CartLines';
 import { useCartPanel } from './useCartPanel';
-import { useCartQuery } from './useCartQuery';
+import { useCartQuery } from '../../components/useCartQuery';
 
 /**
  * The cart from the right, made with the browser's own dialog: the page behind it cannot be reached, Esc closes it

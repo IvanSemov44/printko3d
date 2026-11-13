@@ -5,7 +5,8 @@ import { useRuntimeConfigQuery } from '../store-settings/useRuntimeConfigQuery';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 import { describeAvailability } from '../../components/availability';
 import { cartErrorKey } from './cartErrors';
-import { canIncrease, lineStateNoteKey } from './lineState';
+import { lineStateNoteKey } from '../../components/lineStateNote';
+import { canIncrease } from './lineState';
 import { QuantityStepper } from './QuantityStepper';
 import { useIsLineBusy, useRemoveFromCart, useSetCartQuantity } from './useCartMutations';
 

@@ -6,7 +6,12 @@ import {
   type Cart,
 } from '@storefront/shared';
 import { useIsMutating, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CART_KEY, CART_MUTATION_SCOPE, CLEAR_MUTATION_KEY, lineMutationKey } from './cartKeys';
+import {
+  CART_KEY,
+  CART_MUTATION_SCOPE,
+  CLEAR_MUTATION_KEY,
+  lineMutationKey,
+} from '../../components/cartKeys';
 
 /**
  * Keeps the cache equal to the server. A good answer is the new cart. A failed change may mean the cart is not what

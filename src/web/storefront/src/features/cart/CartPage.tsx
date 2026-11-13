@@ -6,7 +6,7 @@ import { PageMeta } from '../seo/PageMeta';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 import { CartLines } from './CartLines';
 import { ClearCartButton } from './ClearCartButton';
-import { useCartQuery } from './useCartQuery';
+import { useCartQuery } from '../../components/useCartQuery';
 
 /** `/cart`. The same lines and actions as the panel, with the sum beside them. Kept out of search results. */
 export function CartPage() {
