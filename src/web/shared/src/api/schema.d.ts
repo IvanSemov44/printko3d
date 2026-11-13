@@ -2220,6 +2220,17 @@ export interface paths {
             'text/json': components['schemas']['ProblemDetails'];
           };
         };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
       };
     };
     options?: never;
@@ -2330,6 +2341,17 @@ export interface paths {
             'text/json': components['schemas']['ProblemDetails'];
           };
         };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
         /** @description Unprocessable Entity */
         422: {
           headers: {
@@ -2375,6 +2397,17 @@ export interface paths {
         };
         /** @description Not Found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Conflict */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -2579,6 +2612,93 @@ export interface paths {
     };
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/orders': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['PlaceOrderRequest'];
+          'text/json': components['schemas']['PlaceOrderRequest'];
+          'application/*+json': components['schemas']['PlaceOrderRequest'];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['OrderDto'];
+            'application/json': components['schemas']['OrderDto'];
+            'text/json': components['schemas']['OrderDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Conflict */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unprocessable Entity */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -2890,6 +3010,38 @@ export interface components {
     MoveVariantRequest: {
       direction: components['schemas']['MoveDirection'];
     };
+    OrderDto: {
+      /** Format: int32 */
+      number: number | string;
+      status: string;
+      currency: string;
+      /** Format: int64 */
+      total: number | string;
+      customerName: string;
+      email: string;
+      phone: string;
+      shippingStreet: string;
+      shippingCity: string;
+      shippingPostalCode: string;
+      shippingCountry: string;
+      /** Format: date-time */
+      createdAt: string;
+      items: components['schemas']['OrderItemDto'][];
+    };
+    OrderItemDto: {
+      productName: string;
+      variantName: string;
+      sku: string;
+      /** Format: int64 */
+      unitPrice: number | string;
+      /** Format: int32 */
+      quantity: number | string;
+      /** Format: int64 */
+      lineTotal: number | string;
+      fulfilmentType: components['schemas']['FulfilmentType'];
+      /** Format: int32 */
+      leadTimeDays: null | number | string;
+    };
     PagedResultOfProductAdminListItemDto: {
       items: components['schemas']['ProductAdminListItemDto'][];
       /** Format: int32 */
@@ -2911,6 +3063,17 @@ export interface components {
       totalCount: number | string;
       /** Format: int32 */
       totalPages?: number | string;
+    };
+    PlaceOrderRequest: {
+      name: string;
+      email: string;
+      phone: string;
+      street: string;
+      city: string;
+      postalCode: string;
+      termsAccepted: boolean;
+      /** Format: int64 */
+      expectedTotal: number | string;
     };
     ProblemDetails: {
       type?: null | string;
