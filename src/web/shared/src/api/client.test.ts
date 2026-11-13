@@ -1,5 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiError, getProduct, getProducts, getStoreSettings } from './client';
+import { ApiError, getCategories, getProduct, getProducts, getStoreSettings } from './client';
+import { UnexpectedResponseError } from './decode';
+
+const settings = {
+  storeName: 'Shop',
+  defaultCurrency: 'EUR',
+  defaultLocale: 'bg',
+  contactEmail: 'shop@example.test',
+  contactPhone: '+359 111 222 333',
+  logoKey: null,
+  primaryColor: '#2563EB',
+  isDemo: false,
+};
 
 function stubApi(status: number, body: unknown, config: Record<string, unknown> = {}) {
   vi.stubGlobal(
@@ -20,9 +32,9 @@ describe('API client', () => {
   });
 
   it('reads JSON from the configured API address', async () => {
-    stubApi(200, { storeName: 'Shop' });
+    stubApi(200, settings);
 
-    await expect(getStoreSettings()).resolves.toEqual({ storeName: 'Shop' });
+    await expect(getStoreSettings()).resolves.toEqual(settings);
     expect(fetch).toHaveBeenCalledWith('http://api.test/api/v1/store-settings', expect.anything());
   });
 
@@ -34,6 +46,35 @@ describe('API client', () => {
       code: 'store_settings.not_found',
     });
     await expect(getStoreSettings()).rejects.toBeInstanceOf(ApiError);
+  });
+
+  describe('an answer with the wrong shape', () => {
+    it('is named for the settings', async () => {
+      stubApi(200, { storeName: 'Shop' });
+
+      await expect(getStoreSettings()).rejects.toBeInstanceOf(UnexpectedResponseError);
+      await expect(getStoreSettings()).rejects.toThrow('storeSettings.defaultCurrency');
+    });
+
+    it('is named for the categories', async () => {
+      stubApi(200, [{ id: '1' }]);
+
+      await expect(getCategories()).rejects.toThrow('categories[0].parentId');
+    });
+
+    it('is named for the products', async () => {
+      stubApi(200, { items: [], page: 1 });
+
+      await expect(getProducts({ category: 'a', page: 1, pageSize: 12 })).rejects.toThrow(
+        'productPage.pageSize',
+      );
+    });
+
+    it('is named for one product', async () => {
+      stubApi(200, { id: 'p1' });
+
+      await expect(getProduct('dragon')).rejects.toBeInstanceOf(UnexpectedResponseError);
+    });
   });
 
   it('leaves code empty when the error body has none', async () => {

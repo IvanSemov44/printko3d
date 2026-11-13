@@ -1,14 +1,17 @@
 import { loadRuntimeConfig, type RuntimeConfig } from '../config';
-import { imageUrl } from '../images';
-import { toSafeInteger } from '../numbers';
 import type { components } from './schema';
+import {
+  readCategories,
+  readProductDetails,
+  readProductPage,
+  readStoreSettings,
+} from './publicReaders';
 
 export type StoreSettings = components['schemas']['StoreSettingsDto'];
 export type Category = components['schemas']['CategoryDto'];
 export type FulfilmentType = components['schemas']['FulfilmentType'];
 
 type ProductListItemDto = components['schemas']['ProductListItemDto'];
-type ProductPageDto = components['schemas']['PagedResultOfProductListItemDto'];
 
 /** The main image of a card. `url` is null when the environment has no image storage (decision 0011). */
 export interface ProductListImage {
@@ -115,25 +118,11 @@ async function getJson(path: string, signal?: AbortSignal): Promise<unknown> {
 }
 
 export async function getStoreSettings(signal?: AbortSignal): Promise<StoreSettings> {
-  return (await getJson('/api/v1/store-settings', signal)) as StoreSettings;
+  return readStoreSettings(await getJson('/api/v1/store-settings', signal));
 }
 
 export async function getCategories(signal?: AbortSignal): Promise<Category[]> {
-  return (await getJson('/api/v1/categories', signal)) as Category[];
-}
-
-function toProductListItem(item: ProductListItemDto, imageBaseUrl: string | null): ProductListItem {
-  return {
-    ...item,
-    minPrice: toSafeInteger(item.minPrice),
-    leadTimeDays: item.leadTimeDays === null ? null : toSafeInteger(item.leadTimeDays),
-    primaryImage: item.primaryImage
-      ? {
-          url: imageUrl(imageBaseUrl, item.primaryImage.storageKey),
-          altText: item.primaryImage.altText,
-        }
-      : null,
-  };
+  return readCategories(await getJson('/api/v1/categories', signal));
 }
 
 export async function getProducts(query: ProductQuery, signal?: AbortSignal): Promise<ProductPage> {
@@ -143,41 +132,7 @@ export async function getProducts(query: ProductQuery, signal?: AbortSignal): Pr
     pageSize: String(query.pageSize),
   });
   const { body, config } = await getJsonWithConfig(`/api/v1/products?${params.toString()}`, signal);
-  const dto = body as ProductPageDto;
-  const pageSize = toSafeInteger(dto.pageSize);
-  const totalCount = toSafeInteger(dto.totalCount);
-  return {
-    items: dto.items.map((item) => toProductListItem(item, config.imageBaseUrl)),
-    page: toSafeInteger(dto.page),
-    pageSize,
-    totalCount,
-    totalPages:
-      dto.totalPages === undefined
-        ? Math.ceil(totalCount / pageSize)
-        : toSafeInteger(dto.totalPages),
-  };
-}
-
-function bySortOrder<T extends { sortOrder: number }>(items: T[]): T[] {
-  return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
-}
-
-function toProductVariant(variant: ProductVariantDto): ProductVariant {
-  return {
-    ...variant,
-    price: toSafeInteger(variant.price),
-    compareAtPrice: variant.compareAtPrice === null ? null : toSafeInteger(variant.compareAtPrice),
-    weightGrams: toSafeInteger(variant.weightGrams),
-    sortOrder: toSafeInteger(variant.sortOrder),
-  };
-}
-
-function toProductImage(image: ProductImageDto, imageBaseUrl: string | null): ProductImage {
-  return {
-    ...image,
-    sortOrder: toSafeInteger(image.sortOrder),
-    url: imageUrl(imageBaseUrl, image.storageKey),
-  };
+  return readProductPage(body, config.imageBaseUrl);
 }
 
 /** One published product. An unknown, unpublished or hidden product is an ApiError with status 404. */
@@ -186,13 +141,7 @@ export async function getProduct(slug: string, signal?: AbortSignal): Promise<Pr
     `/api/v1/products/${encodeURIComponent(slug)}`,
     signal,
   );
-  const dto = body as ProductDetailsDto;
-  return {
-    ...dto,
-    leadTimeDays: dto.leadTimeDays === null ? null : toSafeInteger(dto.leadTimeDays),
-    variants: bySortOrder(dto.variants.map(toProductVariant)),
-    images: bySortOrder(dto.images.map((image) => toProductImage(image, config.imageBaseUrl))),
-  };
+  return readProductDetails(body, config.imageBaseUrl);
 }
 
 /** The names of the fields in the `errors` of a 400 ProblemDetails answer, or an empty list for any other body. */

@@ -118,7 +118,7 @@
 - **Как се познава:** `(await response.json()) as Dto`.
 - **Защо:** Типът е лъжа: ако сървърът върне друга форма, грешката се вижда по-късно като `undefined` или `NaN` на екрана.
 - **Как:** Четци от `decode.ts`, които проверяват формата и казват кое поле е грешно.
-- **Образец:** `shared/src/api/adminCategories.ts`. [frontend.md](frontend.md), F13. Остава за публичния `client.ts` (D17).
+- **Образец:** `shared/src/api/adminCategories.ts`. [frontend.md](frontend.md), F13. Публичният клиент: `shared/src/api/publicReaders.ts`.
 
 ### 17. Повтарящи се полета във формата (D10)
 
