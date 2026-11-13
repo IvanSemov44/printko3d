@@ -152,6 +152,37 @@ export function cartFixture(lines: Record<string, unknown>[] = []) {
   };
 }
 
+/** An order as the API answers a placed order (decision 0032). */
+export function orderFixture(overrides: Record<string, unknown> = {}) {
+  return {
+    number: 12345678,
+    status: 'New',
+    currency: 'EUR',
+    total: 2500,
+    customerName: 'Test Buyer',
+    email: 'buyer@example.test',
+    phone: '+359 88 000 0000',
+    shippingStreet: '1 Test Street',
+    shippingCity: 'Sofia',
+    shippingPostalCode: '1000',
+    shippingCountry: 'BG',
+    createdAt: '2026-11-13T10:00:00+00:00',
+    items: [
+      {
+        productName: 'Dragon',
+        variantName: 'Small',
+        sku: 'DRG-S',
+        unitPrice: 1250,
+        quantity: 2,
+        lineTotal: 2500,
+        fulfilmentType: 'InStock',
+        leadTimeDays: null,
+      },
+    ],
+    ...overrides,
+  };
+}
+
 export type Responder = () => Response | Promise<Response>;
 
 /** Fakes the network at the HTTP boundary: /config.json plus the API paths. Products get the parsed request address. */
@@ -163,6 +194,8 @@ export function stubNetwork(routes: {
   product?: (slug: string) => Response | Promise<Response>;
   /** Gets every request to /api/v1/cart. Without it the cart is empty, so a page that only shows the header works. */
   cart?: (url: string, init?: RequestInit) => Response | Promise<Response>;
+  /** Gets every request to /api/v1/orders. Without it a test that never places an order fails loudly if one is sent. */
+  orders?: (url: string, init?: RequestInit) => Response | Promise<Response>;
   /** Extra fields for /config.json, for example imageBaseUrl. */
   config?: Record<string, unknown>;
 }) {
@@ -172,6 +205,9 @@ export function stubNetwork(routes: {
     }
     if (url.startsWith('/api/v1/cart')) {
       return Promise.resolve(routes.cart ? routes.cart(url, init) : Response.json(cartFixture()));
+    }
+    if (routes.orders && url.startsWith('/api/v1/orders')) {
+      return Promise.resolve(routes.orders(url, init));
     }
     if (url === 'http://api.test/api/v1/store-settings') {
       return Promise.resolve(routes.settings());

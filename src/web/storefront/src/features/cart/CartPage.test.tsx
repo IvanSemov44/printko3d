@@ -48,7 +48,7 @@ describe('cart page', () => {
     vi.unstubAllGlobals();
   });
 
-  it('shows the lines and the sum of the server, and has no way to pay yet', async () => {
+  it('shows the lines and the sum of the server, with a way to the checkout but none to pay yet', async () => {
     stub(fakeServer({ initial: LINES }));
     renderApp('/cart');
 
@@ -58,6 +58,10 @@ describe('cart page', () => {
     expect(sum(page)).toContain('45,00');
     expect(within(page).getByText('Доставката се изчислява при плащане.')).toBeInTheDocument();
     expect(within(page).queryByRole('link', { name: /плащане/i })).not.toBeInTheDocument();
+    expect(within(page).getByRole('link', { name: 'Към поръчката' })).toHaveAttribute(
+      'href',
+      '/checkout',
+    );
   });
 
   it('is kept out of search results and has its own title', async () => {

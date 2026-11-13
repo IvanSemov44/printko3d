@@ -89,3 +89,5 @@ export type {
 export type { TranslationParams } from './i18n';
 export { addCartItem, clearCart, getCart, removeCartItem, setCartItemQuantity } from './api/cart';
 export type { Cart, CartLine, CartLineImage, CartLineState } from './api/cart';
+export { placeOrder } from './api/orders';
+export type { Order, OrderItem, PlaceOrderInput } from './api/orders';

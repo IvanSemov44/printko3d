@@ -92,7 +92,10 @@ export function CartPanel() {
             <strong>{formatMoney(cart.total, defaultCurrency, defaultLocale)}</strong>
           </p>
           <p className="cart-delivery-note">{t('cart.deliveryNote')}</p>
-          <Link className="button" to="/cart" onClick={close}>
+          <Link className="button" to="/checkout" onClick={close}>
+            {t('cart.checkout')}
+          </Link>
+          <Link className="button button-secondary" to="/cart" onClick={close}>
             {t('cart.viewCart')}
           </Link>
         </div>

@@ -44,6 +44,9 @@ export function CartPage() {
             <strong>{formatMoney(cart.total, defaultCurrency, defaultLocale)}</strong>
           </p>
           <p className="cart-delivery-note">{t('cart.deliveryNote')}</p>
+          <Link className="button" to="/checkout">
+            {t('cart.checkout')}
+          </Link>
         </section>
       </div>
     );
