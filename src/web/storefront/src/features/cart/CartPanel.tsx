@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 import { CartLines } from './CartLines';
 import { useCartPanel } from './useCartPanel';
-import { useCartQuery } from './useCartQuery';
+import { useCartQuery } from '../../components/useCartQuery';
 
 /**
  * The cart from the right, made with the browser's own dialog: the page behind it cannot be reached, Esc closes it
@@ -92,7 +92,10 @@ export function CartPanel() {
             <strong>{formatMoney(cart.total, defaultCurrency, defaultLocale)}</strong>
           </p>
           <p className="cart-delivery-note">{t('cart.deliveryNote')}</p>
-          <Link className="button" to="/cart" onClick={close}>
+          <Link className="button" to="/checkout" onClick={close}>
+            {t('cart.checkout')}
+          </Link>
+          <Link className="button button-secondary" to="/cart" onClick={close}>
             {t('cart.viewCart')}
           </Link>
         </div>

@@ -219,6 +219,10 @@ describe('cart in the shop', () => {
         'href',
         '/cart',
       );
+      expect(within(panel).getByRole('link', { name: 'Към поръчката' })).toHaveAttribute(
+        'href',
+        '/checkout',
+      );
     });
 
     it('changes a quantity with the stepper and shows the answer of the server', async () => {

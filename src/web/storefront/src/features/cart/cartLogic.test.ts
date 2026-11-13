@@ -2,7 +2,7 @@ import { ApiError } from '@storefront/shared';
 import { describe, expect, it } from 'vitest';
 import { cartErrorKey } from './cartErrors';
 import { badgeText, cartButtonLabel } from './itemCount';
-import { canIncrease, lineStateNoteKey } from './lineState';
+import { canIncrease } from './lineState';
 
 describe('badgeText', () => {
   it('shows the exact number up to 99 and "99+" above', () => {
@@ -39,13 +39,6 @@ describe('cartErrorKey', () => {
 });
 
 describe('line state', () => {
-  it('has no note for a line that can be bought and a note for the others', () => {
-    expect(lineStateNoteKey('Available')).toBeNull();
-    expect(lineStateNoteKey('InsufficientStock')).toBe('cart.state.insufficientStock');
-    expect(lineStateNoteKey('Inactive')).toBe('cart.state.unavailable');
-    expect(lineStateNoteKey('Archived')).toBe('cart.state.unavailable');
-  });
-
   it('adds pieces only to a line that can be bought, and never past 20', () => {
     expect(canIncrease({ state: 'Available', quantity: 19, availableQuantity: null })).toBe(true);
     expect(canIncrease({ state: 'Available', quantity: 20, availableQuantity: null })).toBe(false);

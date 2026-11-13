@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router';
 import { useStoreSettings } from '../store-settings/useStoreSettings';
 import { badgeText, cartButtonLabel } from './itemCount';
 import { useCartPanel } from './useCartPanel';
-import { useCartQuery } from './useCartQuery';
+import { useCartQuery } from '../../components/useCartQuery';
 
 export const CART_PATH = '/cart';
 

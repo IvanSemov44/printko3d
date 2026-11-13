@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CART_KEY } from './cartKeys';
+import { CART_KEY } from '../../components/cartKeys';
 import {
   useAddToCart,
   useClearCart,
@@ -11,7 +11,7 @@ import {
   useRemoveFromCart,
   useSetCartQuantity,
 } from './useCartMutations';
-import { useCartQuery } from './useCartQuery';
+import { useCartQuery } from '../../components/useCartQuery';
 
 const VARIANT = 'v1';
 

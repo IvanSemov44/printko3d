@@ -163,6 +163,8 @@ export function stubNetwork(routes: {
   product?: (slug: string) => Response | Promise<Response>;
   /** Gets every request to /api/v1/cart. Without it the cart is empty, so a page that only shows the header works. */
   cart?: (url: string, init?: RequestInit) => Response | Promise<Response>;
+  /** Gets every request to /api/v1/orders. Without it a test that never places an order fails loudly if one is sent. */
+  orders?: (url: string, init?: RequestInit) => Response | Promise<Response>;
   /** Extra fields for /config.json, for example imageBaseUrl. */
   config?: Record<string, unknown>;
 }) {
@@ -172,6 +174,9 @@ export function stubNetwork(routes: {
     }
     if (url.startsWith('/api/v1/cart')) {
       return Promise.resolve(routes.cart ? routes.cart(url, init) : Response.json(cartFixture()));
+    }
+    if (routes.orders && url.startsWith('/api/v1/orders')) {
+      return Promise.resolve(routes.orders(url, init));
     }
     if (url === 'http://api.test/api/v1/store-settings') {
       return Promise.resolve(routes.settings());
@@ -204,7 +209,8 @@ function LocationProbe() {
   );
 }
 
-export function renderApp(initialPath = '/') {
+/** The first address of the test; an entry with a state is how a page that was reached by navigating (with data) is opened. */
+export function renderApp(initialPath: string | { pathname: string; state: unknown } = '/') {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>

@@ -1174,3 +1174,156 @@ body:has(.cart-panel[open]) {
 .cart-notice p {
   margin: 0;
 }
+
+/* The checkout: a form beside the review of the order, like the cart page. Inputs follow the design (docs/design.md, "Inputs & forms"). */
+.checkout-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.checkout-fields {
+  display: grid;
+  gap: 1.5rem;
+  align-content: start;
+}
+
+.checkout-fields fieldset {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.checkout-fields legend {
+  padding: 0 0.5rem;
+  font-weight: 700;
+}
+
+.checkout-review {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.checkout-review h2 {
+  margin: 0;
+}
+
+@media (min-width: 60rem) {
+  .checkout-page {
+    grid-template-columns: minmax(0, 1fr) 26rem;
+    align-items: start;
+  }
+
+  .checkout-review {
+    position: sticky;
+    top: calc(var(--header-height) + 1.5rem);
+  }
+}
+
+.field {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.field label {
+  font-weight: 600;
+}
+
+.field input:not([type='checkbox']) {
+  min-height: 3rem;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+}
+
+.field input:not([type='checkbox']):focus-visible {
+  border-color: var(--color-secondary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.25);
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--color-error);
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
+}
+
+.field-error {
+  margin: 0;
+  color: var(--color-error);
+  font-size: 0.875rem;
+}
+
+.field-check {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  column-gap: 0.75rem;
+}
+
+.field-check input {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  accent-color: var(--color-ink);
+}
+
+.field-check .field-error {
+  grid-column: 1 / -1;
+}
+
+.checkout-notice,
+.checkout-blocked {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--color-warning);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
+}
+
+.checkout-notice p {
+  margin: 0 0 0.5rem;
+}
+
+.checkout-notice p:last-child {
+  margin: 0;
+}
+
+/* The confirmation of an order: the number, and the lines as plain rows (nothing to change on them). */
+.order-number {
+  margin: 0 0 1rem;
+}
+
+.order-number strong {
+  font-family: var(--font-mono);
+}
+
+.order-lines {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}

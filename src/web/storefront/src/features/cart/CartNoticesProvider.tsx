@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { CartNoticesContext } from './CartNoticesContext';
 import { findNotices, loadSeen, saveSeen, snapshotOf, type CartNotice } from './cartNotices';
-import { useCartQuery } from './useCartQuery';
+import { useCartQuery } from '../../components/useCartQuery';
 
 /**
  * Compares every cart the server gives with the one the buyer saw last, and keeps what changed until it is closed.
