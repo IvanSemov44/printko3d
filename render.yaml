@@ -47,6 +47,18 @@ services:
         sync: false
       - key: ImageStorage__SecretKey
         sync: false
+      # Email (decision 0031). Left empty, messages are skipped with a warning in the log. Enter them in the dashboard
+      # when a provider is chosen; the password is a secret.
+      - key: Email__Host
+        sync: false
+      - key: Email__Port
+        sync: false
+      - key: Email__User
+        sync: false
+      - key: Email__Password
+        sync: false
+      - key: Email__From
+        sync: false
 
   - type: web
     name: printko3d-storefront

@@ -17,12 +17,19 @@ docker compose up --build
 | Админ панел         | http://localhost:5174        |
 | API (`GET /health`) | http://localhost:8080/health |
 | PostgreSQL          | `localhost:5433`             |
+| Писма (Mailpit)     | http://localhost:8025        |
 
 Магазинът и админ панелът показват дали API е достъпно. Портовете се сменят в `.env` (`API_PORT`, `STOREFRONT_PORT`, `ADMIN_PORT`, `POSTGRES_PORT`). Ако порт е зает от друга програма, например друг Vite сървър, `localhost` в браузъра може да отвори нея вместо контейнера. Тогава я спри или смени порта.
 
 ## Снимки на продукти
 
 Качените снимки се пазят в S3-съвместимо хранилище (решение [0018](docs/decisions/0018-product-images-in-s3-compatible-storage.md)), не в контейнера. Без настройки всичко работи, само качването на снимка връща грешка. За да го включиш, попълни в `.env` променливите `IMAGE_STORAGE_*` (адрес, регион, име на bucket и двата ключа) и `IMAGE_BASE_URL` (публичният адрес, от който се четат снимките, например `https://<project-ref>.supabase.co/storage/v1/object/public/<bucket>`), после `docker compose up --build`. Ключовете са тайни: само в твоя `.env`, никога в репото.
+
+## Имейл
+
+Магазинът праща писма през интерфейса `IEmailSender` (решение [0031](docs/decisions/0031-email-behind-iemailsender-with-mailkit.md)). С `docker compose up` те отиват в локалния прихващач Mailpit, който не праща нищо навън. Прочиташ ги на http://localhost:8025 (портът се сменя с `MAILPIT_UI_PORT`).
+
+Истински доставчик се включва с `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`, `EMAIL_FROM` и `EMAIL_USE_TLS` в твоя `.env`; паролата е тайна. Празен `EMAIL_HOST` изключва изпращането: писмото се пропуска с предупреждение в журнала (само идентификатор, без адрес и текст), а поръчката не пропада. В демото в render.com `Email__*` са празни, докато не се въведат в таблото; тогава писмата тръгват без промяна на кода.
 
 ## Демо данни
 

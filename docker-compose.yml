@@ -34,11 +34,28 @@ services:
       ImageStorage__Bucket: ${IMAGE_STORAGE_BUCKET:-}
       ImageStorage__AccessKey: ${IMAGE_STORAGE_ACCESS_KEY:-}
       ImageStorage__SecretKey: ${IMAGE_STORAGE_SECRET_KEY:-}
+      # Email (decision 0031). Locally the messages go to Mailpit and are read at http://localhost:8025. An empty
+      # EMAIL_HOST in .env turns sending off (messages are skipped with a warning in the log).
+      Email__Host: ${EMAIL_HOST-mailpit}
+      Email__Port: ${EMAIL_PORT:-1025}
+      Email__User: ${EMAIL_USER:-}
+      Email__Password: ${EMAIL_PASSWORD:-}
+      Email__From: ${EMAIL_FROM:-shop@example.test}
+      Email__UseTls: ${EMAIL_USE_TLS:-false}
     ports:
       - "${API_PORT:-8080}:8080"
     depends_on:
       db:
         condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  # A local mail catcher: takes every message and sends nothing out. Read the messages at http://localhost:8025.
+  mailpit:
+    image: axllent/mailpit:v1.33.1
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_UI_PORT:-8025}:8025"
 
   storefront:
     build:

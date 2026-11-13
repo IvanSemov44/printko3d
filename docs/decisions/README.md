@@ -55,3 +55,4 @@
 - [0028 – Общите части на магазина са в `components/`, а изключенията са записани](0028-storefront-shared-components-and-exceptions.md)
 - [0029 – Вариантите, снимките и редовете на количката са без собствена версия на реда](0029-variants-images-and-cart-lines-have-no-row-version.md)
 - [0030 – Слетите клонове се трият автоматично](0030-merged-branches-are-deleted-automatically.md)
+- [0031 – Имейлът е зад `IEmailSender`, с MailKit и локален прихващач Mailpit](0031-email-behind-iemailsender-with-mailkit.md)
