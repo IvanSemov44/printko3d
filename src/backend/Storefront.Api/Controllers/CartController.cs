@@ -63,13 +63,14 @@ public sealed class CartController(IServiceManager services) : ControllerBase
     /// <summary>Replaces the number of units of one line.</summary>
     /// <remarks>
     /// Errors: 400 validation.failed (quantity below 1), 403 csrf.header_required, 404 cart.item_not_found,
-    /// 422 cart.quantity_too_high, 422 cart.quantity_exceeds_stock (raising the quantity above the stock; lowering is always allowed).
+    /// 409 cart.changed (the line was removed at the same moment: read the cart), 422 cart.quantity_too_high, 422 cart.quantity_exceeds_stock (raising the quantity above the stock; lowering is always allowed).
     /// </remarks>
     [HttpPut("items/{variantId:guid}")]
     [ProducesResponseType<CartDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<CartDto>> SetQuantity(
         Guid variantId, SetCartItemQuantityRequest request, CancellationToken cancellationToken) =>
@@ -77,11 +78,12 @@ public sealed class CartController(IServiceManager services) : ControllerBase
             CartCookie.Read(Request), variantId, request.Quantity, cancellationToken));
 
     /// <summary>Removes one line. The answer has no body: read the cart for its new state.</summary>
-    /// <remarks>Errors: 403 csrf.header_required, 404 cart.item_not_found.</remarks>
+    /// <remarks>Errors: 403 csrf.header_required, 404 cart.item_not_found, 409 cart.changed (the line was removed at the same moment).</remarks>
     [HttpDelete("items/{variantId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public async Task<ActionResult> RemoveItem(Guid variantId, CancellationToken cancellationToken)
     {
         KeepCookie(await services.Cart.RemoveItemAsync(CartCookie.Read(Request), variantId, cancellationToken));
@@ -89,10 +91,11 @@ public sealed class CartController(IServiceManager services) : ControllerBase
     }
 
     /// <summary>Removes every line. The answer has no body. A shopper without a cart gets the same answer, not an error.</summary>
-    /// <remarks>Errors: 403 csrf.header_required.</remarks>
+    /// <remarks>Errors: 403 csrf.header_required, 409 cart.changed (the cart was emptied at the same moment).</remarks>
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public async Task<ActionResult> Clear(CancellationToken cancellationToken)
     {
         KeepCookie(await services.Cart.ClearAsync(CartCookie.Read(Request), cancellationToken));

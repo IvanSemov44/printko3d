@@ -47,6 +47,9 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
     /// <summary>When set, the next saves fail with this exception, like a database that is down.</summary>
     public Exception? SaveFailure { get; set; }
 
+    // Orders are tested against a real database (OrderServiceDatabaseTests); no unit test places one.
+    public IOrderRepository Order => throw new NotSupportedException("The unit tests do not place orders.");
+
     public FakeRepositoryManager() => _cartQueries = new FakeCartQueries(_cart);
 
 
