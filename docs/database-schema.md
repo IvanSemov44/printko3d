@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261112120245_AddCarts`
+Последна миграция: `20261113115533_AddOrders`
 
 ## Връзки
 
@@ -19,6 +19,8 @@ erDiagram
     carts ||--o{ cart_items : "cart_id"
     product_variants ||--o{ cart_items : "variant_id"
     categories |o--o{ categories : "parent_id"
+    orders ||--o{ order_items : "order_id"
+    product_variants ||--o{ order_items : "variant_id"
     products ||--o{ product_images : "product_id"
     product_variants |o--o{ product_images : "variant_id"
     products ||--o{ product_variants : "product_id"
@@ -276,6 +278,83 @@ erDiagram
 | Име | Вид | Определение |
 | --- | --- | --- |
 | PK_data_protection_keys | първичен ключ | `PRIMARY KEY (id)` |
+
+### order_items
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| order_id | uuid | не |  |
+| variant_id | uuid | не |  |
+| product_name | character varying(200) | не |  |
+| variant_name | character varying(200) | не |  |
+| sku | character varying(100) | не |  |
+| unit_price | bigint | не |  |
+| quantity | integer | не |  |
+| line_total | bigint | не |  |
+| fulfilment_type | character varying(20) | не |  |
+| lead_time_days | integer | да |  |
+| created_at | timestamp with time zone | не |  |
+| updated_at | timestamp with time zone | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_order_items | първичен ключ | `PRIMARY KEY (id)` |
+| FK_order_items_orders_order_id | външен ключ | `FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE` |
+| FK_order_items_product_variants_variant_id | външен ключ | `FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE RESTRICT` |
+| ck_order_items_fulfilment_type | проверка | `CHECK (((fulfilment_type)::text = ANY ((ARRAY['InStock'::character varying, 'MadeToOrder'::character varying])::text[])))` |
+| ck_order_items_lead_time_positive | проверка | `CHECK (((lead_time_days IS NULL) OR (lead_time_days > 0)))` |
+| ck_order_items_line_total | проверка | `CHECK ((line_total = (unit_price * quantity)))` |
+| ck_order_items_quantity | проверка | `CHECK ((quantity >= 1))` |
+| ck_order_items_unit_price | проверка | `CHECK ((unit_price >= 0))` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_order_items_order_id | `CREATE INDEX "IX_order_items_order_id" ON public.order_items USING btree (order_id)` |
+| IX_order_items_variant_id | `CREATE INDEX "IX_order_items_variant_id" ON public.order_items USING btree (variant_id)` |
+
+### orders
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| number | integer | не |  |
+| status | character varying(20) | не |  |
+| currency | character varying(3) | не |  |
+| total_amount | bigint | не |  |
+| customer_name | character varying(200) | не |  |
+| email | character varying(254) | не |  |
+| phone | character varying(30) | не |  |
+| shipping_street | character varying(200) | не |  |
+| shipping_city | character varying(100) | не |  |
+| shipping_postal_code | character varying(20) | не |  |
+| shipping_country | character varying(2) | не |  |
+| terms_version | character varying(50) | не |  |
+| terms_accepted_at | timestamp with time zone | не |  |
+| created_at | timestamp with time zone | не |  |
+| updated_at | timestamp with time zone | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_orders | първичен ключ | `PRIMARY KEY (id)` |
+| ck_orders_currency | проверка | `CHECK ((char_length((currency)::text) = 3))` |
+| ck_orders_number | проверка | `CHECK (((number >= 10000000) AND (number <= 99999999)))` |
+| ck_orders_shipping_country | проверка | `CHECK ((char_length((shipping_country)::text) = 2))` |
+| ck_orders_status | проверка | `CHECK (((status)::text = 'New'::text))` |
+| ck_orders_total_amount | проверка | `CHECK ((total_amount >= 0))` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_orders_created_at | `CREATE INDEX "IX_orders_created_at" ON public.orders USING btree (created_at)` |
+| IX_orders_number | `CREATE UNIQUE INDEX "IX_orders_number" ON public.orders USING btree (number)` |
 
 ### product_images
 
