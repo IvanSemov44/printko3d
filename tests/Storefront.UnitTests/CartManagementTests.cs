@@ -403,4 +403,39 @@ public sealed class CartManagementTests
         Assert.Equal("cart.item_not_found", error.Code);
         Assert.Single(Assert.Single(_repositories.Carts).Items);
     }
+
+    [Fact]
+    public async Task Add_SaysWhetherItMadeANewLine_OrRaisedOneThatWasThere()
+    {
+        var (service, token, variantId) = await CartWithOneLineAsync(1);
+        var other = OrderableVariant();
+
+        var raised = await service.AddItemAsync(token, variantId, 1, default);
+        var added = await service.AddItemAsync(token, other, 1, default);
+
+        Assert.False(raised.LineCreated);
+        Assert.True(added.LineCreated);
+    }
+
+    [Fact]
+    public async Task TheFirstAdd_MadeANewLine()
+    {
+        var change = await Service().AddItemAsync(null, OrderableVariant(), 1, default);
+
+        Assert.True(change.LineCreated);
+    }
+
+    [Fact]
+    public async Task GetItem_OfALineThatIsNotThere_OrWithoutACart_IsNotFound()
+    {
+        var (service, token, _) = await CartWithOneLineAsync();
+
+        var missing = await Assert.ThrowsAsync<NotFoundException>(
+            () => service.GetItemAsync(token, Guid.NewGuid(), default));
+        var noCart = await Assert.ThrowsAsync<NotFoundException>(
+            () => service.GetItemAsync(null, Guid.NewGuid(), default));
+
+        Assert.Equal("cart.item_not_found", missing.Code);
+        Assert.Equal("cart.item_not_found", noCart.Code);
+    }
 }

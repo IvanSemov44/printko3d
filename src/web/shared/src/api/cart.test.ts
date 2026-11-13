@@ -116,6 +116,15 @@ describe('cart API', () => {
     expect(JSON.parse(init?.body as string)).toEqual({ variantId: VARIANT_ID, quantity: 1 });
   });
 
+  it('reads the cart from the 201 answer of an add that made a new line', async () => {
+    stubFetch(DTO, 201);
+
+    const cart = await addCartItem(VARIANT_ID, 1);
+
+    expect(cart.lines).toHaveLength(1);
+    expect(cart.itemCount).toBe(2);
+  });
+
   it('changes the quantity of a line', async () => {
     const fetchMock = stubFetch(DTO);
 
@@ -128,21 +137,60 @@ describe('cart API', () => {
     expect(JSON.parse(init?.body as string)).toEqual({ quantity: 5 });
   });
 
-  it('removes a line and clears the cart, both with the header and without a body', async () => {
-    const fetchMock = stubFetch(DTO);
+  describe('removing', () => {
+    // The API answers a DELETE with 204 and no body (rule 6 of decision 0017); the new state is read with a GET.
+    function stubDelete() {
+      const fetchMock = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(
+        (_url, init) =>
+          Promise.resolve(
+            init?.method === 'DELETE' ? new Response(null, { status: 204 }) : Response.json(DTO),
+          ),
+      );
+      vi.stubGlobal('fetch', fetchMock);
+      return fetchMock;
+    }
 
-    await removeCartItem(VARIANT_ID);
-    await clearCart();
+    it('removes a line with the header and no body, then reads the cart', async () => {
+      const fetchMock = stubDelete();
 
-    const [removeUrl, removeInit] = fetchMock.mock.calls[0] ?? [];
-    expect(removeUrl).toBe(`/api/v1/cart/items/${VARIANT_ID}`);
-    expect(removeInit?.method).toBe('DELETE');
-    expect(headersOf(removeInit).get('X-Requested-With')).toBe('XMLHttpRequest');
-    expect(removeInit?.body).toBeUndefined();
-    const [clearUrl, clearInit] = fetchMock.mock.calls[1] ?? [];
-    expect(clearUrl).toBe('/api/v1/cart');
-    expect(clearInit?.method).toBe('DELETE');
-    expect(headersOf(clearInit).get('X-Requested-With')).toBe('XMLHttpRequest');
+      const cart = await removeCartItem(VARIANT_ID);
+
+      const [removeUrl, removeInit] = fetchMock.mock.calls[0] ?? [];
+      expect(removeUrl).toBe(`/api/v1/cart/items/${VARIANT_ID}`);
+      expect(removeInit?.method).toBe('DELETE');
+      expect(headersOf(removeInit).get('X-Requested-With')).toBe('XMLHttpRequest');
+      expect(removeInit?.body).toBeUndefined();
+      const [readUrl, readInit] = fetchMock.mock.calls[1] ?? [];
+      expect(readUrl).toBe('/api/v1/cart');
+      expect(readInit?.method).toBeUndefined();
+      expect(cart.lines).toHaveLength(1);
+    });
+
+    it('clears the cart with the header and no body, then reads the cart', async () => {
+      const fetchMock = stubDelete();
+
+      const cart = await clearCart();
+
+      const [clearUrl, clearInit] = fetchMock.mock.calls[0] ?? [];
+      expect(clearUrl).toBe('/api/v1/cart');
+      expect(clearInit?.method).toBe('DELETE');
+      expect(headersOf(clearInit).get('X-Requested-With')).toBe('XMLHttpRequest');
+      expect(fetchMock.mock.calls[1]?.[0]).toBe('/api/v1/cart');
+      expect(cart.itemCount).toBe(DTO.itemCount);
+    });
+
+    it('does not read the cart when the removal failed', async () => {
+      const fetchMock = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(() =>
+        Promise.resolve(Response.json({ code: 'cart.item_not_found' }, { status: 404 })),
+      );
+      vi.stubGlobal('fetch', fetchMock);
+
+      await expect(removeCartItem(VARIANT_ID)).rejects.toMatchObject({
+        status: 404,
+        code: 'cart.item_not_found',
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('turns a business limit into an error with the code of the server', async () => {

@@ -5,7 +5,7 @@ const CSRF_HEADERS = { 'X-Requested-With': 'XMLHttpRequest' };
 
 /**
  * Sends a request to the API and returns the JSON of the answer, still unchecked (`unknown`): the caller reads it
- * with the readers of `decode.ts`. Addresses are relative on purpose, like the sign-in: the app reaches the API
+ * with the readers of `decode.ts`. An answer of 204 has no body, so the result is `undefined`. Addresses are relative on purpose, like the sign-in: the app reaches the API
  * through its own address (decisions 0014 and 0027).
  */
 export async function apiRequest(url: string, init: RequestInit): Promise<unknown> {
@@ -15,6 +15,9 @@ export async function apiRequest(url: string, init: RequestInit): Promise<unknow
     // The fields are read from a copy first, so the original body is still there for the code.
     const fields = await readErrorFields(response);
     throw new ApiError(response.status, await readErrorCode(response), fields);
+  }
+  if (response.status === 204) {
+    return undefined;
   }
   return response.json();
 }
@@ -42,7 +45,7 @@ export function apiSend(
   });
 }
 
-/** A request that changes data and has no body, such as removing a line from the cart. */
+/** A request that changes data and has no body, such as removing a line from the cart. The API answers 204. */
 export function apiDelete(url: string, signal?: AbortSignal): Promise<unknown> {
   return apiRequest(url, { method: 'DELETE', headers: CSRF_HEADERS, signal });
 }

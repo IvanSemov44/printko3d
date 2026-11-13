@@ -12,6 +12,10 @@ internal sealed class CartService(IRepositoryManager repositories) : ICartServic
             ? repositories.CartQueries.GetAsync(hash, cancellationToken)
             : Task.FromResult(CartDto.Empty);
 
+    public async Task<CartLineDto> GetItemAsync(string? token, Guid variantId, CancellationToken cancellationToken) =>
+        (await GetAsync(token, cancellationToken)).Lines.FirstOrDefault(line => line.VariantId == variantId)
+        ?? throw LineNotFound();
+
     public async Task<CartChange> AddItemAsync(
         string? token, Guid variantId, int quantity, CancellationToken cancellationToken)
     {
@@ -58,7 +62,7 @@ internal sealed class CartService(IRepositoryManager repositories) : ICartServic
             line.Quantity += quantity;
         }
 
-        return await SaveAsync(cart, hash, currentToken, touch: !isNew, cancellationToken);
+        return await SaveAsync(cart, hash, currentToken, touch: !isNew, cancellationToken, lineCreated: existing is null);
     }
 
     public async Task<CartChange> SetQuantityAsync(
@@ -112,7 +116,7 @@ internal sealed class CartService(IRepositoryManager repositories) : ICartServic
     }
 
     private async Task<CartChange> SaveAsync(
-        Cart cart, byte[] hash, string? token, bool touch, CancellationToken cancellationToken)
+        Cart cart, byte[] hash, string? token, bool touch, CancellationToken cancellationToken, bool lineCreated = false)
     {
         if (touch)
         {
@@ -120,7 +124,7 @@ internal sealed class CartService(IRepositoryManager repositories) : ICartServic
         }
 
         await repositories.SaveAsync(cancellationToken);
-        return new CartChange(await repositories.CartQueries.GetAsync(hash, cancellationToken), token);
+        return new CartChange(await repositories.CartQueries.GetAsync(hash, cancellationToken), token, lineCreated);
     }
 
     private static void RequirePositive(int quantity)
