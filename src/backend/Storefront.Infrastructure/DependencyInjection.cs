@@ -6,6 +6,7 @@ using Storefront.Application.Contracts;
 using Storefront.Application.Health;
 using Storefront.Application.Migrations;
 using Storefront.Application.Seeding;
+using Storefront.Infrastructure.Email;
 using Storefront.Infrastructure.Health;
 using Storefront.Infrastructure.Persistence;
 using Storefront.Infrastructure.Repositories;
@@ -31,6 +32,9 @@ public static class DependencyInjection
         // Not validated at startup: the API runs without image storage, and only the image calls fail until it is set.
         services.AddOptions<ImageStorageOptions>().Bind(configuration.GetSection(ImageStorageOptions.SectionName));
         services.AddSingleton<IImageStorage, S3ImageStorage>();
+        // Not validated at startup either: without a host the messages are skipped (decision 0031).
+        services.AddOptions<EmailOptions>().Bind(configuration.GetSection(EmailOptions.SectionName));
+        services.AddSingleton<IEmailSender, SmtpEmailSender>();
         services.AddSingleton(TimeProvider.System);
         services.AddDbContext<StorefrontDbContext>((serviceProvider, options) => options.UseNpgsql(
             serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString));
