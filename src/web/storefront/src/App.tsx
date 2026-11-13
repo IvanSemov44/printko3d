@@ -18,6 +18,13 @@ const CheckoutPage = lazy(() =>
   import('./features/checkout/CheckoutPage').then((module) => ({ default: module.CheckoutPage })),
 );
 
+// The confirmation is read once, right after the checkout, so it is loaded when it is opened too.
+const OrderConfirmationPage = lazy(() =>
+  import('./features/checkout/OrderConfirmationPage').then((module) => ({
+    default: module.OrderConfirmationPage,
+  })),
+);
+
 /** Needs a router and a QueryClientProvider above it (see main.tsx). */
 export function App() {
   return (
@@ -40,6 +47,14 @@ export function App() {
             element={
               <Suspense fallback={<LoadingStatus />}>
                 <CheckoutPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="order/:number"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <OrderConfirmationPage />
               </Suspense>
             }
           />

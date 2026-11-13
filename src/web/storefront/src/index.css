@@ -1302,3 +1302,28 @@ body:has(.cart-panel[open]) {
 .checkout-notice p:last-child {
   margin: 0;
 }
+
+/* The confirmation of an order: the number, and the lines as plain rows (nothing to change on them). */
+.order-number {
+  margin: 0 0 1rem;
+}
+
+.order-number strong {
+  font-family: var(--font-mono);
+}
+
+.order-lines {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}

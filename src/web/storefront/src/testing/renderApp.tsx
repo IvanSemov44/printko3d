@@ -209,7 +209,8 @@ function LocationProbe() {
   );
 }
 
-export function renderApp(initialPath = '/') {
+/** The first address of the test; an entry with a state is how a page that was reached by navigating (with data) is opened. */
+export function renderApp(initialPath: string | { pathname: string; state: unknown } = '/') {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>

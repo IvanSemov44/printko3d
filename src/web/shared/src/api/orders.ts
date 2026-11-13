@@ -71,7 +71,8 @@ const readItem: Reader<OrderItem> = (value, path) => {
   };
 };
 
-function readOrder(value: unknown): Order {
+/** Reads an order from an answer or from the state of a route; a wrong shape throws an UnexpectedResponseError. */
+export function readOrder(value: unknown): Order {
   const object = readObject(value, 'order');
   return {
     number: field(object, 'number', readInteger, 'order'),
