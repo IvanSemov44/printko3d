@@ -7,11 +7,11 @@ import {
   cartLineFixture,
   categoriesFixture,
   findContent,
-  orderFixture,
   renderApp,
   settingsFixture,
   stubNetwork,
 } from '../../testing/renderApp';
+import { orderFixture } from '../../testing/orderFixture';
 import { plain } from '../../testing/text';
 
 const LINES = [
