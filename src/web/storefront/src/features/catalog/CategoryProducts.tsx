@@ -1,12 +1,12 @@
 import type { Category } from '@storefront/shared';
 import { useEffect, useRef } from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router';
-import { LoadingStatus } from '../layout/LoadingStatus';
+import { LoadingStatus } from '../../components/LoadingStatus';
 import { PageMeta } from '../seo/PageMeta';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
-import { CatalogError } from './CatalogError';
+import { CatalogError } from '../../components/CatalogError';
 import { Pagination } from './Pagination';
-import { ProductCard } from './ProductCard';
+import { ProductCard } from '../../components/ProductCard';
 import { parsePageParam } from './pageParams';
 import { useProductsQuery } from './useProductsQuery';
 

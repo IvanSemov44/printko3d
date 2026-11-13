@@ -2,9 +2,9 @@ import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router';
 import { CategoryPage } from './features/catalog/CategoryPage';
 import { HomePage } from './features/home/HomePage';
-import { NotFoundPage } from './features/home/NotFoundPage';
+import { NotFoundPage } from './components/NotFoundPage';
 import { Layout } from './features/layout/Layout';
-import { LoadingStatus } from './features/layout/LoadingStatus';
+import { LoadingStatus } from './components/LoadingStatus';
 import { ProductPage } from './features/product/ProductPage';
 import { StoreSettingsProvider } from './features/store-settings/StoreSettingsProvider';
 

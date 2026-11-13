@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { useCategoriesQuery } from '../catalog/useCategoriesQuery';
+import { useCategoriesQuery } from '../../components/useCategoriesQuery';
 import { useT } from '../store-settings/useStoreSettings';
 
 /** Top-level categories. If they fail to load the menu is left out; the page still works. */

@@ -1,5 +1,5 @@
 import type { ProductImage } from '@storefront/shared';
-import { ImagePlaceholder } from './ImagePlaceholder';
+import { ImagePlaceholder } from '../../components/ImagePlaceholder';
 
 interface StoredImageProps {
   image: ProductImage;

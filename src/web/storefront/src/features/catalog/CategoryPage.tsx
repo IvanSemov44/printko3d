@@ -1,10 +1,10 @@
 import { useParams } from 'react-router';
-import { NotFoundPage } from '../home/NotFoundPage';
-import { LoadingStatus } from '../layout/LoadingStatus';
+import { NotFoundPage } from '../../components/NotFoundPage';
+import { LoadingStatus } from '../../components/LoadingStatus';
 import { PageMeta } from '../seo/PageMeta';
-import { CatalogError } from './CatalogError';
+import { CatalogError } from '../../components/CatalogError';
 import { CategoryProducts } from './CategoryProducts';
-import { useCategoriesQuery } from './useCategoriesQuery';
+import { useCategoriesQuery } from '../../components/useCategoriesQuery';
 
 /** `/categories/:slug`. The name comes from the categories list; a slug that is not in it is a missing page. */
 export function CategoryPage() {

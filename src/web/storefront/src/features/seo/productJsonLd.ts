@@ -1,6 +1,6 @@
 import { currencyFractionDigits, formatMoneyInput, type ProductDetails } from '@storefront/shared';
-import { availabilityKind, type AvailabilityKind } from '../catalog/availability';
-import { defaultImage } from '../product/variantSelection';
+import { availabilityKind, type AvailabilityKind } from '../../components/availability';
+import { defaultImage } from '../../components/variantSelection';
 
 const SCHEMA_AVAILABILITY: Record<AvailabilityKind, string> = {
   inStock: 'https://schema.org/InStock',

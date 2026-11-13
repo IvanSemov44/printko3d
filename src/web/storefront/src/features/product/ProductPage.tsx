@@ -1,9 +1,9 @@
 import { ApiError } from '@storefront/shared';
 import { useParams } from 'react-router';
-import { CatalogError } from '../catalog/CatalogError';
-import { NotFoundPage } from '../home/NotFoundPage';
+import { CatalogError } from '../../components/CatalogError';
+import { NotFoundPage } from '../../components/NotFoundPage';
 import { PageMeta } from '../seo/PageMeta';
-import { LoadingStatus } from '../layout/LoadingStatus';
+import { LoadingStatus } from '../../components/LoadingStatus';
 import { useT } from '../store-settings/useStoreSettings';
 import { ProductDetailsView } from './ProductDetailsView';
 import { useProductQuery } from './useProductQuery';

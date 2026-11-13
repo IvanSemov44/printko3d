@@ -1,7 +1,7 @@
 import type { ProductVariant } from '@storefront/shared';
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
-import { selectVariant } from './variantSelection';
+import { selectVariant } from '../../components/variantSelection';
 
 const VARIANT_PARAM = 'variant';
 

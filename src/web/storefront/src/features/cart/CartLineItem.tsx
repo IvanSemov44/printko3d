@@ -1,9 +1,9 @@
 import { formatMoney, imageUrl, type CartLine } from '@storefront/shared';
 import { Link } from 'react-router';
-import { ImagePlaceholder } from '../product/ImagePlaceholder';
+import { ImagePlaceholder } from '../../components/ImagePlaceholder';
 import { useRuntimeConfigQuery } from '../store-settings/useRuntimeConfigQuery';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
-import { describeAvailability } from '../catalog/availability';
+import { describeAvailability } from '../../components/availability';
 import { cartErrorKey } from './cartErrors';
 import { canIncrease, lineStateNoteKey } from './lineState';
 import { QuantityStepper } from './QuantityStepper';

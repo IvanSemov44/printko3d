@@ -1,5 +1,5 @@
 import type { FulfilmentType } from '@storefront/shared';
-import type { Translate } from '../../i18n';
+import type { Translate } from '../i18n';
 import { formatLeadTime } from './leadTime';
 
 interface AvailabilityInput {

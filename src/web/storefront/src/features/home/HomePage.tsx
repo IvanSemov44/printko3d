@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { useCategoriesQuery } from '../catalog/useCategoriesQuery';
+import { useCategoriesQuery } from '../../components/useCategoriesQuery';
 import { PageMeta } from '../seo/PageMeta';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 import { CategoryPreview } from './CategoryPreview';

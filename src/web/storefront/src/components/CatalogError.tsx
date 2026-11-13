@@ -1,4 +1,4 @@
-import { useT } from '../store-settings/useStoreSettings';
+import { useT } from '../features/store-settings/useStoreSettings';
 
 interface CatalogErrorProps {
   /** Text for the failure; the product list text by default. */

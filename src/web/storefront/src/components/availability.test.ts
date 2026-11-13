@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getTranslator } from '../../i18n';
+import { getTranslator } from '../i18n';
 import { describeAvailability } from './availability';
 
 const t = getTranslator('bg');

@@ -1,5 +1,5 @@
 import { formatMoney, type ProductDetails, type ProductVariant } from '@storefront/shared';
-import { availabilityKind, describeAvailability } from '../catalog/availability';
+import { availabilityKind, describeAvailability } from '../../components/availability';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 
 interface ProductOfferProps {
