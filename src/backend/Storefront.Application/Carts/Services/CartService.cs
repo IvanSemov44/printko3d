@@ -19,12 +19,17 @@ internal sealed class CartService(IRepositoryManager repositories) : ICartServic
         TooMany(quantity);
 
         // The same answer for a variant that does not exist and one that cannot be ordered: nothing is revealed.
-        if (!await repositories.Cart.IsVariantOrderableAsync(variantId, cancellationToken))
+        var supply = await repositories.Cart.GetSupplyAsync(variantId, cancellationToken);
+        if (supply is not { IsOrderable: true })
         {
             throw new NotFoundException("The variant does not exist.", "variant.not_found");
         }
 
         var (cart, hash, currentToken) = await FindAsync(token, cancellationToken);
+        var existing = cart?.Items.SingleOrDefault(i => i.VariantId == variantId);
+        // Checked before a cart is created, so a refused add leaves nothing behind.
+        RequireInStock(supply, (existing?.Quantity ?? 0) + quantity);
+
         var isNew = cart is null;
         if (cart is null)
         {
@@ -34,7 +39,7 @@ internal sealed class CartService(IRepositoryManager repositories) : ICartServic
             repositories.Cart.Create(cart);
         }
 
-        var line = cart.Items.SingleOrDefault(i => i.VariantId == variantId);
+        var line = existing;
         if (line is null)
         {
             if (cart.Items.Count >= Cart.MaxItems)
@@ -64,6 +69,12 @@ internal sealed class CartService(IRepositoryManager repositories) : ICartServic
 
         var (cart, hash, currentToken) = await FindAsync(token, cancellationToken);
         var line = cart?.Items.SingleOrDefault(i => i.VariantId == variantId) ?? throw LineNotFound();
+        // Fewer units are always allowed, also when the stock has since fallen below the line.
+        if (quantity > line.Quantity)
+        {
+            RequireInStock(await repositories.Cart.GetSupplyAsync(variantId, cancellationToken), quantity);
+        }
+
         line.Quantity = quantity;
         return await SaveAsync(cart!, hash, currentToken, touch: true, cancellationToken);
     }
@@ -128,6 +139,15 @@ internal sealed class CartService(IRepositoryManager repositories) : ICartServic
         {
             throw new RuleViolationException(
                 $"At most {Cart.MaxQuantityPerItem} units of one item are allowed.", "cart.quantity_too_high");
+        }
+    }
+
+    private static void RequireInStock(VariantSupply? supply, int quantity)
+    {
+        if (supply?.Limit is { } limit && quantity > limit)
+        {
+            throw new RuleViolationException(
+                $"Only {limit} units are in stock.", "cart.quantity_exceeds_stock");
         }
     }
 

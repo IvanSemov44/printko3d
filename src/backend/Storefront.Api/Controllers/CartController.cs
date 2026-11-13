@@ -28,7 +28,8 @@ public sealed class CartController(IServiceManager services) : ControllerBase
     /// <remarks>
     /// Errors: 400 validation.failed (quantity below 1), 403 csrf.header_required, 404 variant.not_found,
     /// 409 cart.item_conflict (two adds of the same new variant at once: try again),
-    /// 422 cart.too_many_items (more than 50 different items), 422 cart.quantity_too_high (more than 20 units of one item).
+    /// 422 cart.too_many_items (more than 50 different items), 422 cart.quantity_too_high (more than 20 units of one item),
+    /// 422 cart.quantity_exceeds_stock (more units than are in stock, counting the ones already in the cart).
     /// </remarks>
     [HttpPost("items")]
     [ProducesResponseType<CartDto>(StatusCodes.Status200OK)]
@@ -44,7 +45,7 @@ public sealed class CartController(IServiceManager services) : ControllerBase
     /// <summary>Replaces the number of units of one line.</summary>
     /// <remarks>
     /// Errors: 400 validation.failed (quantity below 1), 403 csrf.header_required, 404 cart.item_not_found,
-    /// 422 cart.quantity_too_high.
+    /// 422 cart.quantity_too_high, 422 cart.quantity_exceeds_stock (raising the quantity above the stock; lowering is always allowed).
     /// </remarks>
     [HttpPut("items/{variantId:guid}")]
     [ProducesResponseType<CartDto>(StatusCodes.Status200OK)]

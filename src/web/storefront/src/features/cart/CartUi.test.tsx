@@ -322,24 +322,6 @@ describe('cart in the shop', () => {
       expect(remove?.headers.get('X-Requested-With')).toBe('XMLHttpRequest');
     });
 
-    it('shows a note for a line that cannot be bought as it is, and does not let the number grow', async () => {
-      stub(
-        fakeServer({
-          initial: [cartLineFixture({ state: 'InsufficientStock' }), twoLines[1] as never],
-        }),
-      );
-      renderApp('/products/dragon');
-      const panel = await openPanel();
-
-      expect(
-        within(panel).getByText('Няма достатъчно бройки от този артикул.'),
-      ).toBeInTheDocument();
-      expect(within(panel).getByRole('button', { name: /^Увеличи .*Dragon/ })).toHaveAttribute(
-        'aria-disabled',
-        'true',
-      );
-    });
-
     it('says so, with a retry, when the cart cannot be read', async () => {
       stubNetwork({
         settings: () => Response.json(settingsFixture()),

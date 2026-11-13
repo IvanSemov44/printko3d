@@ -2735,6 +2735,11 @@ export interface components {
       /** Format: int64 */
       linePrice: number | string;
       state: components['schemas']['CartLineState'];
+      fulfilmentType: components['schemas']['FulfilmentType'];
+      /** Format: int32 */
+      leadTimeDays: null | number | string;
+      /** Format: int32 */
+      availableQuantity: null | number | string;
     };
     /** @enum {unknown} */
     CartLineState: 'Available' | 'InsufficientStock' | 'Inactive' | 'Archived';

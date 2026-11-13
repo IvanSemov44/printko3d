@@ -1,8 +1,8 @@
 import { formatMoney, type ProductListItem } from '@storefront/shared';
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { ImagePlaceholder } from '../product/ImagePlaceholder';
-import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
+import { ImagePlaceholder } from './ImagePlaceholder';
+import { useStoreSettings, useT } from '../features/store-settings/useStoreSettings';
 import { availabilityKind, describeAvailability } from './availability';
 
 const IMAGE_SIZE = 320;

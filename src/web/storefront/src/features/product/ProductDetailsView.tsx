@@ -1,6 +1,6 @@
 import type { ProductDetails } from '@storefront/shared';
 import { AddToCartButton } from '../cart/AddToCartButton';
-import { availabilityKind } from '../catalog/availability';
+import { availabilityKind } from '../../components/availability';
 import { PageMeta } from '../seo/PageMeta';
 import { ProductStructuredData } from '../seo/ProductStructuredData';
 import { ProductGallery } from './ProductGallery';
@@ -8,7 +8,7 @@ import { ProductOffer } from './ProductOffer';
 import { ProductSpecs } from './ProductSpecs';
 import { useSelectedVariant } from './useSelectedVariant';
 import { VariantPicker } from './VariantPicker';
-import { defaultImage, imagesForVariant } from './variantSelection';
+import { defaultImage, imagesForVariant } from '../../components/variantSelection';
 
 /** A loaded product. Descriptions are plain text: React escapes them, nothing is inserted as HTML. */
 export function ProductDetailsView({ product }: { product: ProductDetails }) {

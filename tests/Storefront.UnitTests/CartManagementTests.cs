@@ -148,6 +148,110 @@ public sealed class CartManagementTests
         Assert.Equal(0, _repositories.SaveCount);
     }
 
+    private Guid StockedVariant(int stock)
+    {
+        var id = OrderableVariant();
+        _repositories.StockLimits[id] = stock;
+        return id;
+    }
+
+    [Fact]
+    public async Task Add_AcceptsAsManyUnitsAsAreInStock()
+    {
+        var variantId = StockedVariant(stock: 3);
+
+        await Service().AddItemAsync(null, variantId, 3, default);
+
+        Assert.Equal(3, Assert.Single(Assert.Single(_repositories.Carts).Items).Quantity);
+    }
+
+    [Fact]
+    public async Task Add_MoreThanIsInStock_IsRefused_AndCreatesNoCart()
+    {
+        var variantId = StockedVariant(stock: 3);
+
+        var error = await Assert.ThrowsAsync<RuleViolationException>(
+            () => Service().AddItemAsync(null, variantId, 4, default));
+
+        Assert.Equal("cart.quantity_exceeds_stock", error.Code);
+        Assert.Empty(_repositories.Carts);
+    }
+
+    [Fact]
+    public async Task Add_AVariantWithNoStock_IsRefused()
+    {
+        var variantId = StockedVariant(stock: 0);
+
+        var error = await Assert.ThrowsAsync<RuleViolationException>(
+            () => Service().AddItemAsync(null, variantId, 1, default));
+
+        Assert.Equal("cart.quantity_exceeds_stock", error.Code);
+        Assert.Empty(_repositories.Carts);
+    }
+
+    [Fact]
+    public async Task Add_TheSameVariantAgain_ChecksTheSumAgainstTheStock_AndKeepsTheLine()
+    {
+        var variantId = StockedVariant(stock: 5);
+        var service = Service();
+        var token = (await service.AddItemAsync(null, variantId, 3, default)).Token;
+
+        var error = await Assert.ThrowsAsync<RuleViolationException>(
+            () => service.AddItemAsync(token, variantId, 3, default));
+
+        Assert.Equal("cart.quantity_exceeds_stock", error.Code);
+        Assert.Equal(3, Assert.Single(Assert.Single(_repositories.Carts).Items).Quantity);
+    }
+
+    [Fact]
+    public async Task Add_AMadeToOrderVariant_HasNoStockLimit_OnlyTheTwentyUnitLimit()
+    {
+        var variantId = OrderableVariant();
+
+        await Service().AddItemAsync(null, variantId, 20, default);
+
+        Assert.Equal(20, Assert.Single(Assert.Single(_repositories.Carts).Items).Quantity);
+    }
+
+    [Fact]
+    public async Task SetQuantity_AboveTheStock_IsRefused_AndKeepsTheQuantity()
+    {
+        var variantId = StockedVariant(stock: 4);
+        var service = Service();
+        var token = (await service.AddItemAsync(null, variantId, 2, default)).Token;
+
+        var error = await Assert.ThrowsAsync<RuleViolationException>(
+            () => service.SetQuantityAsync(token, variantId, 5, default));
+
+        Assert.Equal("cart.quantity_exceeds_stock", error.Code);
+        Assert.Equal(2, Assert.Single(Assert.Single(_repositories.Carts).Items).Quantity);
+    }
+
+    [Fact]
+    public async Task SetQuantity_ToTheStock_IsAccepted()
+    {
+        var variantId = StockedVariant(stock: 4);
+        var service = Service();
+        var token = (await service.AddItemAsync(null, variantId, 2, default)).Token;
+
+        await service.SetQuantityAsync(token, variantId, 4, default);
+
+        Assert.Equal(4, Assert.Single(Assert.Single(_repositories.Carts).Items).Quantity);
+    }
+
+    [Fact]
+    public async Task SetQuantity_Down_IsAllowed_EvenWhenTheStockFellBelowTheLine()
+    {
+        var variantId = StockedVariant(stock: 6);
+        var service = Service();
+        var token = (await service.AddItemAsync(null, variantId, 6, default)).Token;
+        _repositories.StockLimits[variantId] = 2;
+
+        await service.SetQuantityAsync(token, variantId, 4, default);
+
+        Assert.Equal(4, Assert.Single(Assert.Single(_repositories.Carts).Items).Quantity);
+    }
+
     private async Task<(CartService Service, string? Token)> CartWithLinesAsync(int lines)
     {
         var service = Service();

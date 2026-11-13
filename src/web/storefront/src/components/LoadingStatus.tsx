@@ -1,4 +1,4 @@
-import { useT } from '../store-settings/useStoreSettings';
+import { useT } from '../features/store-settings/useStoreSettings';
 
 /** The loading text for the content area, announced politely by screen readers. */
 export function LoadingStatus() {

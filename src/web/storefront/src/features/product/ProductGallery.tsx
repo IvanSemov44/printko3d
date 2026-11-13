@@ -1,9 +1,9 @@
 import type { ProductImage } from '@storefront/shared';
 import { useState } from 'react';
 import { useT } from '../store-settings/useStoreSettings';
-import { ImagePlaceholder } from './ImagePlaceholder';
+import { ImagePlaceholder } from '../../components/ImagePlaceholder';
 import { StoredImage } from './StoredImage';
-import { defaultImage } from './variantSelection';
+import { defaultImage } from '../../components/variantSelection';
 
 const LARGE_SIZE = 800;
 const THUMBNAIL_SIZE = 96;

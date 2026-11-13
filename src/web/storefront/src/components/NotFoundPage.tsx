@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
-import { PageMeta } from '../seo/PageMeta';
-import { useT } from '../store-settings/useStoreSettings';
+import { PageMeta } from '../features/seo/PageMeta';
+import { useT } from '../features/store-settings/useStoreSettings';
 
 /** Shown for an unknown address and for a missing product or category. Not for the index: the server still answers 200. */
 export function NotFoundPage() {

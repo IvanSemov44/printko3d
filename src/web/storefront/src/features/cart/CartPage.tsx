@@ -1,7 +1,7 @@
 import { formatMoney } from '@storefront/shared';
 import { Link } from 'react-router';
-import { CatalogError } from '../catalog/CatalogError';
-import { LoadingStatus } from '../layout/LoadingStatus';
+import { CatalogError } from '../../components/CatalogError';
+import { LoadingStatus } from '../../components/LoadingStatus';
 import { PageMeta } from '../seo/PageMeta';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 import { CartLines } from './CartLines';

@@ -52,3 +52,4 @@
 - [0025 – React Compiler е включен в build на магазина и на админ панела](0025-react-compiler-in-the-build.md)
 - [0026 – `@storefront/shared` се чете от изходния код през `resolve.alias`](0026-shared-alias-for-windows-links.md)
 - [0027 – Количката е на сървъра, а купувачът се разпознава по бисквитка](0027-server-side-cart-with-anonymous-cookie.md)
+- [0028 – Общите части на магазина са в `components/`, а изключенията са записани](0028-storefront-shared-components-and-exceptions.md)

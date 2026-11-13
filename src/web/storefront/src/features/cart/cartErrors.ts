@@ -12,6 +12,8 @@ export function cartErrorKey(error: unknown): MessageKey {
         return 'cart.error.tooManyItems';
       case 'cart.quantity_too_high':
         return 'cart.error.quantityTooHigh';
+      case 'cart.quantity_exceeds_stock':
+        return 'cart.error.quantityExceedsStock';
       case 'cart.item_not_found':
         return 'cart.error.itemNotFound';
       case 'variant.not_found':

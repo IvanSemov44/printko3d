@@ -32,6 +32,7 @@ internal sealed class CartQueries(StorefrontDbContext context) : ICartQueries
                 variant.StockQuantity,
                 product.Status,
                 product.FulfilmentType,
+                product.LeadTimeDays,
                 ImageKey = product.Images.Where(i => i.IsPrimary).Select(i => i.StorageKey).FirstOrDefault(),
                 ImageAlt = product.Images.Where(i => i.IsPrimary).Select(i => i.AltText).FirstOrDefault(),
             })
@@ -48,7 +49,10 @@ internal sealed class CartQueries(StorefrontDbContext context) : ICartQueries
             r.Price,
             r.Quantity,
             r.Price * r.Quantity,
-            CartLineRules.StateOf(r.Status, r.FulfilmentType, r.IsActive, r.StockQuantity, r.Quantity))).ToList();
+            CartLineRules.StateOf(r.Status, r.FulfilmentType, r.IsActive, r.StockQuantity, r.Quantity),
+            r.FulfilmentType,
+            r.LeadTimeDays,
+            new VariantSupply(true, r.FulfilmentType, r.StockQuantity).Limit)).ToList();
         return CartDto.From(lines);
     }
 }

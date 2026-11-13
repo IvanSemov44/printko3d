@@ -23,7 +23,7 @@ public sealed class CartLineRulesTests
     public void Total_AddsOnlyTheAvailableLines_AndTheCountAddsAllUnits()
     {
         CartLineDto Line(int quantity, CartLineState state) =>
-            new(Guid.NewGuid(), "P", "p", "V", "S", null, 100, quantity, 100 * quantity, state);
+            new(Guid.NewGuid(), "P", "p", "V", "S", null, 100, quantity, 100 * quantity, state, FulfilmentType.InStock, null, 10);
 
         var cart = CartDto.From([
             Line(2, CartLineState.Available),

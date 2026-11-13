@@ -32,6 +32,8 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
     public HashSet<Guid> OrderableVariants => _cart.OrderableVariants;
 
+    public Dictionary<Guid, int> StockLimits => _cart.StockLimits;
+
     public List<Cart> TouchedCarts => _cart.Touched;
 
     public ICartQueries CartQueries => _cartQueries;
@@ -141,8 +143,13 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
         public Task<Cart?> GetByTokenHashAsync(byte[] tokenHash, bool trackChanges, CancellationToken cancellationToken) =>
             Task.FromResult(Items.SingleOrDefault(c => c.TokenHash.SequenceEqual(tokenHash)));
 
-        public Task<bool> IsVariantOrderableAsync(Guid variantId, CancellationToken cancellationToken) =>
-            Task.FromResult(OrderableVariants.Contains(variantId));
+        // A variant in StockLimits is in stock with that many units; any other orderable variant is made to order.
+        public Dictionary<Guid, int> StockLimits { get; } = [];
+
+        public Task<VariantSupply?> GetSupplyAsync(Guid variantId, CancellationToken cancellationToken) =>
+            Task.FromResult<VariantSupply?>(StockLimits.TryGetValue(variantId, out var stock)
+                ? new VariantSupply(OrderableVariants.Contains(variantId), FulfilmentType.InStock, stock)
+                : new VariantSupply(OrderableVariants.Contains(variantId), FulfilmentType.MadeToOrder, null));
 
         // The service also adds the line to the cart, like the change tracker does with the real database.
         public void AddItem(CartItem item)
@@ -180,7 +187,7 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
             var cart = carts.Items.SingleOrDefault(c => c.TokenHash.SequenceEqual(tokenHash));
             var lines = (cart?.Items ?? []).Select(i => new CartLineDto(
                 i.VariantId, "Product", "product", "Variant", "SKU", null, 100, i.Quantity, 100 * i.Quantity,
-                CartLineState.Available)).ToList();
+                CartLineState.Available, FulfilmentType.InStock, null, null)).ToList();
             return Task.FromResult(CartDto.From(lines));
         }
     }

@@ -4187,7 +4187,10 @@
           "unitPrice",
           "quantity",
           "linePrice",
-          "state"
+          "state",
+          "fulfilmentType",
+          "leadTimeDays",
+          "availableQuantity"
         ],
         "type": "object",
         "properties": {
@@ -4234,6 +4237,19 @@
           },
           "state": {
             "$ref": "#/components/schemas/CartLineState"
+          },
+          "fulfilmentType": {
+            "$ref": "#/components/schemas/FulfilmentType"
+          },
+          "leadTimeDays": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["null", "integer", "string"],
+            "format": "int32"
+          },
+          "availableQuantity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["null", "integer", "string"],
+            "format": "int32"
           }
         }
       },

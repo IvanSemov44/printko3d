@@ -118,7 +118,7 @@
 - **Как се познава:** `(await response.json()) as Dto`.
 - **Защо:** Типът е лъжа: ако сървърът върне друга форма, грешката се вижда по-късно като `undefined` или `NaN` на екрана.
 - **Как:** Четци от `decode.ts`, които проверяват формата и казват кое поле е грешно.
-- **Образец:** `shared/src/api/adminCategories.ts`. [frontend.md](frontend.md), F13. Остава за публичния `client.ts` (D17).
+- **Образец:** `shared/src/api/adminCategories.ts`. [frontend.md](frontend.md), F13. Публичният клиент: `shared/src/api/publicReaders.ts`.
 
 ### 17. Повтарящи се полета във формата (D10)
 
@@ -166,6 +166,13 @@
 - **Защо:** Няма фокус, няма клавиатура, няма роля за четеца на екрана.
 - **Как:** `button` или `a`.
 - **Образец:** `ConfirmDialog.tsx`. [frontend.md](frontend.md), F23.
+
+### 24a. Два файла с име, различно само по главна буква
+
+- **Как се познава:** `cartNotices.test.ts` и `CartNotices.test.tsx` в една папка.
+- **Защо:** На Windows и macOS файловата система не ги различава: единият презаписва другия или git показва фантомна промяна.
+- **Как:** Различно име, не различна главна буква (например `CartNoticeBar.test.tsx` за компонента).
+- **Образец:** `cart/cartNotices.test.ts` и `cart/CartNoticeBar.test.tsx`.
 
 ## Документи и процес
 

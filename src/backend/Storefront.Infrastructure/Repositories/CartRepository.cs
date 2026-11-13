@@ -15,12 +15,16 @@ internal sealed class CartRepository(StorefrontDbContext context)
             .Include(c => c.Items)
             .SingleOrDefaultAsync(c => c.TokenHash == tokenHash, cancellationToken);
 
-    public Task<bool> IsVariantOrderableAsync(Guid variantId, CancellationToken cancellationToken) =>
-        Context.ProductVariants.AsNoTracking().AnyAsync(
-            v => v.Id == variantId
-                && v.IsActive
-                && Context.Products.Any(p => p.Id == v.ProductId && p.Status == ProductStatus.Published),
-            cancellationToken);
+    public Task<VariantSupply?> GetSupplyAsync(Guid variantId, CancellationToken cancellationToken) =>
+        Context.ProductVariants.AsNoTracking()
+            .Where(v => v.Id == variantId)
+            .Join(
+                Context.Products,
+                v => v.ProductId,
+                p => p.Id,
+                (v, p) => new VariantSupply(
+                    v.IsActive && p.Status == ProductStatus.Published, p.FulfilmentType, v.StockQuantity))
+            .SingleOrDefaultAsync(cancellationToken);
 
     public void AddItem(CartItem item) => Context.Set<CartItem>().Add(item);
 

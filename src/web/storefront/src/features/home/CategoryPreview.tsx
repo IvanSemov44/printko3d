@@ -1,6 +1,6 @@
 import type { Category } from '@storefront/shared';
 import { Link } from 'react-router';
-import { ProductCard } from '../catalog/ProductCard';
+import { ProductCard } from '../../components/ProductCard';
 import { useT } from '../store-settings/useStoreSettings';
 import { useCategoryPreviewQuery } from './useCategoryPreviewQuery';
 

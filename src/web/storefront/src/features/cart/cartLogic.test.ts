@@ -24,6 +24,7 @@ describe('cartErrorKey', () => {
   it.each([
     ['cart.too_many_items', 'cart.error.tooManyItems'],
     ['cart.quantity_too_high', 'cart.error.quantityTooHigh'],
+    ['cart.quantity_exceeds_stock', 'cart.error.quantityExceedsStock'],
     ['cart.item_not_found', 'cart.error.itemNotFound'],
     ['variant.not_found', 'cart.error.variantNotFound'],
   ])('maps the code %s to its own text', (code, key) => {
@@ -46,9 +47,20 @@ describe('line state', () => {
   });
 
   it('adds pieces only to a line that can be bought, and never past 20', () => {
-    expect(canIncrease('Available', 19)).toBe(true);
-    expect(canIncrease('Available', 20)).toBe(false);
-    expect(canIncrease('InsufficientStock', 1)).toBe(false);
-    expect(canIncrease('Inactive', 1)).toBe(false);
+    expect(canIncrease({ state: 'Available', quantity: 19, availableQuantity: null })).toBe(true);
+    expect(canIncrease({ state: 'Available', quantity: 20, availableQuantity: null })).toBe(false);
+    expect(canIncrease({ state: 'InsufficientStock', quantity: 1, availableQuantity: 5 })).toBe(
+      false,
+    );
+    expect(canIncrease({ state: 'Inactive', quantity: 1, availableQuantity: 5 })).toBe(false);
+  });
+
+  it('stops at the stock when there are fewer than 20 pieces', () => {
+    expect(canIncrease({ state: 'Available', quantity: 2, availableQuantity: 3 })).toBe(true);
+    expect(canIncrease({ state: 'Available', quantity: 3, availableQuantity: 3 })).toBe(false);
+  });
+
+  it('does not stop a made-to-order line at the stock, only at 20', () => {
+    expect(canIncrease({ state: 'Available', quantity: 10, availableQuantity: null })).toBe(true);
   });
 });
