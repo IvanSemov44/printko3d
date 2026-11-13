@@ -34,13 +34,13 @@
 
 ### `Storefront.Infrastructure`
 
-| Папка           | Съдържание                                                                         |
-| --------------- | ---------------------------------------------------------------------------------- |
-| `Persistence/`  | `StorefrontDbContext`, `Configurations/` (по един клас на обект), `Migrations/`    |
-| `Repositories/` | `*Repository`, `CatalogQueries` (четене към DTO със `Select`), `RepositoryManager` |
-| `Identity/`     | ASP.NET Identity: `AdminUser`, услуги за вход и създаване на администратор         |
-| `Storage/`      | Хранилище за снимки, съвместимо със S3 (`S3ImageStorage`, решение 0018)            |
-| `Health/`       | Проверка на връзката с базата                                                      |
+| Папка           | Съдържание                                                                                                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Persistence/`  | `StorefrontDbContext`, `Configurations/` (по един клас на обект), `Migrations/`                                                                                                 |
+| `Repositories/` | `*Repository`, `CatalogQueries` (четене към DTO със `Select`; админ продуктите и категориите са в `AdminProductQueries` и `AdminCategoryQueries` зад него), `RepositoryManager` |
+| `Identity/`     | ASP.NET Identity: `AdminUser`, услуги за вход и създаване на администратор                                                                                                      |
+| `Storage/`      | Хранилище за снимки, съвместимо със S3 (`S3ImageStorage`, решение 0018)                                                                                                         |
+| `Health/`       | Проверка на връзката с базата                                                                                                                                                   |
 
 **Къде слагам нова колона?** В обекта на `Domain`, в конфигурацията му, нова миграция с ясно име, и се обновява `docs/database-schema.md` (генерира се, решение 0007).
 
