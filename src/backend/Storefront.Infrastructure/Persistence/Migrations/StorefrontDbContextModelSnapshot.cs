@@ -664,6 +664,10 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(30)")
                         .HasColumnName("phone");
 
+                    b.Property<long>("ShippingAmount")
+                        .HasColumnType("bigint")
+                        .HasColumnName("shipping_amount");
+
                     b.Property<string>("ShippingCity")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -675,6 +679,12 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                         .HasMaxLength(2)
                         .HasColumnType("character varying(2)")
                         .HasColumnName("shipping_country");
+
+                    b.Property<string>("ShippingMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("shipping_method");
 
                     b.Property<string>("ShippingPostalCode")
                         .IsRequired()
@@ -735,11 +745,15 @@ namespace Storefront.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("ck_orders_number", "number BETWEEN 10000000 AND 99999999");
 
+                            t.HasCheckConstraint("ck_orders_shipping_amount", "shipping_amount >= 0");
+
                             t.HasCheckConstraint("ck_orders_shipping_country", "char_length(shipping_country) = 2");
 
                             t.HasCheckConstraint("ck_orders_status", "status IN ('New')");
 
                             t.HasCheckConstraint("ck_orders_total_amount", "total_amount >= 0");
+
+                            t.HasCheckConstraint("ck_orders_total_covers_shipping", "total_amount >= shipping_amount");
                         });
                 });
 

@@ -2809,6 +2809,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/shipping/quotes': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ShippingOptionsDto'];
+            'application/json': components['schemas']['ShippingOptionsDto'];
+            'text/json': components['schemas']['ShippingOptionsDto'];
+          };
+        };
+        /** @description Unprocessable Entity */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/store-settings': {
     parameters: {
       query?: never;
@@ -3017,6 +3065,9 @@ export interface components {
       currency: string;
       /** Format: int64 */
       total: number | string;
+      shippingMethod: string;
+      /** Format: int64 */
+      shippingAmount: number | string;
       customerName: string;
       email: string;
       phone: string;
@@ -3072,6 +3123,7 @@ export interface components {
       city: string;
       postalCode: string;
       termsAccepted: boolean;
+      shippingMethod: string;
       /** Format: int64 */
       expectedTotal: number | string;
     };
@@ -3194,6 +3246,16 @@ export interface components {
     };
     SetVariantActiveRequest: {
       isActive: boolean;
+    };
+    ShippingOptionsDto: {
+      /** Format: int64 */
+      itemsTotal: number | string;
+      methods: components['schemas']['ShippingQuote'][];
+    };
+    ShippingQuote: {
+      code: string;
+      /** Format: int64 */
+      amount: number | string;
     };
     StoreSettingsAdminDto: {
       storeName: string;

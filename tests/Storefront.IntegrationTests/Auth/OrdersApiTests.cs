@@ -78,6 +78,7 @@ public sealed class OrdersApiTests(PostgresFixture postgres)
         context.Add(category);
         context.Add(product);
         context.Add(CatalogData.Settings());
+        context.Add(CatalogData.FreeShipping());
         await context.SaveChangesAsync();
         return variant.Id;
     }
@@ -90,17 +91,22 @@ public sealed class OrdersApiTests(PostgresFixture postgres)
         return CartCookieOf(response);
     }
 
-    private static object Body(long expectedTotal = 3000, bool termsAccepted = true, string email = BuyerEmail) => new
-    {
-        name = BuyerName,
-        email,
-        phone = BuyerPhone,
-        street = BuyerStreet,
-        city = "Sofia",
-        postalCode = "1000",
-        termsAccepted,
-        expectedTotal,
-    };
+    private static object Body(
+        long expectedTotal = 3000,
+        bool termsAccepted = true,
+        string email = BuyerEmail,
+        string shippingMethod = "address") => new
+        {
+            name = BuyerName,
+            email,
+            phone = BuyerPhone,
+            street = BuyerStreet,
+            city = "Sofia",
+            postalCode = "1000",
+            termsAccepted,
+            shippingMethod,
+            expectedTotal,
+        };
 
     private static async Task<int> OrderCountAsync(AuthApiHost host)
     {

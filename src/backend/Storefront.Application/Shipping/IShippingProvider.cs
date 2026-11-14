@@ -1,7 +1,10 @@
 namespace Storefront.Application.Shipping;
 
-/// <summary>What a courier needs to price a parcel. The weight is the sum of the lines; the address is where it goes.</summary>
-public sealed record ShippingRequest(int WeightGrams, string Country, string City, string PostalCode);
+/// <summary>
+/// What a courier needs to price a parcel. The weight is the sum of the lines; the address is where it goes. The city
+/// and the postal code are null while the buyer has not typed them yet (the price shown on the checkout page).
+/// </summary>
+public sealed record ShippingRequest(long WeightGrams, string Country, string? City = null, string? PostalCode = null);
 
 /// <summary>A way to deliver the parcel and its price in the smallest unit of the store currency.</summary>
 public sealed record ShippingQuote(string Code, long Amount);

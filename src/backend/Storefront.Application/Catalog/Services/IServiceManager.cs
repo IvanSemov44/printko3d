@@ -1,5 +1,6 @@
 using Storefront.Application.Carts;
 using Storefront.Application.Orders;
+using Storefront.Application.Shipping;
 
 namespace Storefront.Application.Catalog;
 
@@ -16,4 +17,6 @@ public interface IServiceManager
     ICartService Cart { get; }
 
     IOrderService Orders { get; }
+
+    IShippingService Shipping { get; }
 }

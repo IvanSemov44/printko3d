@@ -23,6 +23,7 @@ public sealed partial class ClosedByDefaultTests(PostgresFixture postgres)
         "PUT api/v1/cart/items/{variantId:guid}",
         // A buyer without an account places an order from the cart cookie (decision 0032, task 23b2).
         "POST api/v1/orders",
+        "GET api/v1/shipping/quotes",
         "GET api/v1/categories",
         "GET api/v1/products",
         "GET api/v1/products/{slug}",

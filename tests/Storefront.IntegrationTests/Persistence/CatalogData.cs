@@ -1,4 +1,5 @@
 using Storefront.Domain.Catalog;
+using Storefront.Domain.Shipping;
 
 namespace Storefront.IntegrationTests.Persistence;
 
@@ -68,6 +69,14 @@ internal static class CatalogData
         ContactEmail = "shop@example.com",
         ContactPhone = "+359000000",
         PrimaryColor = "#112233",
+    };
+
+    /// <summary>A tariff where every parcel up to 1000 kg is delivered for free, so a test about something else keeps its totals.</summary>
+    public static ShippingRate FreeShipping() => new()
+    {
+        MethodCode = "address",
+        MaxWeightGrams = 1_000_000,
+        Price = 0,
     };
 }
 

@@ -40,6 +40,7 @@ public sealed class OrderServiceDatabaseTests(PostgresFixture postgres)
             fields.City,
             fields.PostalCode,
             fields.TermsAccepted,
+            fields.ShippingMethod,
             fields.ExpectedTotal);
     }
 
@@ -58,6 +59,8 @@ public sealed class OrderServiceDatabaseTests(PostgresFixture postgres)
         public string PostalCode { get; set; } = "1000";
 
         public bool TermsAccepted { get; set; } = true;
+
+        public string ShippingMethod { get; set; } = "address";
 
         public long ExpectedTotal { get; set; } = expectedTotal;
     }
@@ -81,6 +84,7 @@ public sealed class OrderServiceDatabaseTests(PostgresFixture postgres)
         context.Add(category);
         context.Add(product);
         context.Add(CatalogData.Settings());
+        context.Add(CatalogData.FreeShipping());
         await context.SaveChangesAsync();
 
         var factory = new ApiFactory(database.ConnectionString).WithWebHostBuilder(builder =>

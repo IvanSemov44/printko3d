@@ -4309,6 +4309,53 @@
         }
       }
     },
+    "/api/v1/shipping/quotes": {
+      "get": {
+        "tags": ["Shipping"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingOptionsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingOptionsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingOptionsDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/store-settings": {
       "get": {
         "tags": ["StoreSettings"],
@@ -4793,6 +4840,8 @@
           "status",
           "currency",
           "total",
+          "shippingMethod",
+          "shippingAmount",
           "customerName",
           "email",
           "phone",
@@ -4817,6 +4866,14 @@
             "type": "string"
           },
           "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int64"
+          },
+          "shippingMethod": {
+            "type": "string"
+          },
+          "shippingAmount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": ["integer", "string"],
             "format": "int64"
@@ -4974,6 +5031,7 @@
           "city",
           "postalCode",
           "termsAccepted",
+          "shippingMethod",
           "expectedTotal"
         ],
         "type": "object",
@@ -4998,6 +5056,9 @@
           },
           "termsAccepted": {
             "type": "boolean"
+          },
+          "shippingMethod": {
+            "type": "string"
           },
           "expectedTotal": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -5403,6 +5464,37 @@
           }
         }
       },
+      "ShippingOptionsDto": {
+        "required": ["itemsTotal", "methods"],
+        "type": "object",
+        "properties": {
+          "itemsTotal": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int64"
+          },
+          "methods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShippingQuote"
+            }
+          }
+        }
+      },
+      "ShippingQuote": {
+        "required": ["code", "amount"],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int64"
+          }
+        }
+      },
       "StoreSettingsAdminDto": {
         "required": [
           "storeName",
@@ -5803,6 +5895,9 @@
     },
     {
       "name": "Products"
+    },
+    {
+      "name": "Shipping"
     },
     {
       "name": "StoreSettings"

@@ -4,6 +4,7 @@ using Storefront.Application.Carts;
 using Storefront.Application.Carts.Queries;
 using Storefront.Application.Contracts;
 using Storefront.Application.Exceptions;
+using Storefront.Application.Shipping;
 using Storefront.Domain.Catalog;
 using Storefront.Domain.Orders;
 
@@ -13,11 +14,10 @@ internal sealed partial class OrderService(
     IRepositoryManager repositories,
     IOrderNumberGenerator numbers,
     TimeProvider timeProvider,
-    OrderOptions options) : IOrderService
+    OrderOptions options,
+    IShippingProvider shipping) : IOrderService
 {
     private const int NumberAttempts = 5;
-
-    private const string Country = "BG";
 
     public async Task<OrderDto> PlaceAsync(string? cartToken, PlaceOrderInput input, CancellationToken cancellationToken)
     {
@@ -44,7 +44,8 @@ internal sealed partial class OrderService(
                 "A line of the cart cannot be ordered. Open the cart and remove it.", "order.cart_not_orderable");
         }
 
-        var total = lines.Sum(line => line.LinePrice);
+        var delivery = await PriceDeliveryAsync(lines, fields, cancellationToken);
+        var total = lines.Sum(line => line.LinePrice) + delivery.Amount;
         if (total != input.ExpectedTotal)
         {
             throw new ConflictException(
@@ -60,13 +61,15 @@ internal sealed partial class OrderService(
             Number = await FreeNumberAsync(cancellationToken),
             Currency = settings.DefaultCurrency,
             TotalAmount = total,
+            ShippingMethod = delivery.Code,
+            ShippingAmount = delivery.Amount,
             CustomerName = fields.Name,
             Email = fields.Email,
             Phone = fields.Phone,
             ShippingStreet = fields.Street,
             ShippingCity = fields.City,
             ShippingPostalCode = fields.PostalCode,
-            ShippingCountry = Country,
+            ShippingCountry = ShippingMethods.Country,
             TermsVersion = options.TermsVersion,
             TermsAcceptedAt = timeProvider.GetUtcNow(),
             Items = lines.Select(line => new OrderItem
@@ -95,6 +98,24 @@ internal sealed partial class OrderService(
         await transaction.CommitAsync(cancellationToken);
 
         return ToDto(order);
+    }
+
+    /// <summary>
+    /// Asks the courier for the price of the method the buyer chose. The price is never taken from the buyer: a method
+    /// the courier does not offer for this parcel is refused, and a parcel it cannot carry is refused by the courier.
+    /// </summary>
+    private async Task<ShippingQuote> PriceDeliveryAsync(
+        IReadOnlyList<CartLineDto> lines,
+        PlaceOrderInput fields,
+        CancellationToken cancellationToken)
+    {
+        var quotes = await shipping.GetQuotesAsync(
+            new ShippingRequest(ParcelWeight.Of(lines), ShippingMethods.Country, fields.City, fields.PostalCode),
+            cancellationToken);
+        return quotes.FirstOrDefault(quote => quote.Code == fields.ShippingMethod)
+            ?? throw new RuleViolationException(
+                "The chosen delivery is not available. Open the checkout and choose again.",
+                "order.shipping_unavailable");
     }
 
     /// <summary>
@@ -162,6 +183,7 @@ internal sealed partial class OrderService(
             Street = input.Street.Trim(),
             City = input.City.Trim(),
             PostalCode = input.PostalCode.Trim(),
+            ShippingMethod = input.ShippingMethod.Trim(),
         };
 
         var errors = new Dictionary<string, string[]>();
@@ -181,6 +203,11 @@ internal sealed partial class OrderService(
         if (Required(errors, "postalCode", fields.PostalCode, 20) && !PostalCodePattern().IsMatch(fields.PostalCode))
         {
             errors["postalCode"] = ["The postal code is four digits."];
+        }
+
+        if (fields.ShippingMethod.Length == 0)
+        {
+            errors["shippingMethod"] = ["The delivery method is required."];
         }
 
         if (!fields.TermsAccepted)
@@ -227,6 +254,8 @@ internal sealed partial class OrderService(
         order.Status.ToString(),
         order.Currency,
         order.TotalAmount,
+        order.ShippingMethod,
+        order.ShippingAmount,
         order.CustomerName,
         order.Email,
         order.Phone,
