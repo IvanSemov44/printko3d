@@ -166,6 +166,61 @@ function stubApi({ signedIn }: { signedIn: boolean }) {
           ],
         });
       }
+      if (path === '/api/v1/admin/orders') {
+        return json({
+          items: [
+            {
+              number: 12345678,
+              status: 'Paid',
+              currency: 'EUR',
+              total: 4500,
+              customerName: 'Anna Test',
+              email: 'anna@example.test',
+              itemCount: 1,
+              createdAt: '2026-11-14T10:00:00Z',
+            },
+          ],
+          page: 1,
+          pageSize: 20,
+          totalCount: 1,
+          totalPages: 1,
+        });
+      }
+      if (path === '/api/v1/admin/orders/12345678') {
+        return json({
+          order: {
+            number: 12345678,
+            status: 'Paid',
+            currency: 'EUR',
+            total: 4500,
+            shippingMethod: 'address',
+            shippingAmount: 600,
+            customerName: 'Anna Test',
+            email: 'anna@example.test',
+            phone: '+359000000',
+            shippingStreet: '1 Test Street',
+            shippingCity: 'Sofia',
+            shippingPostalCode: '1000',
+            shippingCountry: 'BG',
+            createdAt: '2026-11-14T10:00:00Z',
+            paymentDueAt: null,
+            items: [
+              {
+                productName: 'Dragon',
+                variantName: 'Red',
+                sku: 'DRG-RED',
+                unitPrice: 1950,
+                quantity: 2,
+                lineTotal: 3900,
+                fulfilmentType: 'InStock',
+                leadTimeDays: null,
+              },
+            ],
+          },
+          nextStatuses: ['InProduction'],
+          canCancel: true,
+        });
+      }
       if (path === '/api/v1/store-settings') {
         return json({ defaultCurrency: 'EUR', defaultLocale: 'bg' });
       }
@@ -263,6 +318,23 @@ describe('accessibility of the admin panel (axe, WCAG 2.1 A and AA)', () => {
     const violations = await violationsOf('/shipping', () =>
       screen.findByRole('group', { name: 'Стъпка 2' }),
     );
+
+    expect(violations).toEqual([]);
+  });
+
+  it('has none on the list of orders', async () => {
+    const violations = await violationsOf('/orders', () =>
+      screen.findByRole('link', { name: 'PR-12345678' }),
+    );
+
+    expect(violations).toEqual([]);
+  });
+
+  it('has none on one order, with its lines, its contact and its buttons', async () => {
+    const violations = await violationsOf('/orders/12345678', async () => {
+      await screen.findByText('DRG-RED');
+      await screen.findByRole('button', { name: 'Започни производство' });
+    });
 
     expect(violations).toEqual([]);
   });

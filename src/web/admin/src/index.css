@@ -378,3 +378,28 @@ input[type='color'] {
   border: 1px solid #57606a;
   border-radius: 0.25rem;
 }
+
+/* The state of an order is a word in a badge, never only a colour. */
+.badge.order-Completed {
+  border-color: #1a7f37;
+  color: #1a7f37;
+}
+
+.badge.order-Cancelled {
+  border-style: dashed;
+  color: #57606a;
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1.5rem;
+}
+
+.detail-list dt {
+  font-weight: 600;
+}
+
+.detail-list dd {
+  margin: 0;
+}
