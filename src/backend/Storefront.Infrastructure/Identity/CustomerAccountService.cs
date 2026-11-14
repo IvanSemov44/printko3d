@@ -65,6 +65,9 @@ internal sealed class CustomerAccountService(
         {
             throw TokenInvalid();
         }
+
+        // The address is the buyer's now: the orders placed as a guest with it join the account (decision 0039).
+        await repositories.Order.LinkGuestOrdersAsync(user.Id, user.Email!, cancellationToken);
     }
 
     public async Task ResendConfirmationAsync(CancellationToken cancellationToken)
@@ -123,9 +126,10 @@ internal sealed class CustomerAccountService(
         await users.UpdateAsync(user);
         await users.SetLockoutEndDateAsync(user, null);
         await users.ResetAccessFailedCountAsync(user);
+        await repositories.Order.LinkGuestOrdersAsync(user.Id, user.Email!, cancellationToken);
     }
 
-    public async Task<CustomerDto?> SignInAsync(string email, string password, CancellationToken cancellationToken)
+    public async Task<SignedInCustomer?> SignInAsync(string email, string password, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -149,7 +153,12 @@ internal sealed class CustomerAccountService(
             return null;
         }
 
-        return await ToDtoAsync(user);
+        if (user.EmailConfirmed)
+        {
+            await repositories.Order.LinkGuestOrdersAsync(user.Id, user.Email!, cancellationToken);
+        }
+
+        return new SignedInCustomer(user.Id, await ToDtoAsync(user));
     }
 
     public async Task SignOutAsync(CancellationToken cancellationToken)

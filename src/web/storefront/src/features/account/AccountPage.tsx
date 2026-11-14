@@ -6,7 +6,7 @@ import {
 } from '@storefront/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
-import { Navigate, useNavigate } from 'react-router';
+import { Link, Navigate, useNavigate } from 'react-router';
 import { CART_KEY } from '../../components/cartKeys';
 import { FormField } from '../../components/FormField';
 import { LoadingStatus } from '../../components/LoadingStatus';
@@ -151,6 +151,9 @@ function Profile({ customer }: { customer: Customer }) {
         {t('account.signedInAs')} <strong>{customer.displayName}</strong> ({customer.email})
       </p>
       {!customer.emailConfirmed && <ResendConfirmation />}
+      <p>
+        <Link to="/account/orders">{t('account.orders.link')}</Link>
+      </p>
       {customer.hasPassword ? <PasswordForm /> : <p>{t('account.noPassword')}</p>}
       <button
         type="button"

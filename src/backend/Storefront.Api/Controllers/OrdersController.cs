@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Storefront.Api.Auth;
 using Storefront.Api.Cart;
 using Storefront.Api.Requests;
 using Storefront.Api.Setup;
@@ -43,7 +44,9 @@ public sealed class OrdersController(IServiceManager services) : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<OrderDto>> Place(PlaceOrderRequest request, CancellationToken cancellationToken)
     {
-        var order = await services.Orders.PlaceAsync(CartCookie.Read(Request), request.ToInput(), cancellationToken);
+        // A signed-in buyer's account is on the order; the account never comes from the request.
+        var input = request.ToInput() with { CustomerId = await CustomerSession.IdAsync(HttpContext) };
+        var order = await services.Orders.PlaceAsync(CartCookie.Read(Request), input, cancellationToken);
         return StatusCode(StatusCodes.Status201Created, order);
     }
 

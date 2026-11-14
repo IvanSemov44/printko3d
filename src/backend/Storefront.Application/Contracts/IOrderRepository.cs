@@ -19,6 +19,13 @@ public interface IOrderRepository
     /// </summary>
     Task<bool> TryMarkStockReleasedAsync(Guid orderId, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Gives the orders that were placed as a guest with this email (compared without regard to case) to the account, in one
+    /// statement. Orders that already have an account stay with it. Returns how many were linked (decision 0039). It does not
+    /// wait for a save. The caller calls it only for an email that is confirmed.
+    /// </summary>
+    Task<int> LinkGuestOrdersAsync(Guid customerId, string email, CancellationToken cancellationToken);
+
     /// <summary>The order with its lines, by the key of the link in the email, or null. Not tracked.</summary>
     Task<Order?> GetByAccessTokenAsync(string token, CancellationToken cancellationToken);
 

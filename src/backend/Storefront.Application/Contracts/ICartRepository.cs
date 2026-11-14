@@ -9,6 +9,12 @@ public interface ICartRepository
     /// <summary>Finds the cart by the SHA-256 hash of the cookie token, with its lines. Null when there is none.</summary>
     Task<Cart?> GetByTokenHashAsync(byte[] tokenHash, bool trackChanges, CancellationToken cancellationToken);
 
+    /// <summary>Finds the cart of an account (decision 0039), with its lines. Null when the account has none.</summary>
+    Task<Cart?> GetByCustomerIdAsync(Guid customerId, bool trackChanges, CancellationToken cancellationToken);
+
+    /// <summary>Marks the cart for deletion at the next save; its lines go with it.</summary>
+    void Remove(Cart cart);
+
     /// <summary>Reads what the cart needs to judge a variant (orderable, fulfilment, stock) in one query. Null when the variant does not exist.</summary>
     Task<VariantSupply?> GetSupplyAsync(Guid variantId, CancellationToken cancellationToken);
 

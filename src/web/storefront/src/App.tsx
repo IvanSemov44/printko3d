@@ -64,6 +64,17 @@ const ResetPasswordPage = lazy(() =>
   })),
 );
 
+const AccountOrdersPage = lazy(() =>
+  import('./features/account/AccountOrdersPage').then((module) => ({
+    default: module.AccountOrdersPage,
+  })),
+);
+const AccountOrderPage = lazy(() =>
+  import('./features/account/AccountOrderPage').then((module) => ({
+    default: module.AccountOrderPage,
+  })),
+);
+
 /** Needs a router and a QueryClientProvider above it (see main.tsx). */
 export function App() {
   return (
@@ -102,6 +113,22 @@ export function App() {
             element={
               <Suspense fallback={<LoadingStatus />}>
                 <AccountPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/orders"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <AccountOrdersPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/orders/:number"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <AccountOrderPage />
               </Suspense>
             }
           />

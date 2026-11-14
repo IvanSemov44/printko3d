@@ -183,6 +183,11 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
         public Task<Cart?> GetByTokenHashAsync(byte[] tokenHash, bool trackChanges, CancellationToken cancellationToken) =>
             Task.FromResult(Items.SingleOrDefault(c => c.TokenHash.SequenceEqual(tokenHash)));
 
+        public Task<Cart?> GetByCustomerIdAsync(Guid customerId, bool trackChanges, CancellationToken cancellationToken) =>
+            Task.FromResult(Items.SingleOrDefault(c => c.CustomerId == customerId));
+
+        public void Remove(Cart cart) => Items.Remove(cart);
+
         // A variant in StockLimits is in stock with that many units; any other orderable variant is made to order.
         public Dictionary<Guid, int> StockLimits { get; } = [];
 

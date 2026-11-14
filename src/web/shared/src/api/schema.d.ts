@@ -570,6 +570,129 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/account/orders': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          page?: number | string;
+          pageSize?: number | string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['PagedResultOfCustomerOrderListItemDto'];
+            'application/json': components['schemas']['PagedResultOfCustomerOrderListItemDto'];
+            'text/json': components['schemas']['PagedResultOfCustomerOrderListItemDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/orders/{number}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          number: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['OrderDto'];
+            'application/json': components['schemas']['OrderDto'];
+            'text/json': components['schemas']['OrderDto'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/account/change-password': {
     parameters: {
       query?: never;
@@ -4727,6 +4850,18 @@ export interface components {
       email: string;
       password: string;
     };
+    CustomerOrderListItemDto: {
+      /** Format: int32 */
+      number: number | string;
+      status: string;
+      currency: string;
+      /** Format: int64 */
+      total: number | string;
+      /** Format: int32 */
+      itemCount: number | string;
+      /** Format: date-time */
+      createdAt: string;
+    };
     ForgotPasswordRequest: {
       email: string;
     };
@@ -4834,6 +4969,17 @@ export interface components {
     };
     OrderTokenLookupRequest: {
       token: string;
+    };
+    PagedResultOfCustomerOrderListItemDto: {
+      items: components['schemas']['CustomerOrderListItemDto'][];
+      /** Format: int32 */
+      page: number | string;
+      /** Format: int32 */
+      pageSize: number | string;
+      /** Format: int32 */
+      totalCount: number | string;
+      /** Format: int32 */
+      totalPages?: number | string;
     };
     PagedResultOfOrderAdminListItemDto: {
       items: components['schemas']['OrderAdminListItemDto'][];

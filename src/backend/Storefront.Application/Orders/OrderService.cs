@@ -74,6 +74,7 @@ internal sealed partial class OrderService(
             ShippingPostalCode = fields.PostalCode,
             ShippingCountry = ShippingMethods.Country,
             AccessToken = OrderAccessToken.Create(),
+            CustomerId = input.CustomerId,
             TermsVersion = options.TermsVersion,
             TermsAcceptedAt = timeProvider.GetUtcNow(),
             // Payment turned off: nobody can pay, so the order has no deadline and is never cancelled for it.

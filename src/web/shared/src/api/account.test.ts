@@ -7,6 +7,8 @@ import {
   resendCustomerConfirmation,
   resetCustomerPassword,
   getCurrentCustomer,
+  getMyOrder,
+  getMyOrders,
   loginCustomer,
   logoutCustomer,
   registerCustomer,
@@ -170,5 +172,69 @@ describe('the emails of an account', () => {
       '/api/v1/account/resend-confirmation',
       '/api/v1/account/reset-password',
     ]);
+  });
+});
+
+describe('the orders of a buyer', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const PAGE = {
+    items: [
+      {
+        number: 12345678,
+        status: 'Paid',
+        currency: 'BGN',
+        total: '3600',
+        itemCount: 2,
+        createdAt: '2026-11-13T10:00:00+00:00',
+      },
+    ],
+    page: 1,
+    pageSize: 20,
+    totalCount: 1,
+    totalPages: 1,
+  };
+
+  it('asks for a page and reads the rows, with the money as numbers', async () => {
+    const fetchMock = stubFetch(PAGE);
+
+    const page = await getMyOrders({ page: 2, pageSize: 5 });
+
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/v1/account/orders?page=2&pageSize=5');
+    expect(page.items).toEqual([
+      {
+        number: 12345678,
+        status: 'Paid',
+        currency: 'BGN',
+        total: 3600,
+        itemCount: 2,
+        createdAt: '2026-11-13T10:00:00+00:00',
+      },
+    ]);
+    expect(page.totalPages).toBe(1);
+  });
+
+  it('works out the pages when the server leaves them out', async () => {
+    stubFetch({ ...PAGE, totalPages: undefined, totalCount: 41, pageSize: 20 });
+
+    expect((await getMyOrders({ page: 1, pageSize: 20 })).totalPages).toBe(3);
+  });
+
+  it('refuses a row with an unknown status', async () => {
+    stubFetch({ ...PAGE, items: [{ ...PAGE.items[0], status: 'Lost' }] });
+
+    await expect(getMyOrders({ page: 1, pageSize: 20 })).rejects.toThrow(/status/);
+  });
+
+  it('reads one order by its number, and turns a refusal into an ApiError', async () => {
+    const fetchMock = stubFetch({ code: 'order.not_found' }, 404);
+
+    await expect(getMyOrder(12345678)).rejects.toMatchObject({
+      status: 404,
+      code: 'order.not_found',
+    });
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/v1/account/orders/12345678');
   });
 });

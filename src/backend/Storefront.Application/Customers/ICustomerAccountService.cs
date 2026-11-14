@@ -34,8 +34,10 @@ public interface ICustomerAccountService
     /// </summary>
     Task ResetPasswordAsync(string email, string token, string newPassword, CancellationToken cancellationToken);
 
-    /// <summary>Signs in with the password. Null when it did not work, and does not say why (wrong email, wrong password and a locked account look the same).</summary>
-    Task<CustomerDto?> SignInAsync(string email, string password, CancellationToken cancellationToken);
+    /// <summary>
+    /// Signs in with the password. A buyer with a confirmed address also gets the orders they placed as a guest with that address.
+    /// Null when it did not work, and does not say why (wrong email, wrong password and a locked account look the same).</summary>
+    Task<SignedInCustomer?> SignInAsync(string email, string password, CancellationToken cancellationToken);
 
     /// <summary>Ends the session on the server: the cookie of this session stops working, even if someone kept a copy.</summary>
     Task SignOutAsync(CancellationToken cancellationToken);

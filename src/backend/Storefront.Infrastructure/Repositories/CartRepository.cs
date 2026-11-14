@@ -15,6 +15,13 @@ internal sealed class CartRepository(StorefrontDbContext context)
             .Include(c => c.Items)
             .SingleOrDefaultAsync(c => c.TokenHash == tokenHash, cancellationToken);
 
+    public Task<Cart?> GetByCustomerIdAsync(Guid customerId, bool trackChanges, CancellationToken cancellationToken) =>
+        Query(trackChanges)
+            .Include(c => c.Items)
+            .SingleOrDefaultAsync(c => c.CustomerId == customerId, cancellationToken);
+
+    public void Remove(Cart cart) => Context.Carts.Remove(cart);
+
     public Task<VariantSupply?> GetSupplyAsync(Guid variantId, CancellationToken cancellationToken) =>
         Context.ProductVariants.AsNoTracking()
             .Where(v => v.Id == variantId)

@@ -116,6 +116,8 @@ export {
   changeCustomerPassword,
   confirmCustomerEmail,
   getCurrentCustomer,
+  getMyOrder,
+  getMyOrders,
   loginCustomer,
   logoutCustomer,
   readCustomer,
@@ -124,4 +126,4 @@ export {
   resendCustomerConfirmation,
   resetCustomerPassword,
 } from './api/account';
-export type { Customer } from './api/account';
+export type { Customer, CustomerOrderListItem, CustomerOrderPage } from './api/account';

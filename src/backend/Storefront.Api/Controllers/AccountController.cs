@@ -2,9 +2,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Storefront.Api.Auth;
+using Storefront.Api.Cart;
 using Storefront.Api.Requests;
+using Storefront.Application.Catalog;
+using Storefront.Application.Catalog.Queries;
 using Storefront.Application.Customers;
 using Storefront.Application.Exceptions;
+using Storefront.Application.Orders;
 using Storefront.Infrastructure.Identity;
 
 namespace Storefront.Api.Controllers;
@@ -15,7 +19,7 @@ namespace Storefront.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/v1/account")]
-public sealed class AccountController(ICustomerAccountService accounts) : ControllerBase
+public sealed class AccountController(ICustomerAccountService accounts, IServiceManager services) : ControllerBase
 {
     /// <summary>
     /// Makes an account. It does not sign the buyer in. An address that already has an account gets the same answer, so the call does
@@ -110,9 +114,19 @@ public sealed class AccountController(ICustomerAccountService accounts) : Contro
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
-    public async Task<ActionResult<CustomerDto>> Login(CustomerLoginRequest request, CancellationToken cancellationToken) =>
-        Ok(await accounts.SignInAsync(request.Email, request.Password, cancellationToken)
-            ?? throw new InvalidCredentialsException());
+    public async Task<ActionResult<CustomerDto>> Login(CustomerLoginRequest request, CancellationToken cancellationToken)
+    {
+        var signedIn = await accounts.SignInAsync(request.Email, request.Password, cancellationToken)
+            ?? throw new InvalidCredentialsException();
+        // One cart for the account: the one of this browser and the one of the account are joined (decision 0039).
+        var cart = await services.Cart.MergeIntoAccountAsync(CartCookie.Read(Request), signedIn.Id, cancellationToken);
+        if (cart.Token is not null)
+        {
+            CartCookie.Write(Response, cart.Token);
+        }
+
+        return Ok(signedIn.Customer);
+    }
 
     /// <summary>Ends the session on the server.</summary>
     /// <remarks>Errors: 401 when there is no session, 403 csrf.header_required.</remarks>
@@ -124,6 +138,8 @@ public sealed class AccountController(ICustomerAccountService accounts) : Contro
     public async Task<ActionResult> Logout(CancellationToken cancellationToken)
     {
         await accounts.SignOutAsync(cancellationToken);
+        // The cart stays with the account; the browser starts again with no cart.
+        CartCookie.Delete(Response);
         return NoContent();
     }
 
@@ -138,6 +154,27 @@ public sealed class AccountController(ICustomerAccountService accounts) : Contro
         var customer = await accounts.GetCurrentAsync(cancellationToken);
         return customer is null ? Unauthorized() : Ok(customer);
     }
+
+    /// <summary>The orders of the signed-in buyer, the newest first, one page at a time (at most 100 on a page).</summary>
+    /// <remarks>Errors: 400 validation.failed (page or pageSize out of range), 401 when there is no session.</remarks>
+    [HttpGet("orders")]
+    [Authorize(AuthenticationSchemes = CustomerAuthentication.Scheme)]
+    [ProducesResponseType<PagedResult<CustomerOrderListItemDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<PagedResult<CustomerOrderListItemDto>>> Orders(
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default) =>
+        Ok(await services.CustomerOrders.ListAsync(CurrentCustomerId(), page, pageSize, cancellationToken));
+
+    /// <summary>One order of the signed-in buyer. The same answer for a number that does not exist and one that is another buyer's.</summary>
+    /// <remarks>Errors: 401 when there is no session, 404 order.not_found.</remarks>
+    [HttpGet("orders/{number:int}")]
+    [Authorize(AuthenticationSchemes = CustomerAuthentication.Scheme)]
+    [ProducesResponseType<OrderDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<OrderDto>> Order(int number, CancellationToken cancellationToken) =>
+        Ok(await services.CustomerOrders.GetAsync(CurrentCustomerId(), number, cancellationToken));
 
     /// <summary>Sets a new password after the current one. The other sessions end; this one stays.</summary>
     /// <remarks>
@@ -156,4 +193,7 @@ public sealed class AccountController(ICustomerAccountService accounts) : Contro
         await accounts.ChangePasswordAsync(request.CurrentPassword, request.NewPassword, cancellationToken);
         return NoContent();
     }
+
+    private Guid CurrentCustomerId() =>
+        CustomerSession.IdOf(User) ?? throw new InvalidCredentialsException();
 }

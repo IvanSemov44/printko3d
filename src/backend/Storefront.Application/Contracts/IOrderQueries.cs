@@ -10,6 +10,9 @@ public interface IOrderQueries
     /// <summary>Every order, the newest first, one page at a time. The search matches the number exactly and the email and the name by a part.</summary>
     Task<PagedResult<OrderAdminListItemDto>> GetAdminOrdersAsync(OrderAdminListQuery query, CancellationToken cancellationToken);
 
+    /// <summary>The orders of one account, the newest first, one page at a time (decision 0039).</summary>
+    Task<PagedResult<CustomerOrderListItemDto>> GetCustomerOrdersAsync(Guid customerId, int page, int pageSize, CancellationToken cancellationToken);
+
     /// <summary>The number of orders of each status that has at least one order, with one query.</summary>
     Task<IReadOnlyDictionary<OrderStatus, int>> GetStatusCountsAsync(CancellationToken cancellationToken);
 }

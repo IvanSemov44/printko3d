@@ -3,26 +3,12 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, type SyntheticEvent } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { FormField } from '../../components/FormField';
-import { OrderDetails } from '../checkout/OrderDetails';
 import { PageMeta } from '../seo/PageMeta';
 import { useT } from '../store-settings/useStoreSettings';
 import { looksLikeEmail, myOrderFailure, parseOrderNumber } from './myOrderFailure';
-import { OrderStatusTrack } from './OrderStatusTrack';
+import { OrderView } from './OrderView';
 
 type FieldError = 'myOrder.error.numberInvalid' | 'myOrder.error.emailInvalid';
-
-function OrderView({ order }: { order: Order }) {
-  const t = useT();
-  return (
-    <>
-      <p className="order-number">
-        {t('order.numberLabel')} <strong>{`PR-${String(order.number)}`}</strong>
-      </p>
-      <OrderStatusTrack status={order.status} />
-      <OrderDetails order={order} />
-    </>
-  );
-}
 
 function LookupForm({ onFound }: { onFound: (order: Order) => void }) {
   const t = useT();

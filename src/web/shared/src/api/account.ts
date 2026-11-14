@@ -1,6 +1,16 @@
 import { ApiError } from './client';
-import { field, readBoolean, readObject, readString } from './decode';
+import {
+  field,
+  readArray,
+  readBoolean,
+  readInteger,
+  readObject,
+  readOneOf,
+  readString,
+  type Reader,
+} from './decode';
 import { apiAct, apiRequest, apiSend } from './http';
+import { ORDER_STATUSES, readOrder, type Order, type OrderStatus } from './orders';
 
 /** The signed-in buyer (decision 0039). */
 export interface Customer {
@@ -103,4 +113,72 @@ export async function resetCustomerPassword(
   signal?: AbortSignal,
 ): Promise<void> {
   await apiSend('POST', `${ACCOUNT}/reset-password`, input, signal);
+}
+
+/** One row of the history of orders of a buyer. Money is in the smallest unit of `currency`. */
+export interface CustomerOrderListItem {
+  number: number;
+  status: OrderStatus;
+  currency: string;
+  total: number;
+  itemCount: number;
+  createdAt: string;
+}
+
+export interface CustomerOrderPage {
+  items: CustomerOrderListItem[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+const readListItem: Reader<CustomerOrderListItem> = (value, path) => {
+  const object = readObject(value, path);
+  return {
+    number: field(object, 'number', readInteger, path),
+    status: field(object, 'status', readOneOf(ORDER_STATUSES), path),
+    currency: field(object, 'currency', readString, path),
+    total: field(object, 'total', readInteger, path),
+    itemCount: field(object, 'itemCount', readInteger, path),
+    createdAt: field(object, 'createdAt', readString, path),
+  };
+};
+
+function readOrderPage(value: unknown): CustomerOrderPage {
+  const path = 'customerOrders';
+  const object = readObject(value, path);
+  const pageSize = field(object, 'pageSize', readInteger, path);
+  const totalCount = field(object, 'totalCount', readInteger, path);
+  return {
+    items: field(object, 'items', readArray(readListItem), path),
+    page: field(object, 'page', readInteger, path),
+    pageSize,
+    totalCount,
+    // The server may leave it out; it is then worked out from the other two numbers.
+    totalPages:
+      object.totalPages === undefined
+        ? Math.ceil(totalCount / pageSize)
+        : field(object, 'totalPages', readInteger, path),
+  };
+}
+
+/** The orders of the signed-in buyer, the newest first, one page at a time. A refusal is an ApiError: 400 `validation.failed`, 401. */
+export async function getMyOrders(
+  query: { page: number; pageSize: number },
+  signal?: AbortSignal,
+): Promise<CustomerOrderPage> {
+  const params = new URLSearchParams({
+    page: String(query.page),
+    pageSize: String(query.pageSize),
+  });
+  return readOrderPage(await apiRequest(`${ACCOUNT}/orders?${params.toString()}`, { signal }));
+}
+
+/**
+ * One order of the signed-in buyer. A refusal is an ApiError: 401, 404 `order.not_found` (the same for a number that does not
+ * exist and one that is another buyer's).
+ */
+export async function getMyOrder(number: number, signal?: AbortSignal): Promise<Order> {
+  return readOrder(await apiRequest(`${ACCOUNT}/orders/${String(number)}`, { signal }));
 }

@@ -30,4 +30,6 @@ public interface IServiceManager
     IOrderLookupService OrderLookup { get; }
 
     IOrderAdminService OrderAdmin { get; }
+
+    ICustomerOrderService CustomerOrders { get; }
 }
