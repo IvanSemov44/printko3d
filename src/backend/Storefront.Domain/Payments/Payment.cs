@@ -16,6 +16,9 @@ public sealed class Payment : Entity
     /// <summary>The identifier the provider gave to the session.</summary>
     public string ProviderReference { get; set; } = string.Empty;
 
+    /// <summary>Where the buyer is led to pay, kept so that a second request for the same order gets the same session.</summary>
+    public string RedirectUrl { get; set; } = string.Empty;
+
     /// <summary>Random identifier the storefront uses to ask about the payment. It does not reveal the order.</summary>
     public Guid PublicId { get; set; } = Guid.NewGuid();
 

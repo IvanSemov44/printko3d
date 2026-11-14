@@ -887,6 +887,12 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("public_id");
 
+                    b.Property<string>("RedirectUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("redirect_url");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)

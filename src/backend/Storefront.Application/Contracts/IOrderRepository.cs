@@ -18,4 +18,21 @@ public interface IOrderRepository
     /// give the stock back a second time. It does not wait for a save.
     /// </summary>
     Task<bool> TryMarkStockReleasedAsync(Guid orderId, CancellationToken cancellationToken);
+
+    /// <summary>The order with its lines, by the number the buyer sees, or null. Not tracked.</summary>
+    Task<Order?> GetByNumberAsync(int number, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// <c>WHERE status = New</c> to <c>Paid</c>, in one statement. Returns false when the order was not new any more
+    /// (paid, or cancelled by the expiry at the same moment), so only one of two competing changes wins. It does not
+    /// wait for a save.
+    /// </summary>
+    Task<bool> TryMarkPaidAsync(Guid orderId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// <c>WHERE status = Cancelled</c> to <c>Paid</c>, and the mark that the stock was given back is cleared, in one
+    /// statement. The caller has already taken the stock again. Returns false when the order was not cancelled. It does
+    /// not wait for a save.
+    /// </summary>
+    Task<bool> TryReviveAsync(Guid orderId, CancellationToken cancellationToken);
 }

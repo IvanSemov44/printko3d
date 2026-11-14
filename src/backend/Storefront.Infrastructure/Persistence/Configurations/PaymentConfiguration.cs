@@ -22,6 +22,7 @@ internal sealed class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.Property(p => p.Id).ValueGeneratedNever();
         builder.Property(p => p.Provider).HasMaxLength(50).IsRequired();
         builder.Property(p => p.ProviderReference).HasMaxLength(200).IsRequired();
+        builder.Property(p => p.RedirectUrl).HasMaxLength(500).IsRequired();
         builder.Property(p => p.Currency).HasMaxLength(3).IsRequired();
         builder.Property(p => p.Status).HasConversion<string>().HasMaxLength(20);
 

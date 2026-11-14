@@ -1,6 +1,7 @@
 using Storefront.Application.Carts;
 using Storefront.Application.Contracts;
 using Storefront.Application.Orders;
+using Storefront.Application.Payments;
 using Storefront.Application.Shipping;
 
 namespace Storefront.Application.Catalog;
@@ -11,7 +12,10 @@ public sealed class ServiceManager(
     IOrderNumberGenerator? orderNumbers = null,
     TimeProvider? timeProvider = null,
     OrderOptions? orderOptions = null,
-    IShippingProvider? shippingProvider = null) : IServiceManager
+    IShippingProvider? shippingProvider = null,
+    PaymentOptions? paymentOptions = null,
+    IPaymentProvider? paymentProvider = null,
+    IPaymentSimulator? paymentSimulator = null) : IServiceManager
 {
     private readonly Lazy<ICategoryService> _category = new(() => new CategoryService(repositories));
     private readonly Lazy<IProductService> _product = new(() => new ProductService(repositories, imageStorage));
@@ -27,7 +31,16 @@ public sealed class ServiceManager(
         orderNumbers ?? new RandomOrderNumberGenerator(),
         timeProvider ?? TimeProvider.System,
         orderOptions ?? new OrderOptions(),
-        shippingProvider ?? new NoShippingProvider()));
+        shippingProvider ?? new NoShippingProvider(),
+        paymentOptions ?? new PaymentOptions()));
+
+    // Without a provider the service cannot be built; the API always registers the real ones.
+    private readonly Lazy<IPaymentService> _payments = new(() => new PaymentService(
+        repositories,
+        paymentProvider ?? throw new InvalidOperationException("No payment provider is registered."),
+        paymentSimulator ?? throw new InvalidOperationException("No payment simulator is registered."),
+        timeProvider ?? TimeProvider.System,
+        paymentOptions ?? new PaymentOptions()));
 
     private readonly Lazy<IShippingService> _shipping = new(() => new ShippingService(
         repositories,
@@ -48,6 +61,8 @@ public sealed class ServiceManager(
     public IOrderService Orders => _orders.Value;
 
     public IShippingService Shipping => _shipping.Value;
+
+    public IPaymentService Payments => _payments.Value;
 
     public IShippingTariffService ShippingTariff => _shippingTariff.Value;
 }

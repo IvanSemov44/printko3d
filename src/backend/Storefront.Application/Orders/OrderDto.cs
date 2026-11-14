@@ -23,6 +23,7 @@ public sealed record OrderDto(
     string ShippingPostalCode,
     string ShippingCountry,
     DateTimeOffset CreatedAt,
+    DateTimeOffset? PaymentDueAt,
     IReadOnlyList<OrderItemDto> Items);
 
 public sealed record OrderItemDto(

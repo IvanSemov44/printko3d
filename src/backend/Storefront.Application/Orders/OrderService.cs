@@ -4,6 +4,7 @@ using Storefront.Application.Carts;
 using Storefront.Application.Carts.Queries;
 using Storefront.Application.Contracts;
 using Storefront.Application.Exceptions;
+using Storefront.Application.Payments;
 using Storefront.Application.Shipping;
 using Storefront.Domain.Catalog;
 using Storefront.Domain.Orders;
@@ -15,7 +16,8 @@ internal sealed partial class OrderService(
     IOrderNumberGenerator numbers,
     TimeProvider timeProvider,
     OrderOptions options,
-    IShippingProvider shipping) : IOrderService
+    IShippingProvider shipping,
+    PaymentOptions paymentOptions) : IOrderService
 {
     private const int NumberAttempts = 5;
 
@@ -72,6 +74,7 @@ internal sealed partial class OrderService(
             ShippingCountry = ShippingMethods.Country,
             TermsVersion = options.TermsVersion,
             TermsAcceptedAt = timeProvider.GetUtcNow(),
+            PaymentDueAt = timeProvider.GetUtcNow().AddMinutes(paymentOptions.WindowMinutes),
             Items = lines.Select(line => new OrderItem
             {
                 VariantId = line.VariantId,
@@ -155,8 +158,7 @@ internal sealed partial class OrderService(
         await transaction.CommitAsync(cancellationToken);
     }
 
-    private static IEnumerable<OrderItem> StockLines(Order order) =>
-        order.Items.Where(i => i.FulfilmentType == FulfilmentType.InStock).OrderBy(i => i.VariantId);
+    private static IEnumerable<OrderItem> StockLines(Order order) => OrderStockLines.Of(order);
 
     // A clash of two random numbers is rare; the unique index is the guard and this loop is the polite path.
     private async Task<int> FreeNumberAsync(CancellationToken cancellationToken)
@@ -264,6 +266,7 @@ internal sealed partial class OrderService(
         order.ShippingPostalCode,
         order.ShippingCountry,
         order.CreatedAt,
+        order.PaymentDueAt,
         order.Items.Select(i => new OrderItemDto(
             i.ProductName,
             i.VariantName,
