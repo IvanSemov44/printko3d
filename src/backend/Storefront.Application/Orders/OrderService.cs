@@ -74,7 +74,8 @@ internal sealed partial class OrderService(
             ShippingCountry = ShippingMethods.Country,
             TermsVersion = options.TermsVersion,
             TermsAcceptedAt = timeProvider.GetUtcNow(),
-            PaymentDueAt = timeProvider.GetUtcNow().AddMinutes(paymentOptions.WindowMinutes),
+            // Payment turned off: nobody can pay, so the order has no deadline and is never cancelled for it.
+            PaymentDueAt = paymentOptions.Enabled ? timeProvider.GetUtcNow().AddMinutes(paymentOptions.WindowMinutes) : null,
             Items = lines.Select(line => new OrderItem
             {
                 VariantId = line.VariantId,
@@ -145,17 +146,10 @@ internal sealed partial class OrderService(
             ?? throw new NotFoundException($"Order {orderId} was not found.", "order.not_found");
 
         await using var transaction = await repositories.BeginTransactionAsync(cancellationToken);
-        if (!await repositories.Order.TryMarkStockReleasedAsync(orderId, cancellationToken))
+        if (await OrderStockLines.GiveBackAsync(repositories, order, cancellationToken))
         {
-            return;
+            await transaction.CommitAsync(cancellationToken);
         }
-
-        foreach (var item in StockLines(order))
-        {
-            await repositories.Product.ReturnStockAsync(item.VariantId, item.Quantity, cancellationToken);
-        }
-
-        await transaction.CommitAsync(cancellationToken);
     }
 
     private static IEnumerable<OrderItem> StockLines(Order order) => OrderStockLines.Of(order);

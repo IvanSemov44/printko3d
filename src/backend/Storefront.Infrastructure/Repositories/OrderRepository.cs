@@ -55,4 +55,26 @@ internal sealed class OrderRepository(StorefrontDbContext context)
                 cancellationToken);
         return changed == 1;
     }
+
+    public async Task<IReadOnlyList<Order>> ListExpiredAsync(
+        DateTimeOffset cutoff,
+        int batchSize,
+        CancellationToken cancellationToken) =>
+        await Query(trackChanges: false)
+            .Include(o => o.Items)
+            .Where(o => o.Status == OrderStatus.New && o.PaymentDueAt < cutoff)
+            .OrderBy(o => o.PaymentDueAt)
+            .Take(batchSize)
+            .ToListAsync(cancellationToken);
+
+    public async Task<bool> TryCancelExpiredAsync(Guid orderId, DateTimeOffset cutoff, CancellationToken cancellationToken)
+    {
+        var now = Context.Now;
+        var changed = await Context.Orders
+            .Where(o => o.Id == orderId && o.Status == OrderStatus.New && o.PaymentDueAt < cutoff)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(o => o.Status, OrderStatus.Cancelled).SetProperty(o => o.UpdatedAt, now),
+                cancellationToken);
+        return changed == 1;
+    }
 }

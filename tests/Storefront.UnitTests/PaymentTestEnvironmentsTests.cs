@@ -35,4 +35,23 @@ public sealed class PaymentTestEnvironmentsTests
         Assert.Equal(
             expected,
             PaymentOptions.IsValid(new PaymentOptions { WindowMinutes = window, GraceMinutes = grace }));
+
+    [Theory]
+    [InlineData(0, 30, 100, false)]
+    [InlineData(1441, 30, 100, false)]
+    [InlineData(1, -1, 100, false)]
+    [InlineData(1, 3601, 100, false)]
+    [InlineData(1, 30, 0, false)]
+    [InlineData(1, 30, 1001, false)]
+    [InlineData(1, 0, 1, true)]
+    [InlineData(1440, 3600, 1000, true)]
+    public void Options_AcceptOnlyARunIntervalDelayAndBatchInsideTheirLimits(int interval, int delay, int batch, bool expected) =>
+        Assert.Equal(
+            expected,
+            PaymentOptions.IsValid(new PaymentOptions
+            {
+                ExpiryIntervalMinutes = interval,
+                ExpiryInitialDelaySeconds = delay,
+                ExpiryBatchSize = batch,
+            }));
 }

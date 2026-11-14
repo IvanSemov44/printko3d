@@ -29,7 +29,12 @@ internal static class PaymentWorld
     public static PlaceOrderInput Input(long expectedTotal) =>
         new("Test Buyer", "buyer@example.com", "+359 88 000 0000", "1 Test Street", "Sofia", "1000", true, "address", expectedTotal);
 
-    public static async Task<Setup> CreateAsync(PostgresFixture postgres, int firstStock = 5, int secondStock = 5, bool paymentEnabled = true)
+    public static async Task<Setup> CreateAsync(
+        PostgresFixture postgres,
+        int firstStock = 5,
+        int secondStock = 5,
+        bool paymentEnabled = true,
+        IReadOnlyDictionary<string, string>? settings = null)
     {
         var database = await postgres.CreateDatabaseAsync();
         await using (var context = database.CreateContext())
@@ -59,6 +64,13 @@ internal static class PaymentWorld
         var factory = new ApiFactory(database.ConnectionString).WithWebHostBuilder(builder =>
         {
             builder.UseSetting("Payment:Enabled", paymentEnabled ? "true" : "false");
+            // The worker must not run by itself in the middle of a test: the tests call the service when they want it.
+            builder.UseSetting("Payment:ExpiryInitialDelaySeconds", "3600");
+            foreach (var (key, value) in settings ?? new Dictionary<string, string>())
+            {
+                builder.UseSetting(key, value);
+            }
+
             builder.ConfigureServices(services => services.AddSingleton<TimeProvider>(time));
         });
         return new Setup(database, factory, time);

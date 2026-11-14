@@ -35,4 +35,17 @@ public interface IOrderRepository
     /// not wait for a save.
     /// </summary>
     Task<bool> TryReviveAsync(Guid orderId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// The orders that are still new and whose deadline passed before <paramref name="cutoff"/>, the oldest first, with
+    /// their lines. At most <paramref name="batchSize"/>. Not tracked.
+    /// </summary>
+    Task<IReadOnlyList<Order>> ListExpiredAsync(DateTimeOffset cutoff, int batchSize, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// <c>WHERE status = New AND payment_due_at &lt; cutoff</c> to <c>Cancelled</c>, in one statement, so a payment that
+    /// arrives at the same moment and an expiry cannot both win. Returns false when the order was not new any more or
+    /// its deadline was moved. It does not wait for a save.
+    /// </summary>
+    Task<bool> TryCancelExpiredAsync(Guid orderId, DateTimeOffset cutoff, CancellationToken cancellationToken);
 }

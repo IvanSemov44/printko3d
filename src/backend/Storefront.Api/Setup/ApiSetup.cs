@@ -101,13 +101,21 @@ internal static class ApiSetup
             .Bind(section)
             .Validate(
                 PaymentOptions.IsValid,
-                "Payment:WindowMinutes must be between 1 minute and 7 days, and Payment:GraceMinutes between 0 and 24 hours.")
+                "Payment:WindowMinutes must be between 1 minute and 7 days, Payment:GraceMinutes between 0 and 24 hours, "
+                + "Payment:ExpiryIntervalMinutes between 1 minute and 24 hours, Payment:ExpiryInitialDelaySeconds between 0 and 3600 and Payment:ExpiryBatchSize between 1 and 1000.")
             .ValidateOnStart();
         builder.Services.AddSingleton(services => services.GetRequiredService<IOptions<PaymentOptions>>().Value);
+
+        builder.Services.AddScoped<IPaymentExpiryService>(services => new PaymentExpiryService(
+            services.GetRequiredService<IRepositoryManager>(),
+            services.GetRequiredService<TimeProvider>(),
+            services.GetRequiredService<PaymentOptions>()));
 
         if (section.Get<PaymentOptions>()?.Enabled ?? true)
         {
             PaymentTestEnvironments.EnsureAllowed(builder.Environment.EnvironmentName);
+            // With payment off nobody can pay, so no order has a deadline and there is nothing to cancel.
+            builder.Services.AddHostedService<PaymentExpiryWorker>();
         }
     }
 

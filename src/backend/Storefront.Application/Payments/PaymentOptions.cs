@@ -20,6 +20,19 @@ public sealed class PaymentOptions
     /// </summary>
     public int GraceMinutes { get; init; } = 5;
 
+    /// <summary>Minutes between two runs of the cancellation of unpaid orders.</summary>
+    public int ExpiryIntervalMinutes { get; init; } = 1;
+
+    /// <summary>Seconds to wait after the start before the first run, so the start of the API is not slowed down.</summary>
+    public int ExpiryInitialDelaySeconds { get; init; } = 30;
+
+    /// <summary>Orders cancelled in one read. Small batches keep every read short; the run goes on while batches are full.</summary>
+    public int ExpiryBatchSize { get; init; } = 100;
+
     public static bool IsValid(PaymentOptions options) =>
-        options.WindowMinutes is > 0 and <= 7 * 24 * 60 && options.GraceMinutes is >= 0 and <= 24 * 60;
+        options.WindowMinutes is > 0 and <= 7 * 24 * 60
+        && options.GraceMinutes is >= 0 and <= 24 * 60
+        && options.ExpiryIntervalMinutes is >= 1 and <= 24 * 60
+        && options.ExpiryInitialDelaySeconds is >= 0 and <= 3600
+        && options.ExpiryBatchSize is >= 1 and <= 1000;
 }
