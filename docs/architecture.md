@@ -40,7 +40,7 @@
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Persistence/`  | `StorefrontDbContext`, `Configurations/` (по един клас на обект), `Migrations/`                                                                                                 |
 | `Repositories/` | `*Repository`, `CatalogQueries` (четене към DTO със `Select`; админ продуктите и категориите са в `AdminProductQueries` и `AdminCategoryQueries` зад него), `RepositoryManager` |
-| `Identity/`     | ASP.NET Identity: `AdminUser`, услуги за вход и създаване на администратор                                                                                                      |
+| `Identity/`     | ASP.NET Identity: `AdminUser`, услуги за вход и създаване на администратор; `CustomerUser` и услугите за акаунта и за външен вход на купувача ([0039](decisions/0039-customer-accounts-password-and-social-login.md))                                                                                                      |
 | `Storage/`      | Хранилище за снимки, съвместимо със S3 (`S3ImageStorage`, решение 0018)                                                                                                         |
 | `Health/`       | Проверка на връзката с базата                                                                                                                                                   |
 
