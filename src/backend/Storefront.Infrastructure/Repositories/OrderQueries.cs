@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Storefront.Application.Catalog.Queries;
 using Storefront.Application.Contracts;
 using Storefront.Application.Orders;
+using Storefront.Domain.Orders;
 using Storefront.Infrastructure.Persistence;
 
 namespace Storefront.Infrastructure.Repositories;
@@ -60,4 +61,11 @@ internal sealed class OrderQueries(StorefrontDbContext context) : IOrderQueries
 
         return new PagedResult<OrderAdminListItemDto>(items, query.Page, query.PageSize, totalCount);
     }
+
+    public async Task<IReadOnlyDictionary<OrderStatus, int>> GetStatusCountsAsync(CancellationToken cancellationToken) =>
+        await context.Orders
+            .AsNoTracking()
+            .GroupBy(o => o.Status)
+            .Select(group => new { Status = group.Key, Count = group.Count() })
+            .ToDictionaryAsync(row => row.Status, row => row.Count, cancellationToken);
 }

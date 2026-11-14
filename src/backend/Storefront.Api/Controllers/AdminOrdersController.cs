@@ -37,6 +37,14 @@ public sealed class AdminOrdersController(IServiceManager services) : Controller
             OrderAdminListQuery.Create(status, search, page, pageSize),
             cancellationToken));
 
+    /// <summary>The number of orders of every status (zero for a status without orders), for the filter of the list.</summary>
+    [HttpGet("status-counts")]
+    [ProducesResponseType<IReadOnlyList<OrderStatusCountDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<IReadOnlyList<OrderStatusCountDto>>> GetStatusCounts(CancellationToken cancellationToken) =>
+        Ok(await services.OrderAdmin.GetStatusCountsAsync(cancellationToken));
+
     /// <summary>One order with its lines, the contact and the production steps that can be taken now.</summary>
     /// <remarks>Errors: 404 order.not_found.</remarks>
     [HttpGet("{number:int}")]

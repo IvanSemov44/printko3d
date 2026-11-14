@@ -10,6 +10,14 @@ internal sealed class OrderAdminService(IRepositoryManager repositories, IOrderS
     public Task<PagedResult<OrderAdminListItemDto>> GetListAsync(OrderAdminListQuery query, CancellationToken cancellationToken) =>
         repositories.OrderQueries.GetAdminOrdersAsync(query, cancellationToken);
 
+    public async Task<IReadOnlyList<OrderStatusCountDto>> GetStatusCountsAsync(CancellationToken cancellationToken)
+    {
+        var counts = await repositories.OrderQueries.GetStatusCountsAsync(cancellationToken);
+        return Enum.GetValues<OrderStatus>()
+            .Select(status => new OrderStatusCountDto(status.ToString(), counts.GetValueOrDefault(status)))
+            .ToList();
+    }
+
     public async Task<OrderAdminDto> GetAsync(int number, CancellationToken cancellationToken) =>
         ToAdminDto(await GetOrderAsync(number, cancellationToken));
 
