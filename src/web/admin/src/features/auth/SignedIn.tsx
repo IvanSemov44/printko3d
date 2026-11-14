@@ -22,6 +22,10 @@ const SettingsPage = lazy(() =>
   import('../settings/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 );
 
+const ShippingTariffPage = lazy(() =>
+  import('../shipping/ShippingTariffPage').then((m) => ({ default: m.ShippingTariffPage })),
+);
+
 /** What the signed-in administrator sees: who is signed in, the menu and the page of the address. */
 export function SignedIn({ user }: { user: AdminUser }) {
   const apiState = useApiHealth();
@@ -58,6 +62,7 @@ export function SignedIn({ user }: { user: AdminUser }) {
       <nav aria-label={t('nav.label')}>
         <NavLink to="/products">{t('nav.products')}</NavLink>
         <NavLink to="/categories">{t('nav.categories')}</NavLink>
+        <NavLink to="/shipping">{t('nav.shipping')}</NavLink>
         <NavLink to="/settings">{t('nav.settings')}</NavLink>
       </nav>
 
@@ -71,6 +76,7 @@ export function SignedIn({ user }: { user: AdminUser }) {
             <Route path="categories" element={<CategoryListPage />} />
             <Route path="categories/new" element={<CategoryFormPage />} />
             <Route path="categories/:id" element={<CategoryFormPage />} />
+            <Route path="shipping" element={<ShippingTariffPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route
               path="*"

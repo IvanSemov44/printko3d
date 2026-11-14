@@ -367,3 +367,14 @@ input[type='color'] {
   border: 2px solid;
   border-radius: 0.25rem;
 }
+
+/* One step of the delivery tariff: a weight, a price and a button, framed so the rows are told apart. */
+.tariff-step {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 28rem;
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #57606a;
+  border-radius: 0.25rem;
+}

@@ -93,3 +93,5 @@ export { placeOrder, readOrder } from './api/orders';
 export type { Order, OrderItem, PlaceOrderInput } from './api/orders';
 export { getShippingOptions } from './api/shipping';
 export type { ShippingOptions, ShippingQuote } from './api/shipping';
+export { getShippingTariff, saveShippingTariff } from './api/adminShipping';
+export type { ShippingTariffStep } from './api/adminShipping';

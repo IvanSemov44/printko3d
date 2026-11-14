@@ -158,6 +158,14 @@ function stubApi({ signedIn }: { signedIn: boolean }) {
       if (path === '/api/v1/admin/store-settings') {
         return json(SETTINGS);
       }
+      if (path === '/api/v1/admin/shipping-tariff') {
+        return json({
+          steps: [
+            { maxWeightGrams: 1000, price: 600 },
+            { maxWeightGrams: 5000, price: 900 },
+          ],
+        });
+      }
       if (path === '/api/v1/store-settings') {
         return json({ defaultCurrency: 'EUR', defaultLocale: 'bg' });
       }
@@ -246,6 +254,14 @@ describe('accessibility of the admin panel (axe, WCAG 2.1 A and AA)', () => {
   it('has none on the settings of the store', async () => {
     const violations = await violationsOf('/settings', () =>
       screen.findByDisplayValue('Test shop'),
+    );
+
+    expect(violations).toEqual([]);
+  });
+
+  it('has none on the delivery tariff, with its steps', async () => {
+    const violations = await violationsOf('/shipping', () =>
+      screen.findByRole('group', { name: 'Стъпка 2' }),
     );
 
     expect(violations).toEqual([]);
