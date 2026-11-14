@@ -238,7 +238,11 @@ describe('settings screen', () => {
   it('refreshes the currency and language of the product forms after a currency change', async () => {
     fakeApi();
     const client = renderPage();
-    client.setQueryData(['admin', 'store-money'], { currency: 'EUR', locale: 'bg' });
+    client.setQueryData(['admin', 'store-money'], {
+      storeName: 'Принтко 3Д',
+      currency: 'EUR',
+      locale: 'bg',
+    });
     await loaded();
 
     type('Валута', 'BGN');
@@ -249,6 +253,7 @@ describe('settings screen', () => {
 
     await waitFor(() => {
       expect(client.getQueryData(['admin', 'store-money'])).toEqual({
+        storeName: 'Принтко 3Д',
         currency: 'BGN',
         locale: 'bg',
       });

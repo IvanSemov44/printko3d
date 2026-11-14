@@ -43,7 +43,19 @@ describe('admin store settings API', () => {
     const money = await getStoreMoneySettings();
 
     expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/v1/store-settings');
-    expect(money).toEqual({ currency: 'EUR', locale: 'bg' });
+    expect(money).toEqual({ storeName: 'Принтко 3Д', currency: 'EUR', locale: 'bg' });
+  });
+
+  it('still reads the prices when the answer has no name of the shop', async () => {
+    const withoutName: Record<string, unknown> = { ...DTO };
+    delete withoutName.storeName;
+    stubFetch(Response.json(withoutName));
+
+    await expect(getStoreMoneySettings()).resolves.toEqual({
+      storeName: '',
+      currency: 'EUR',
+      locale: 'bg',
+    });
   });
 
   it('reads the settings from the admin address and turns the version into a number', async () => {

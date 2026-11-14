@@ -29,11 +29,17 @@ export function App() {
   } else if (session.data === null) {
     content = <LoginForm />;
   } else {
-    content = <SignedIn user={session.data} />;
+    // The signed-in panel has its own frame (side panel and content).
+    return (
+      <>
+        <title>{t('app.title')}</title>
+        <SignedIn user={session.data} />
+      </>
+    );
   }
 
   return (
-    <main>
+    <main className="narrow">
       <title>{t('app.title')}</title>
       <h1>{t('app.title')}</h1>
       {content}

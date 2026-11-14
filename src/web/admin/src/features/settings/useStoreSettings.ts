@@ -32,6 +32,7 @@ export function useSaveStoreSettings() {
     onSuccess: (saved: AdminStoreSettings) => {
       queryClient.setQueryData(SETTINGS_KEY, saved);
       queryClient.setQueryData(STORE_MONEY_KEY, {
+        storeName: saved.storeName,
         currency: saved.defaultCurrency,
         locale: saved.defaultLocale,
       });

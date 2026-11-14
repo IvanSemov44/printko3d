@@ -1,8 +1,10 @@
 import { apiRequest, apiSend } from './http';
 import { field, readBoolean, readInteger, readNullable, readObject, readString } from './decode';
 
-/** The two settings the admin forms need to show and read prices. */
+/** The settings the admin panel needs to show and read prices, and the name of the shop for the menu. */
 export interface StoreMoneySettings {
+  /** For display only: empty when the answer has none, so a missing name never blocks the prices. */
+  storeName: string;
   currency: string;
   locale: string;
 }
@@ -17,6 +19,7 @@ export async function getStoreMoneySettings(signal?: AbortSignal): Promise<Store
     'storeSettings',
   );
   return {
+    storeName: typeof object.storeName === 'string' ? object.storeName : '',
     currency: field(object, 'defaultCurrency', readString, 'storeSettings'),
     locale: field(object, 'defaultLocale', readString, 'storeSettings'),
   };
