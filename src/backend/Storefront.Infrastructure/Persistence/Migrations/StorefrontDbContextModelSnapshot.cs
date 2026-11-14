@@ -694,6 +694,10 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("status");
 
+                    b.Property<DateTimeOffset?>("StockReleasedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("stock_released_at");
+
                     b.Property<DateTimeOffset>("TermsAcceptedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("terms_accepted_at");

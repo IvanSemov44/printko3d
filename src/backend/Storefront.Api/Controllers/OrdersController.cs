@@ -24,7 +24,8 @@ public sealed class OrdersController(IServiceManager services) : ControllerBase
     /// <remarks>
     /// Errors: 400 validation.failed (a field is missing or wrong, or the terms are not accepted; the fields are named),
     /// 403 csrf.header_required, 409 order.total_changed (the cart is worth something else than `expectedTotal`: read the cart
-    /// and ask again), 409 cart.changed (the cart was changed at the same moment: read it and try again),
+    /// and ask again), 409 order.stock_changed (someone took the last pieces at the same moment: read the cart and
+    /// check it), 409 cart.changed (the cart was changed at the same moment: read it and try again),
     /// 422 order.cart_empty (no cart, an unknown cookie, or no lines), 422 order.cart_not_orderable (a line is archived,
     /// inactive or over the stock: remove it from the cart).
     /// </remarks>

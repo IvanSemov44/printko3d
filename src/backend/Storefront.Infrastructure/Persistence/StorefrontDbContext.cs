@@ -35,6 +35,9 @@ public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> op
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
+    /// <summary>The time the stamps use, for writes that bypass the change tracker (ExecuteUpdate).</summary>
+    public DateTimeOffset Now => timeProvider.GetUtcNow();
+
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
         StampEntities();

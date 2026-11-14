@@ -4,6 +4,7 @@ using Storefront.Application.Carts;
 using Storefront.Application.Carts.Queries;
 using Storefront.Application.Contracts;
 using Storefront.Application.Exceptions;
+using Storefront.Domain.Catalog;
 using Storefront.Domain.Orders;
 
 namespace Storefront.Application.Orders;
@@ -82,15 +83,59 @@ internal sealed partial class OrderService(
             }).ToList(),
         };
 
-        // The order and the removal of the lines are one save. A second order made from the same cart at the same
-        // moment deletes lines that are already gone, which the database reports; it is translated to cart.changed.
+        // The order, the removal of the lines and the stock are one transaction: if any part fails, nothing stays.
+        // A second order made from the same cart at the same moment deletes lines that are already gone, which the
+        // database reports; it is translated to cart.changed, and the stock it took goes back with the rollback.
+        await using var transaction = await repositories.BeginTransactionAsync(cancellationToken);
+        await TakeStockAsync(order, cancellationToken);
         repositories.Order.Create(order);
         repositories.Cart.RemoveItems(cart);
         repositories.Cart.Touch(cart);
         await repositories.SaveAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
 
         return ToDto(order);
     }
+
+    /// <summary>
+    /// Takes the stock of every line that is in stock, in the order of the variant ids, so that two orders with the same
+    /// lines never wait for each other in a circle. The statement is conditional: if someone took the piece between the
+    /// cart check and now, it refuses and the transaction goes back.
+    /// </summary>
+    private async Task TakeStockAsync(Order order, CancellationToken cancellationToken)
+    {
+        foreach (var item in StockLines(order))
+        {
+            if (!await repositories.Product.TryTakeStockAsync(item.VariantId, item.Quantity, cancellationToken))
+            {
+                throw new ConflictException(
+                    "Someone else took the last pieces at the same moment. Open the cart and check it.",
+                    OrderErrorCodes.StockChanged);
+            }
+        }
+    }
+
+    public async Task ReleaseStockAsync(Guid orderId, CancellationToken cancellationToken)
+    {
+        var order = await repositories.Order.GetByIdAsync(orderId, trackChanges: false, cancellationToken)
+            ?? throw new NotFoundException($"Order {orderId} was not found.", "order.not_found");
+
+        await using var transaction = await repositories.BeginTransactionAsync(cancellationToken);
+        if (!await repositories.Order.TryMarkStockReleasedAsync(orderId, cancellationToken))
+        {
+            return;
+        }
+
+        foreach (var item in StockLines(order))
+        {
+            await repositories.Product.ReturnStockAsync(item.VariantId, item.Quantity, cancellationToken);
+        }
+
+        await transaction.CommitAsync(cancellationToken);
+    }
+
+    private static IEnumerable<OrderItem> StockLines(Order order) =>
+        order.Items.Where(i => i.FulfilmentType == FulfilmentType.InStock).OrderBy(i => i.VariantId);
 
     // A clash of two random numbers is rare; the unique index is the guard and this loop is the polite path.
     private async Task<int> FreeNumberAsync(CancellationToken cancellationToken)
