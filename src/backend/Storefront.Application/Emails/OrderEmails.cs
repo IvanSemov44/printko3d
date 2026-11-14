@@ -32,6 +32,24 @@ internal static class OrderEmails
         ["address"] = $"{order.ShippingStreet}, {order.ShippingPostalCode} {order.ShippingCity}",
     });
 
+    /// <summary>
+    /// The email to the administrator about a new order (task 28c). It holds the number, the sum, the count of lines and the
+    /// link to the order in the panel, and nothing that the buyer typed: the name, the email, the phone and the address are
+    /// read in the panel, behind the sign-in.
+    /// </summary>
+    public static EmailMessage NewOrderForAdmin(Order order, string toAddress, string adminUrl)
+    {
+        var (subject, body) = EmailTexts.Default.Message("adminNewOrder");
+        var values = new Dictionary<string, string>
+        {
+            ["number"] = order.Number.ToString(CultureInfo.InvariantCulture),
+            ["total"] = Money(order.TotalAmount, order.Currency),
+            ["lineCount"] = order.Items.Count.ToString(CultureInfo.InvariantCulture),
+            ["link"] = $"{adminUrl.TrimEnd('/')}/orders/{order.Number.ToString(CultureInfo.InvariantCulture)}",
+        };
+        return new EmailMessage(toAddress, EmailTexts.Fill(subject, values), EmailTexts.Fill(body, values));
+    }
+
     /// <summary>The address of the page "My order" for this order. The token is the key, so the link is private to the buyer.</summary>
     public static string Link(Order order, string storefrontUrl) =>
         $"{storefrontUrl.TrimEnd('/')}/my-order?token={Uri.EscapeDataString(order.AccessToken ?? string.Empty)}";

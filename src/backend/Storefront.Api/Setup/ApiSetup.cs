@@ -99,7 +99,7 @@ internal static class ApiSetup
             })
             .Validate(
                 OrderOptions.IsValid,
-                "Checkout is not valid: TermsVersion must be 1 to 50 characters, StorefrontUrl an http(s) address, "
+                "Checkout is not valid: TermsVersion must be 1 to 50 characters, StorefrontUrl and AdminUrl http(s) addresses, "
                 + "LookupAttemptsPerMinute and PlaceAttemptsPerMinute 1 to 1000, LookupFailuresPerOrder 1 to 100 and LookupFailureWindowMinutes 1 to 1440.")
             .ValidateOnStart();
         builder.Services.AddSingleton(services => services.GetRequiredService<IOptions<OrderOptions>>().Value);
