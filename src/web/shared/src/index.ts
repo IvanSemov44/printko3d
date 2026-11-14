@@ -91,6 +91,8 @@ export { addCartItem, clearCart, getCart, removeCartItem, setCartItemQuantity } 
 export type { Cart, CartLine, CartLineImage, CartLineState } from './api/cart';
 export { placeOrder, readOrder } from './api/orders';
 export type { Order, OrderItem, PlaceOrderInput } from './api/orders';
+export { completeTestPayment, getPaymentMode, getPaymentState, startPayment } from './api/payments';
+export type { PaymentSession, PaymentState, TestPaymentOutcome } from './api/payments';
 export { getShippingOptions } from './api/shipping';
 export type { ShippingOptions, ShippingQuote } from './api/shipping';
 export { getShippingTariff, saveShippingTariff } from './api/adminShipping';

@@ -44,7 +44,7 @@ export interface OrderItem {
 /** An order as it was placed. Its number is random and is shown as `PR-` and the digits. */
 export interface Order {
   number: number;
-  /** Only `New` exists for now; more come with payment and the statuses (tasks 26 and 27). */
+  /** `New`, `Paid` or `Cancelled`; the other statuses come with task 27. */
   status: string;
   currency: string;
   /** The lines plus `shippingAmount`. */
@@ -60,6 +60,8 @@ export interface Order {
   shippingPostalCode: string;
   shippingCountry: string;
   createdAt: string;
+  /** The last moment to pay, or null for an order made before payment existed (decision 0035). */
+  paymentDueAt: string | null;
   items: OrderItem[];
 }
 
@@ -95,6 +97,7 @@ export function readOrder(value: unknown): Order {
     shippingPostalCode: field(object, 'shippingPostalCode', readString, 'order'),
     shippingCountry: field(object, 'shippingCountry', readString, 'order'),
     createdAt: field(object, 'createdAt', readString, 'order'),
+    paymentDueAt: field(object, 'paymentDueAt', readNullable(readString), 'order'),
     items: field(object, 'items', readArray(readItem), 'order'),
   };
 }
