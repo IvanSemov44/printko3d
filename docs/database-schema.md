@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261113115533_AddOrders`
+Последна миграция: `20261113145451_AddOrderStockReleasedAt`
 
 ## Връзки
 
@@ -337,6 +337,7 @@ erDiagram
 | terms_accepted_at | timestamp with time zone | не |  |
 | created_at | timestamp with time zone | не |  |
 | updated_at | timestamp with time zone | не |  |
+| stock_released_at | timestamp with time zone | да |  |
 
 **Ограничения**
 

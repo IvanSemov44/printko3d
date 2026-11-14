@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Storefront.Application.Exceptions;
+using Storefront.Application.Orders;
 
 namespace Storefront.Api.Errors;
 
 /// <summary>Turns the known Application exceptions into ProblemDetails. Anything else stays a generic 500.</summary>
-internal sealed class ApiExceptionHandler(IProblemDetailsService problemDetails) : IExceptionHandler
+internal sealed class ApiExceptionHandler(IProblemDetailsService problemDetails, ILogger<ApiExceptionHandler> logger)
+    : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
@@ -31,6 +33,12 @@ internal sealed class ApiExceptionHandler(IProblemDetailsService problemDetails)
         if (details is null)
         {
             return false;
+        }
+
+        if (exception is ConflictException { Code: OrderErrorCodes.StockChanged })
+        {
+            // Counted from the journal; nothing about the buyer or the cart is written.
+            logger.LogInformation("An order was refused because the stock changed at the same moment.");
         }
 
         httpContext.Response.StatusCode = details.Status!.Value;

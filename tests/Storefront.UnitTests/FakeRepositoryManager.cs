@@ -50,6 +50,9 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
     // Orders are tested against a real database (OrderServiceDatabaseTests); no unit test places one.
     public IOrderRepository Order => throw new NotSupportedException("The unit tests do not place orders.");
 
+    public Task<IRepositoryTransaction> BeginTransactionAsync(CancellationToken cancellationToken) =>
+        throw new NotSupportedException("Transactions are covered by the database tests.");
+
     public FakeRepositoryManager() => _cartQueries = new FakeCartQueries(_cart);
 
 
@@ -203,6 +206,12 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
         public Task<Product?> GetByIdAsync(Guid id, bool trackChanges, CancellationToken cancellationToken) =>
             Task.FromResult(Items.SingleOrDefault(p => p.Id == id));
+
+        public Task<bool> TryTakeStockAsync(Guid variantId, int quantity, CancellationToken cancellationToken) =>
+            throw new NotSupportedException("Stock is covered by the database tests.");
+
+        public Task ReturnStockAsync(Guid variantId, int quantity, CancellationToken cancellationToken) =>
+            throw new NotSupportedException("Stock is covered by the database tests.");
 
         public void RemoveImage(ProductImage image)
         {

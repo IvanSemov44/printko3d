@@ -17,4 +17,7 @@ public interface IRepositoryManager
     ICatalogQueries Catalog { get; }
 
     Task SaveAsync(CancellationToken cancellationToken);
+
+    /// <summary>Starts a transaction for writes that must succeed or fail together, such as an order and its stock.</summary>
+    Task<IRepositoryTransaction> BeginTransactionAsync(CancellationToken cancellationToken);
 }

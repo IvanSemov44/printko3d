@@ -93,7 +93,7 @@ export function readOrder(value: unknown): Order {
 
 /**
  * Turns the cart of the cookie into an order. The server reads the prices again and empties the cart.
- * A refusal is an ApiError: 400 `validation.failed` (with the fields), 409 `order.total_changed` or `cart.changed`,
+ * A refusal is an ApiError: 400 `validation.failed` (with the fields), 409 `order.total_changed`, `order.stock_changed` or `cart.changed`,
  * 422 `order.cart_empty` or `order.cart_not_orderable`.
  */
 export async function placeOrder(input: PlaceOrderInput, signal?: AbortSignal): Promise<Order> {

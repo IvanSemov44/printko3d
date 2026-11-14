@@ -259,6 +259,11 @@ describe('checkout page', () => {
       422,
       'Някой артикул вече не може да се поръча. Провери количката и го махни.',
     ],
+    [
+      'order.stock_changed',
+      409,
+      'Последните бройки от някой артикул току-що бяха взети от друг купувач. Провери количката и поръчай пак.',
+    ],
     ['cart.changed', 409, 'Количката се промени в същия момент. Опитай пак.'],
   ])('answers %s with a notice, a way to the cart and a fresh cart', async (code, status, text) => {
     const server = fakeServer({ initial: LINES });

@@ -31,6 +31,9 @@ internal sealed class RepositoryManager(StorefrontDbContext context) : IReposito
 
     public IOrderRepository Order => _order.Value;
 
+    public async Task<IRepositoryTransaction> BeginTransactionAsync(CancellationToken cancellationToken) =>
+        new RepositoryTransaction(await context.Database.BeginTransactionAsync(cancellationToken));
+
     public async Task SaveAsync(CancellationToken cancellationToken)
     {
         try
