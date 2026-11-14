@@ -17,6 +17,13 @@ public sealed class OrderOptions
     /// </summary>
     public string StorefrontUrl { get; set; } = "http://localhost:5173";
 
+    /// <summary>
+    /// The address of the admin panel, for the link in the email to the administrator about a new order (for example
+    /// <c>https://admin.shop.example</c>). The default is the local address of Docker Compose; the real one is set per
+    /// environment (task 33).
+    /// </summary>
+    public string AdminUrl { get; set; } = "http://localhost:5174";
+
     /// <summary>Requests a client may make to see an order in a minute (decision 0036, debt D64).</summary>
     public int LookupAttemptsPerMinute { get; set; } = 20;
 
@@ -33,6 +40,8 @@ public sealed class OrderOptions
         options.TermsVersion.Length is > 0 and <= 50
         && Uri.TryCreate(options.StorefrontUrl, UriKind.Absolute, out var url)
         && url.Scheme is "http" or "https"
+        && Uri.TryCreate(options.AdminUrl, UriKind.Absolute, out var adminUrl)
+        && adminUrl.Scheme is "http" or "https"
         && options.LookupAttemptsPerMinute is >= 1 and <= 1000
         && options.PlaceAttemptsPerMinute is >= 1 and <= 1000
         && options.LookupFailuresPerOrder is >= 1 and <= 100

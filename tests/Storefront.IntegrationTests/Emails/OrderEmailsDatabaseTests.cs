@@ -16,7 +16,11 @@ public sealed class OrderEmailsDatabaseTests(PostgresFixture postgres)
     private static async Task<List<OutgoingEmail>> QueueAsync(Setup setup)
     {
         await using var context = setup.Database.CreateContext();
-        return await context.OutgoingEmails.AsNoTracking().OrderBy(e => e.CreatedAt).ToListAsync();
+        // The emails to the buyer. The one to the administrator about a new order is tested in AdminNewOrderEmailDatabaseTests.
+        return await context.OutgoingEmails.AsNoTracking()
+            .Where(e => e.ToAddress == "buyer@example.com")
+            .OrderBy(e => e.CreatedAt)
+            .ToListAsync();
     }
 
     private static async Task PayAsync(Setup setup, Storefront.Application.Orders.OrderDto order)

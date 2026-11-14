@@ -50,6 +50,10 @@ public sealed class ServiceManager(
 
     private readonly Lazy<IOrderStatusService> _orderStatuses = new(() => new OrderStatusService(repositories, orderOptions ?? new OrderOptions()));
 
+    private readonly Lazy<IOrderAdminService> _orderAdmin = new(() => new OrderAdminService(
+        repositories,
+        new OrderStatusService(repositories, orderOptions ?? new OrderOptions())));
+
     private readonly Lazy<IShippingService> _shipping = new(() => new ShippingService(
         repositories,
         shippingProvider ?? new NoShippingProvider()));
@@ -77,4 +81,6 @@ public sealed class ServiceManager(
     public IOrderStatusService OrderStatuses => _orderStatuses.Value;
 
     public IOrderLookupService OrderLookup => _orderLookup.Value;
+
+    public IOrderAdminService OrderAdmin => _orderAdmin.Value;
 }

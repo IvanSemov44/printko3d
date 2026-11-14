@@ -14,6 +14,8 @@ public interface IRepositoryManager
 
     IOrderRepository Order { get; }
 
+    IOrderQueries OrderQueries { get; }
+
     IShippingRateRepository ShippingRates { get; }
 
     IPaymentRepository Payments { get; }

@@ -100,6 +100,13 @@ internal sealed partial class OrderService(
         repositories.Order.Create(order);
         // The email is queued in the same transaction: an order that is saved always has its email, and one that fails has none.
         repositories.OutgoingEmails.Enqueue(OrderEmails.Placed(order, options.StorefrontUrl));
+        // The administrator is told in the same transaction. With no contact address in the settings nobody is told: the
+        // order still stands, and it is in the list of the panel.
+        if (!string.IsNullOrWhiteSpace(settings.ContactEmail))
+        {
+            repositories.OutgoingEmails.Enqueue(OrderEmails.NewOrderForAdmin(order, settings.ContactEmail, options.AdminUrl));
+        }
+
         repositories.Cart.RemoveItems(cart);
         repositories.Cart.Touch(cart);
         await repositories.SaveAsync(cancellationToken);

@@ -49,6 +49,8 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
     public Exception? SaveFailure { get; set; }
 
     // Orders are tested against a real database (OrderServiceDatabaseTests); no unit test places one.
+    public IOrderQueries OrderQueries => throw new NotSupportedException("The list of orders is tested against a real database.");
+
     public IOrderRepository Order => throw new NotSupportedException("The unit tests do not place orders.");
 
     // Payments are tested against a real database (PaymentServiceDatabaseTests).

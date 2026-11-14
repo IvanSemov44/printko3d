@@ -139,3 +139,6 @@ export async function findOrder(
 export async function findOrderByToken(token: string, signal?: AbortSignal): Promise<Order> {
   return readOrder(await apiSend('POST', '/api/v1/orders/lookup-by-token', { token }, signal));
 }
+
+/** One of the seven statuses of an order. */
+export type OrderStatus = (typeof ORDER_STATUSES)[number];

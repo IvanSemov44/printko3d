@@ -22,6 +22,13 @@ const SettingsPage = lazy(() =>
   import('../settings/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 );
 
+const OrderListPage = lazy(() =>
+  import('../orders/OrderListPage').then((m) => ({ default: m.OrderListPage })),
+);
+const OrderDetailPage = lazy(() =>
+  import('../orders/OrderDetailPage').then((m) => ({ default: m.OrderDetailPage })),
+);
+
 const ShippingTariffPage = lazy(() =>
   import('../shipping/ShippingTariffPage').then((m) => ({ default: m.ShippingTariffPage })),
 );
@@ -62,6 +69,7 @@ export function SignedIn({ user }: { user: AdminUser }) {
       <nav aria-label={t('nav.label')}>
         <NavLink to="/products">{t('nav.products')}</NavLink>
         <NavLink to="/categories">{t('nav.categories')}</NavLink>
+        <NavLink to="/orders">{t('nav.orders')}</NavLink>
         <NavLink to="/shipping">{t('nav.shipping')}</NavLink>
         <NavLink to="/settings">{t('nav.settings')}</NavLink>
       </nav>
@@ -76,6 +84,8 @@ export function SignedIn({ user }: { user: AdminUser }) {
             <Route path="categories" element={<CategoryListPage />} />
             <Route path="categories/new" element={<CategoryFormPage />} />
             <Route path="categories/:id" element={<CategoryFormPage />} />
+            <Route path="orders" element={<OrderListPage />} />
+            <Route path="orders/:number" element={<OrderDetailPage />} />
             <Route path="shipping" element={<ShippingTariffPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route
