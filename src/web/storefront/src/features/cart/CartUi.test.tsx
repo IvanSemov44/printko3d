@@ -214,7 +214,9 @@ describe('cart in the shop', () => {
       expect(plain(panel.querySelector('.cart-subtotal strong')?.textContent ?? '')).toContain(
         '45,00',
       );
-      expect(within(panel).getByText('Доставката се изчислява при плащане.')).toBeInTheDocument();
+      expect(
+        within(panel).getByText('Цената на доставката се вижда при поръчка.'),
+      ).toBeInTheDocument();
       expect(within(panel).getByRole('link', { name: 'Виж количката' })).toHaveAttribute(
         'href',
         '/cart',

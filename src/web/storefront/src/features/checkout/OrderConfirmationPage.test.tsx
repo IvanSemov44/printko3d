@@ -10,6 +10,7 @@ import {
   findContent,
   renderApp,
   settingsFixture,
+  shippingFixture,
   stubNetwork,
 } from '../../testing/renderApp';
 import { plain } from '../../testing/text';
@@ -21,6 +22,7 @@ function stub(server = fakeServer(), orders?: () => Response) {
     settings: () => Response.json(settingsFixture()),
     categories: () => Response.json(categoriesFixture()),
     cart: server.cart,
+    shipping: () => Response.json(shippingFixture({ itemsTotal: 2500 })),
     ...(orders ? { orders } : {}),
   });
 }
@@ -65,7 +67,7 @@ describe('order confirmation page', () => {
             leadTimeDays: 7,
           },
         ],
-        total: 4500,
+        total: 5100,
       }),
     });
 
@@ -77,8 +79,10 @@ describe('order confirmation page', () => {
     expect(within(page).getByText('Dragon')).toBeInTheDocument();
     expect(within(page).getByText(/По поръчка · 7 дни/)).toBeInTheDocument();
     expect(plain(page.querySelector('.checkout-total strong')?.textContent ?? '')).toContain(
-      '45,00',
+      '51,00',
     );
+    // The delivery is a row of its own, named by the code it was copied with.
+    expect(within(page).getByText('До адрес').closest('p')).toHaveTextContent('6,00');
     expect(within(page).getByText('Test Buyer')).toBeInTheDocument();
     expect(within(page).getByText(/1 Test Street/)).toBeInTheDocument();
     expect(within(page).getByText(/Плащането още не е включено/)).toBeInTheDocument();

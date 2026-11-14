@@ -152,6 +152,11 @@ export function cartFixture(lines: Record<string, unknown>[] = []) {
   };
 }
 
+/** What delivery costs for a cart worth 4500: one method, 600. The sums are the server's, so a test says them. */
+export function shippingFixture(overrides: Record<string, unknown> = {}) {
+  return { itemsTotal: 4500, methods: [{ code: 'address', amount: 600 }], ...overrides };
+}
+
 export type Responder = () => Response | Promise<Response>;
 
 /** Fakes the network at the HTTP boundary: /config.json plus the API paths. Products get the parsed request address. */
@@ -165,6 +170,8 @@ export function stubNetwork(routes: {
   cart?: (url: string, init?: RequestInit) => Response | Promise<Response>;
   /** Gets every request to /api/v1/orders. Without it a test that never places an order fails loudly if one is sent. */
   orders?: (url: string, init?: RequestInit) => Response | Promise<Response>;
+  /** Gets every request to /api/v1/shipping. Without it a test that never prices a delivery fails loudly if one is sent. */
+  shipping?: (url: string, init?: RequestInit) => Response | Promise<Response>;
   /** Extra fields for /config.json, for example imageBaseUrl. */
   config?: Record<string, unknown>;
 }) {
@@ -177,6 +184,9 @@ export function stubNetwork(routes: {
     }
     if (routes.orders && url.startsWith('/api/v1/orders')) {
       return Promise.resolve(routes.orders(url, init));
+    }
+    if (routes.shipping && url.startsWith('/api/v1/shipping')) {
+      return Promise.resolve(routes.shipping(url, init));
     }
     if (url === 'http://api.test/api/v1/store-settings') {
       return Promise.resolve(routes.settings());

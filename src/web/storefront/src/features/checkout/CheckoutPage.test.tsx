@@ -9,6 +9,7 @@ import {
   findContent,
   renderApp,
   settingsFixture,
+  shippingFixture,
   stubNetwork,
 } from '../../testing/renderApp';
 import { orderFixture } from '../../testing/orderFixture';
@@ -32,11 +33,16 @@ const LINES = [
 
 type OrdersHandler = (url: string, init?: RequestInit) => Response | Promise<Response>;
 
-function stub(server: ReturnType<typeof fakeServer>, orders?: OrdersHandler) {
+function stub(
+  server: ReturnType<typeof fakeServer>,
+  orders?: OrdersHandler,
+  shipping: OrdersHandler = () => Response.json(shippingFixture()),
+) {
   return stubNetwork({
     settings: () => Response.json(settingsFixture()),
     categories: () => Response.json(categoriesFixture()),
     cart: server.cart,
+    shipping,
     ...(orders ? { orders } : {}),
   });
 }
@@ -76,11 +82,19 @@ async function fill(
   }
 }
 
-async function openCheckout(server = fakeServer({ initial: LINES }), orders?: OrdersHandler) {
-  stub(server, orders);
+async function openCheckout(
+  server = fakeServer({ initial: LINES }),
+  orders?: OrdersHandler,
+  shipping?: OrdersHandler,
+) {
+  stub(server, orders, shipping);
   renderApp('/checkout');
   await screen.findByRole('heading', { level: 1, name: 'Поръчка' });
   await screen.findByRole('button', { name: 'Потвърди поръчката' });
+  if (shipping === undefined) {
+    // The price of the delivery is read after the cart; the buyer can order only once it is there.
+    await screen.findByRole('radio', { name: /До адрес/ });
+  }
 }
 
 const acceptTerms = (user: ReturnType<typeof userEvent.setup>) =>
@@ -117,10 +131,107 @@ describe('checkout page', () => {
     expect(
       within(page).getByText('Част от поръчката се изработва след плащане.'),
     ).toBeInTheDocument();
+    // 45,00 for the lines and 6,00 for the delivery.
     expect(plain(page.querySelector('.checkout-total strong')?.textContent ?? '')).toContain(
-      '45,00',
+      '51,00',
     );
     expect(within(page).queryByRole('button', { name: /Махни|Изчисти/ })).not.toBeInTheDocument();
+  });
+
+  it('shows the delivery with its price, chosen, and adds it to the total as its own row', async () => {
+    await openCheckout();
+
+    const page = await findContent();
+    expect(within(page).getByRole('radio', { name: /До адрес/ })).toBeChecked();
+    expect(within(page).getByRole('radio', { name: /До адрес/ })).toHaveAccessibleName(/6,00/);
+    const row = (label: string) => within(page).getByText(label, { selector: 'span' }).closest('p');
+    expect(row('Артикули')).toHaveTextContent('45,00');
+    expect(row('Доставка')).toHaveTextContent('6,00');
+    expect(row('Общо')).toHaveTextContent('51,00');
+  });
+
+  it('asks for the price of the delivery once, for the cart of the buyer', async () => {
+    const shipping = vi.fn<OrdersHandler>(() => Response.json(shippingFixture()));
+    await openCheckout(fakeServer({ initial: LINES }), undefined, shipping);
+    await screen.findByRole('radio', { name: /До адрес/ });
+
+    expect(shipping).toHaveBeenCalledTimes(1);
+    expect(shipping.mock.calls[0]?.[0]).toBe('/api/v1/shipping/quotes');
+  });
+
+  it('does not let the buyer order before the price of the delivery is there', async () => {
+    const orders = vi.fn<OrdersHandler>();
+    const user = userEvent.setup();
+    await openCheckout(
+      fakeServer({ initial: LINES }),
+      orders,
+      () => new Promise<Response>(() => undefined),
+    );
+    await fill(user);
+    await acceptTerms(user);
+
+    await submit(user);
+
+    expect(screen.getByText('Цената на доставката се зарежда…')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Потвърди поръчката' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(ordersSent(orders)).toBe(0);
+  });
+
+  it('says that the cart is too heavy to deliver, with a way to the cart, and sends nothing', async () => {
+    const orders = vi.fn<OrdersHandler>();
+    const user = userEvent.setup();
+    await openCheckout(fakeServer({ initial: LINES }), orders, () =>
+      problem(422, 'shipping.too_heavy'),
+    );
+    await fill(user);
+    await acceptTerms(user);
+
+    await submit(user);
+
+    const notice = await screen.findByRole('alert');
+    expect(notice).toHaveTextContent('Количката е твърде тежка за доставка');
+    expect(within(notice).getByRole('link', { name: 'Към количката' })).toHaveAttribute(
+      'href',
+      '/cart',
+    );
+    expect(ordersSent(orders)).toBe(0);
+  });
+
+  it('offers a retry when the price of the delivery cannot be read, and does not show what the server said', async () => {
+    let calls = 0;
+    const shipping = vi.fn<OrdersHandler>(() => {
+      calls += 1;
+      return calls === 1
+        ? problem(500, 'internal.secret_detail')
+        : Response.json(shippingFixture());
+    });
+    const user = userEvent.setup();
+    await openCheckout(fakeServer({ initial: LINES }), undefined, shipping);
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Цената на доставката не можа да се зареди.');
+    expect(alert).not.toHaveTextContent('secret_detail');
+    await user.click(within(alert).getByRole('button', { name: 'Опитай пак' }));
+
+    expect(await screen.findByRole('radio', { name: /До адрес/ })).toBeChecked();
+  });
+
+  it('says so, and does not let the buyer order, when no delivery is offered', async () => {
+    const orders = vi.fn<OrdersHandler>();
+    const user = userEvent.setup();
+    await openCheckout(fakeServer({ initial: LINES }), orders, () =>
+      Response.json(shippingFixture({ methods: [] })),
+    );
+    await fill(user);
+    await acceptTerms(user);
+
+    await submit(user);
+
+    expect(await screen.findByText(/Доставка в момента не се предлага/)).toBeInTheDocument();
+    expect(ordersSent(orders)).toBe(0);
   });
 
   it('is kept out of search results and has its own title', async () => {
@@ -197,7 +308,8 @@ describe('checkout page', () => {
       city: 'Sofia',
       postalCode: '1000',
       termsAccepted: true,
-      expectedTotal: 4500,
+      shippingMethod: 'address',
+      expectedTotal: 5100,
     });
   });
 
@@ -265,6 +377,12 @@ describe('checkout page', () => {
       'Последните бройки от някой артикул току-що бяха взети от друг купувач. Провери количката и поръчай пак.',
     ],
     ['cart.changed', 409, 'Количката се промени в същия момент. Опитай пак.'],
+    ['order.shipping_unavailable', 422, 'Избраната доставка вече не е налична. Избери отново.'],
+    [
+      'shipping.too_heavy',
+      422,
+      'Пратката е твърде тежка за доставка. Намали количеството в количката.',
+    ],
   ])('answers %s with a notice, a way to the cart and a fresh cart', async (code, status, text) => {
     const server = fakeServer({ initial: LINES });
     const orders = vi.fn<OrdersHandler>(() => problem(status, code));
@@ -280,7 +398,7 @@ describe('checkout page', () => {
     expect(notice).toHaveTextContent(text);
     // The buyer stays on the page: it is still the address the test opened.
     expect(location()).toBe('/checkout POP');
-    if (code !== 'cart.changed') {
+    if (code !== 'cart.changed' && code !== 'order.shipping_unavailable') {
       expect(within(notice).getByRole('link', { name: 'Към количката' })).toHaveAttribute(
         'href',
         '/cart',
@@ -342,14 +460,16 @@ describe('checkout page', () => {
     expect(screen.getByLabelText('Име и фамилия')).toHaveValue('Test Buyer');
   });
 
-  it('does not let a buyer order a line that is no longer sold', async () => {
+  it('does not let a buyer order a line that is no longer sold, and does not price its delivery', async () => {
     const orders = vi.fn<OrdersHandler>();
+    const shipping = vi.fn<OrdersHandler>();
     const user = userEvent.setup();
     await openCheckout(
       fakeServer({
         initial: [LINES[0] ?? {}, cartLineFixture({ variantId: 'v3', state: 'Archived' })],
       }),
       orders,
+      shipping,
     );
     await fill(user);
     await acceptTerms(user);
@@ -360,6 +480,7 @@ describe('checkout page', () => {
       screen.getByText('Някой артикул не може да се поръча. Върни се в количката и го махни.'),
     ).toBeInTheDocument();
     expect(ordersSent(orders)).toBe(0);
+    expect(shipping).not.toHaveBeenCalled();
   });
 
   it('has no accessibility violations, with the form empty and with errors shown', async () => {

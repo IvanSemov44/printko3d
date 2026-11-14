@@ -91,3 +91,5 @@ export { addCartItem, clearCart, getCart, removeCartItem, setCartItemQuantity } 
 export type { Cart, CartLine, CartLineImage, CartLineState } from './api/cart';
 export { placeOrder, readOrder } from './api/orders';
 export type { Order, OrderItem, PlaceOrderInput } from './api/orders';
+export { getShippingOptions } from './api/shipping';
+export type { ShippingOptions, ShippingQuote } from './api/shipping';

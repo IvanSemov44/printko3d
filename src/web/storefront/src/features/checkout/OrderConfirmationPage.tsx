@@ -2,6 +2,7 @@ import { formatMoney, readOrder, type Order } from '@storefront/shared';
 import { Link, useLocation, useParams } from 'react-router';
 import { describeAvailability } from '../../components/availability';
 import { PageMeta } from '../seo/PageMeta';
+import { shippingMethodNameKey } from './shippingMethodName';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 
 /**
@@ -80,6 +81,12 @@ export function OrderConfirmationPage() {
               </li>
             ))}
           </ul>
+          {order.shippingMethod !== '' && (
+            <p className="cart-subtotal">
+              <span>{t(shippingMethodNameKey(order.shippingMethod))}</span>
+              <span>{money(order.shippingAmount)}</span>
+            </p>
+          )}
           <p className="cart-subtotal checkout-total">
             <span>{t('checkout.total')}</span>
             <strong>{money(order.total)}</strong>
