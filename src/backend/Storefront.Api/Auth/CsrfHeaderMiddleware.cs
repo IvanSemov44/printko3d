@@ -13,7 +13,9 @@ internal static class CsrfHeaderMiddleware
     public static IApplicationBuilder UseCsrfHeaderCheck(this IApplicationBuilder app) =>
         app.Use(async (context, next) =>
         {
-            if (ChangesData(context.Request.Method) && !context.Request.Headers.ContainsKey(HeaderName))
+            if (ChangesData(context.Request.Method)
+                && !context.Request.Headers.ContainsKey(HeaderName)
+                && !IsProviderMessage(context.Request))
             {
                 var problem = ApiProblems.Create(
                     StatusCodes.Status403Forbidden, "Forbidden", detail: null, code: "csrf.header_required");
@@ -25,6 +27,16 @@ internal static class CsrfHeaderMiddleware
 
             await next(context);
         });
+
+    /// <summary>
+    /// The one known exception (decision 0035): the payment provider cannot send the header, so its address is protected by
+    /// the signature of the message instead. Nothing else is exempt, and a signature that is not right changes nothing.
+    /// </summary>
+    internal const string ProviderMessagePath = "/api/v1/payments/notifications";
+
+    private static bool IsProviderMessage(HttpRequest request) =>
+        HttpMethods.IsPost(request.Method)
+        && request.Path.Equals(ProviderMessagePath, StringComparison.OrdinalIgnoreCase);
 
     private static bool ChangesData(string method) =>
         !(HttpMethods.IsGet(method) || HttpMethods.IsHead(method)

@@ -17,6 +17,7 @@ internal sealed class PaymentRepository(StorefrontDbContext context)
 
     public Task<Payment?> GetByReferenceAsync(string provider, string reference, CancellationToken cancellationToken) =>
         Query(trackChanges: true)
+            .Include(p => p.Order)
             .SingleOrDefaultAsync(p => p.Provider == provider && p.ProviderReference == reference, cancellationToken);
 
     public Task<Payment?> GetPendingForOrderAsync(Guid orderId, CancellationToken cancellationToken) =>

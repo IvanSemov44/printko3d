@@ -73,15 +73,16 @@ internal sealed class PaymentService(
         return new PaymentStatusDto(expired ? "Expired" : payment.Status.ToString());
     }
 
-    public async Task<PaymentNotificationResult> HandleNotificationAsync(
+    public async Task<PaymentNotificationReport> HandleNotificationAsync(
         PaymentMessage message,
         CancellationToken cancellationToken)
     {
+        EnsureEnabled();
         var notification = await provider.ReadNotificationAsync(message, cancellationToken);
         var payment = await repositories.Payments.GetByReferenceAsync(provider.Code, notification.Reference, cancellationToken);
         if (payment is null)
         {
-            return PaymentNotificationResult.UnknownPayment;
+            return new PaymentNotificationReport(PaymentNotificationResult.UnknownPayment, null);
         }
 
         // The record of the message, the payment and the order are one transaction: a repeat or a failure leaves nothing.
@@ -98,16 +99,16 @@ internal sealed class PaymentService(
         }
         catch (ConflictException exception) when (exception.Code == EventRepeated)
         {
-            return PaymentNotificationResult.Repeated;
+            return new PaymentNotificationReport(PaymentNotificationResult.Repeated, payment.Order?.Number);
         }
 
         var result = await ApplyAsync(payment, notification, cancellationToken);
         await repositories.SaveAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
-        return result;
+        return new PaymentNotificationReport(result, payment.Order?.Number);
     }
 
-    public async Task<PaymentNotificationResult> CompleteTestPaymentAsync(
+    public async Task<PaymentNotificationReport> CompleteTestPaymentAsync(
         string reference,
         PaymentOutcome outcome,
         CancellationToken cancellationToken)

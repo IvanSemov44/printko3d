@@ -18,13 +18,13 @@ public interface IPaymentService
     /// message changes nothing, and the sum must match. Throws <see cref="PaymentMessageRejectedException"/> when the
     /// message does not come from the provider. Everything it changes is one transaction.
     /// </summary>
-    Task<PaymentNotificationResult> HandleNotificationAsync(PaymentMessage message, CancellationToken cancellationToken);
+    Task<PaymentNotificationReport> HandleNotificationAsync(PaymentMessage message, CancellationToken cancellationToken);
 
     /// <summary>
     /// The test page: the provider side signs a message about the session and it goes the same road as a real one.
     /// Errors: 404 payment.not_found, 404 payment.disabled, 422 payment.session_expired (a payment after the session ended).
     /// </summary>
-    Task<PaymentNotificationResult> CompleteTestPaymentAsync(
+    Task<PaymentNotificationReport> CompleteTestPaymentAsync(
         string reference,
         PaymentOutcome outcome,
         CancellationToken cancellationToken);

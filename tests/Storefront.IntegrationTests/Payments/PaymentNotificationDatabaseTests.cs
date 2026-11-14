@@ -236,7 +236,7 @@ public sealed class PaymentNotificationDatabaseTests(PostgresFixture postgres)
         var order = await PlaceAsync(setup);
         var (_, reference) = await OpenAsync(setup, order);
 
-        var result = await InScopeAsync(setup, s => s.Payments.CompleteTestPaymentAsync(reference, PaymentOutcome.Paid, default));
+        var result = (await InScopeAsync(setup, s => s.Payments.CompleteTestPaymentAsync(reference, PaymentOutcome.Paid, default))).Result;
 
         Assert.Equal(PaymentNotificationResult.Applied, result);
         Assert.Equal(OrderStatus.Paid, (await OrderAsync(setup, order.Number)).Status);
@@ -264,7 +264,7 @@ public sealed class PaymentNotificationDatabaseTests(PostgresFixture postgres)
 
         var exception = await Assert.ThrowsAsync<RuleViolationException>(() =>
             InScopeAsync(setup, s => s.Payments.CompleteTestPaymentAsync(reference, PaymentOutcome.Paid, default)));
-        var failed = await InScopeAsync(setup, s => s.Payments.CompleteTestPaymentAsync(reference, PaymentOutcome.Failed, default));
+        var failed = (await InScopeAsync(setup, s => s.Payments.CompleteTestPaymentAsync(reference, PaymentOutcome.Failed, default))).Result;
 
         Assert.Equal("payment.session_expired", exception.Code);
         Assert.Equal(PaymentNotificationResult.Applied, failed);

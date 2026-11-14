@@ -37,3 +37,9 @@ public enum PaymentNotificationResult
     /// <summary>The payment was not waiting any more, so the message changed nothing.</summary>
     Ignored,
 }
+
+/// <summary>
+/// What a message led to and the number of the order it was about (null when the session is unknown). The number is
+/// for the journal only: it is public by design (decision 0032) and says nothing about the buyer.
+/// </summary>
+public sealed record PaymentNotificationReport(PaymentNotificationResult Result, int? OrderNumber);

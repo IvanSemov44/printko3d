@@ -107,8 +107,8 @@ internal static class PaymentWorld
         return await simulator.CreateMessageAsync(reference, outcome, amount, eventId, default);
     }
 
-    public static Task<PaymentNotificationResult> SendAsync(Setup setup, PaymentMessage message) =>
-        InScopeAsync(setup, s => s.Payments.HandleNotificationAsync(message, default));
+    public static async Task<PaymentNotificationResult> SendAsync(Setup setup, PaymentMessage message) =>
+        (await InScopeAsync(setup, s => s.Payments.HandleNotificationAsync(message, default))).Result;
 
     /// <summary>Starts a payment and returns the session with the reference the provider gave it.</summary>
     public static async Task<(PaymentSessionDto Session, string Reference)> OpenAsync(Setup setup, OrderDto order)
