@@ -5,6 +5,7 @@ using Storefront.Api.Errors;
 using Storefront.Application.Carts;
 using Storefront.Application.Catalog;
 using Storefront.Application.Contracts;
+using Storefront.Application.Emails;
 using Storefront.Application.Health;
 using Storefront.Application.Orders;
 using Storefront.Application.Payments;
@@ -37,6 +38,7 @@ internal static class ApiSetup
         builder.AddCartCleanup();
         builder.AddOrders();
         builder.AddPayments();
+        builder.AddEmailOutbox();
         builder.Services
             .AddOptions<SiteOptions>()
             .Bind(builder.Configuration.GetSection(SiteOptions.SectionName))
@@ -117,6 +119,26 @@ internal static class ApiSetup
             // With payment off nobody can pay, so no order has a deadline and there is nothing to cancel.
             builder.Services.AddHostedService<PaymentExpiryWorker>();
         }
+    }
+
+    /// <summary>The queue of outgoing emails (decision 0036): its settings, checked at startup, and the worker that sends them.</summary>
+    private static void AddEmailOutbox(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .AddOptions<EmailOutboxOptions>()
+            .Bind(builder.Configuration.GetSection(EmailOutboxOptions.SectionName))
+            .Validate(
+                EmailOutboxOptions.IsValid,
+                "EmailOutbox values are out of range: IntervalSeconds 1 to 3600, InitialDelaySeconds 0 to 3600, BatchSize 1 to 500, "
+                + "MaxAttempts 1 to 20, RetryBaseSeconds 1 to 86400, LeaseSeconds 1 to 3600 and RetentionDays 1 to 3650.")
+            .ValidateOnStart();
+        builder.Services.AddSingleton(services => services.GetRequiredService<IOptions<EmailOutboxOptions>>().Value);
+        builder.Services.AddScoped<IEmailOutboxService>(services => new EmailOutboxService(
+            services.GetRequiredService<IRepositoryManager>(),
+            services.GetRequiredService<IEmailSender>(),
+            services.GetRequiredService<TimeProvider>(),
+            services.GetRequiredService<EmailOutboxOptions>()));
+        builder.Services.AddHostedService<EmailOutboxWorker>();
     }
 
     /// <summary>The daily cleanup of old carts (decision 0027), with its settings checked at startup.</summary>

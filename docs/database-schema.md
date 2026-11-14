@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261114110142_AddOrderStatuses`
+Последна миграция: `20261114111135_AddOutgoingEmails`
 
 ## Връзки
 
@@ -363,6 +363,36 @@ erDiagram
 | --- | --- |
 | IX_orders_created_at | `CREATE INDEX "IX_orders_created_at" ON public.orders USING btree (created_at)` |
 | IX_orders_number | `CREATE UNIQUE INDEX "IX_orders_number" ON public.orders USING btree (number)` |
+
+### outgoing_emails
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| to_address | character varying(254) | не |  |
+| subject | character varying(200) | не |  |
+| text_body | text | не |  |
+| html_body | text | да |  |
+| status | character varying(20) | не |  |
+| attempts | integer | не |  |
+| next_attempt_at | timestamp with time zone | не |  |
+| sent_at | timestamp with time zone | да |  |
+| created_at | timestamp with time zone | не |  |
+| updated_at | timestamp with time zone | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_outgoing_emails | първичен ключ | `PRIMARY KEY (id)` |
+| ck_outgoing_emails_attempts | проверка | `CHECK ((attempts >= 0))` |
+| ck_outgoing_emails_status | проверка | `CHECK (((status)::text = ANY ((ARRAY['Pending'::character varying, 'Sent'::character varying, 'Failed'::character varying])::text[])))` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_outgoing_emails_status_next_attempt_at | `CREATE INDEX "IX_outgoing_emails_status_next_attempt_at" ON public.outgoing_emails USING btree (status, next_attempt_at)` |
 
 ### payment_events
 

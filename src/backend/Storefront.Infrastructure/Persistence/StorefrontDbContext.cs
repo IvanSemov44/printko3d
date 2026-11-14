@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Storefront.Domain;
 using Storefront.Domain.Carts;
 using Storefront.Domain.Catalog;
+using Storefront.Domain.Emails;
 using Storefront.Domain.Orders;
 using Storefront.Domain.Payments;
 using Storefront.Domain.Shipping;
@@ -40,6 +41,8 @@ public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> op
     public DbSet<Payment> Payments => Set<Payment>();
 
     public DbSet<PaymentEvent> PaymentEvents => Set<PaymentEvent>();
+
+    public DbSet<OutgoingEmail> OutgoingEmails => Set<OutgoingEmail>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
