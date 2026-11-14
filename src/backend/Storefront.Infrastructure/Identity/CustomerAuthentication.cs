@@ -9,4 +9,6 @@ public static class CustomerAuthentication
 
     /// <summary>The short-lived cookie that holds the answer of a social provider between the provider and the callback of the shop.</summary>
     public const string ExternalScheme = "printko-customer-external";
+
+    public const string ExternalCookieName = "__Host-printko-customer-external";
 }

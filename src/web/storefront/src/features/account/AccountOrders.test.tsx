@@ -16,6 +16,7 @@ const CUSTOMER = {
   displayName: 'Test Buyer',
   emailConfirmed: true,
   hasPassword: true,
+  linkedProviders: [],
 };
 
 function row(number: number, status: string, total: number) {

@@ -11,7 +11,7 @@ public sealed class CustomerOptions
     /// <summary>
     /// Limit of requests per minute to the open account addresses (sign-in, register, forgot password), counted by address.
     /// Behind the proxy of the shop every request has the same address, so the limit is generous: the lockout of the account is
-    /// the real guard against guessing (debt D65).
+    /// the real guard against guessing (debt D70).
     /// </summary>
     public int AttemptsPerMinute { get; set; } = 60;
 

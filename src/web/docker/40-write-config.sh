@@ -106,6 +106,15 @@ else
         printf '    proxy_ssl_server_name on;\n'
         printf '    proxy_read_timeout 90s;\n'
         printf '}\n'
+        # The social providers send the buyer back to these two addresses of the shop (decision 0039). The API reads the address of the
+        # shop from its own settings, so the Host that it gets here does not matter. Nothing else under /signin- is forwarded.
+        printf 'location ~ ^/signin-(google|facebook)$ {\n'
+        printf '    proxy_pass %s;\n' "$API_ADDRESS"
+        printf '    proxy_http_version 1.1;\n'
+        printf '    proxy_set_header Host $proxy_host;\n'
+        printf '    proxy_ssl_server_name on;\n'
+        printf '    proxy_read_timeout 90s;\n'
+        printf '}\n'
     } > "$CART_CONF"
 fi
 

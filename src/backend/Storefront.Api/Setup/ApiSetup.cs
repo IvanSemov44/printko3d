@@ -58,6 +58,8 @@ internal static class ApiSetup
         app.UseCors();
         app.UseRateLimiter();
         app.UseCsrfHeaderCheck();
+        // The social sign-in lives at the address of the shop, not at the internal one of the API (decision 0039).
+        app.UseExternalLoginAddress();
         app.UseAuthentication();
         app.UseAuthorization();
 

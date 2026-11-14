@@ -59,6 +59,16 @@ services:
         sync: false
       - key: Email__From
         sync: false
+      # Sign-in through Google and Facebook (decision 0039). Enter them in the dashboard; a provider is on only when both of its
+      # values are set. They are secrets. The address that the provider sends the buyer back to is Site__Url + /signin-google.
+      - key: Authentication__Google__ClientId
+        sync: false
+      - key: Authentication__Google__ClientSecret
+        sync: false
+      - key: Authentication__Facebook__AppId
+        sync: false
+      - key: Authentication__Facebook__AppSecret
+        sync: false
 
   - type: web
     name: printko3d-storefront

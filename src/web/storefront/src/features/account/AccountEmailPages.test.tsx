@@ -77,6 +77,7 @@ describe('confirming the address', () => {
             displayName: 'Buyer',
             emailConfirmed: false,
             hasPassword: true,
+            linkedProviders: [],
           })
         : new Response(null, { status: 204 });
     });

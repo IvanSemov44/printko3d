@@ -51,6 +51,7 @@ expect_contains "sitemap goes to the API" "$OUT/conf/sitemap-proxy.conf" "proxy_
 expect_empty "no admin proxy for the storefront" "$OUT/conf/api-proxy.conf"
 expect_contains "cart goes to the API" "$OUT/conf/cart-proxy.conf" "proxy_pass http://api.test;"
 expect_contains "only the cart, the orders, the delivery prices, the payments and the account are forwarded" "$OUT/conf/cart-proxy.conf" 'location ~ ^/api/v1/(cart|orders|shipping|payments|account)(/|$) {'
+expect_contains "the two addresses of the social providers are forwarded" "$OUT/conf/cart-proxy.conf" 'location ~ ^/signin-(google|facebook)$ {'
 expect_contains "the messages of the payment provider are not forwarded through the shop" "$OUT/conf/cart-proxy.conf" 'location = /api/v1/payments/notifications {'
 
 if grep -qF "admin" "$OUT/conf/cart-proxy.conf"; then echo "FAIL cart proxy must not mention admin"; FAILED=1; fi

@@ -1,14 +1,17 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Storefront.Application.Contracts;
 using Storefront.Application.Customers;
 using Storefront.Application.Exceptions;
 using Storefront.Application.Orders;
+using Storefront.Infrastructure.Persistence;
 
 namespace Storefront.Infrastructure.Identity;
 
 internal sealed class CustomerAccountService(
+    StorefrontDbContext context,
     UserManager<CustomerUser> users,
     SignInManager<CustomerUser> signInManager,
     IRepositoryManager repositories,
@@ -216,8 +219,12 @@ internal sealed class CustomerAccountService(
 
     private Task<CustomerUser?> CurrentAsync() => users.GetUserAsync(signInManager.Context.User);
 
-    private async Task<CustomerDto> ToDtoAsync(CustomerUser user) =>
-        new(user.Email!, user.DisplayName, user.EmailConfirmed, await users.HasPasswordAsync(user));
+    private async Task<CustomerDto> ToDtoAsync(CustomerUser user)
+    {
+        var linked = await context.CustomerExternalLogins.AsNoTracking()
+            .Where(l => l.CustomerId == user.Id).OrderBy(l => l.Provider).Select(l => l.Provider).ToListAsync();
+        return new CustomerDto(user.Email!, user.DisplayName, user.EmailConfirmed, await users.HasPasswordAsync(user), linked);
+    }
 
     private static ValidationFailedException ToValidationFailure(IdentityResult result) =>
         new(

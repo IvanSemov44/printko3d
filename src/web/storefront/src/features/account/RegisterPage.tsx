@@ -13,6 +13,7 @@ import {
   validateRegistration,
   type AccountErrors,
 } from './accountValidation';
+import { ExternalSignInButtons } from './ExternalSignInButtons';
 import { CUSTOMER_KEY } from './useCustomer';
 
 /**
@@ -145,6 +146,7 @@ export function RegisterPage() {
           {register.isPending ? t('account.register.submitting') : t('account.register.submit')}
         </button>
       </form>
+      <ExternalSignInButtons />
       <p>
         {t('account.register.haveAccount')}{' '}
         <Link to="/account/login">{t('account.login.title')}</Link>

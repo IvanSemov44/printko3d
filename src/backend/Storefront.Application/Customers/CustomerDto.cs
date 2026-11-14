@@ -5,7 +5,13 @@ namespace Storefront.Application.Customers;
 /// <param name="DisplayName">The name shown to the buyer.</param>
 /// <param name="EmailConfirmed">True after the buyer opened the link in the confirmation email, or signed in through a provider that confirmed the address.</param>
 /// <param name="HasPassword">False for an account made only by a social sign-in: it can set a password through "forgot password".</param>
-public sealed record CustomerDto(string Email, string DisplayName, bool EmailConfirmed, bool HasPassword);
+/// <param name="LinkedProviders">The social providers connected to the account, such as <c>Google</c>.</param>
+public sealed record CustomerDto(
+    string Email,
+    string DisplayName,
+    bool EmailConfirmed,
+    bool HasPassword,
+    IReadOnlyList<string> LinkedProviders);
 
 /// <summary>The buyer who has just signed in, with the id of the account for what the server does next (joining the carts). The id is not sent to the browser.</summary>
 public sealed record SignedInCustomer(Guid Id, CustomerDto Customer);

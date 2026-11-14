@@ -1419,3 +1419,19 @@ body:has(.cart-panel[open]) {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+/* The buttons of the social providers (decision 0039). */
+.external-sign-in-divider {
+  margin: 1.5rem 0 0.75rem;
+  color: var(--color-ink-muted, inherit);
+  text-align: center;
+}
+
+.external-sign-in-list,
+.external-connections {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

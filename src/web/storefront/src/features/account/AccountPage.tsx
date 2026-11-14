@@ -14,6 +14,7 @@ import { PageMeta } from '../seo/PageMeta';
 import { useT } from '../store-settings/useStoreSettings';
 import { passwordFailure } from './accountErrors';
 import { firstInvalid, validatePasswordChange, type AccountErrors } from './accountValidation';
+import { ExternalConnections } from './ExternalConnections';
 import { CUSTOMER_KEY, useCustomer } from './useCustomer';
 
 function PasswordForm() {
@@ -154,6 +155,7 @@ function Profile({ customer }: { customer: Customer }) {
       <p>
         <Link to="/account/orders">{t('account.orders.link')}</Link>
       </p>
+      <ExternalConnections customer={customer} />
       {customer.hasPassword ? <PasswordForm /> : <p>{t('account.noPassword')}</p>}
       <button
         type="button"

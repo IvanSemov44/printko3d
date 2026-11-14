@@ -34,10 +34,12 @@ internal static class CustomerAuthSetup
             .AddOptions<DataProtectionTokenProviderOptions>()
             .Configure<IOptions<CustomerOptions>>((token, customer) =>
                 token.TokenLifespan = TimeSpan.FromMinutes(customer.Value.TokenLifetimeMinutes));
-        builder.Services.AddAuthentication().AddCookie(CustomerAuthentication.Scheme, _ => { });
+        var authentication = builder.Services.AddAuthentication();
+        authentication.AddCookie(CustomerAuthentication.Scheme, _ => { });
         builder.Services
             .AddOptions<CookieAuthenticationOptions>(CustomerAuthentication.Scheme)
             .Configure<IOptions<CustomerOptions>>(ConfigureCookie);
+        builder.AddExternalProviders(authentication);
         builder.Services.AddRateLimiter(limiter => limiter.AddPolicy(RateLimit, context =>
             RateLimitPartition.GetFixedWindowLimiter(
                 context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -47,6 +49,54 @@ internal static class CustomerAuthSetup
                     Window = TimeSpan.FromMinutes(1),
                     QueueLimit = 0,
                 })));
+    }
+
+    /// <summary>
+    /// Google and Facebook, each only when its keys are in the settings (decision 0039). What a provider says is kept for a few minutes in
+    /// a cookie of its own, until the callback of the shop reads it.
+    /// </summary>
+    private static void AddExternalProviders(this WebApplicationBuilder builder, AuthenticationBuilder authentication)
+    {
+        var keys = builder.Configuration.GetSection(ExternalLoginOptions.SectionName).Get<ExternalLoginOptions>() ?? new ExternalLoginOptions();
+        var enabled = new List<string>();
+
+        authentication.AddCookie(CustomerAuthentication.ExternalScheme, cookie =>
+        {
+            cookie.Cookie.Name = CustomerAuthentication.ExternalCookieName;
+            cookie.Cookie.HttpOnly = true;
+            cookie.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            // Lax: the buyer arrives from the provider, which is another site, with a plain navigation.
+            cookie.Cookie.SameSite = SameSiteMode.Lax;
+            cookie.Cookie.Path = "/";
+            cookie.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+        });
+
+        if (keys.Google.IsSet)
+        {
+            authentication.AddGoogle(ExternalLoginOptions.GoogleName, options =>
+            {
+                options.ClientId = keys.Google.ClientId;
+                options.ClientSecret = keys.Google.ClientSecret;
+                options.SignInScheme = CustomerAuthentication.ExternalScheme;
+                // Google says whether it verified the address; only a verified one makes or joins an account.
+                options.ClaimActions.MapJsonKey("email_verified", "email_verified");
+            });
+            enabled.Add(ExternalLoginOptions.GoogleName);
+        }
+
+        if (keys.Facebook.IsSet)
+        {
+            authentication.AddFacebook(ExternalLoginOptions.FacebookName, options =>
+            {
+                options.AppId = keys.Facebook.AppId;
+                options.AppSecret = keys.Facebook.AppSecret;
+                options.SignInScheme = CustomerAuthentication.ExternalScheme;
+            });
+            enabled.Add(ExternalLoginOptions.FacebookName);
+        }
+
+        builder.Services.AddSingleton(new EnabledExternalProviders(enabled));
+        builder.Services.AddSingleton<ExternalLinkIntent>();
     }
 
     private static void ConfigureCookie(CookieAuthenticationOptions cookie, IOptions<CustomerOptions> customer)

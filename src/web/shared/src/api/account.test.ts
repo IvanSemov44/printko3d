@@ -3,6 +3,10 @@ import { ApiError } from './client';
 import {
   changeCustomerPassword,
   confirmCustomerEmail,
+  externalLinkAddress,
+  externalSignInAddress,
+  getExternalProviders,
+  prepareExternalLink,
   requestPasswordReset,
   resendCustomerConfirmation,
   resetCustomerPassword,
@@ -20,6 +24,7 @@ const DTO = {
   displayName: 'Test Buyer',
   emailConfirmed: false,
   hasPassword: true,
+  linkedProviders: [],
 };
 
 function stubFetch(body: unknown, status = 200) {
@@ -236,5 +241,43 @@ describe('the orders of a buyer', () => {
       code: 'order.not_found',
     });
     expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/v1/account/orders/12345678');
+  });
+});
+
+describe('the social providers', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('reads the providers that are turned on', async () => {
+    const fetchMock = stubFetch({ providers: ['Google', 'Facebook'] });
+
+    expect(await getExternalProviders()).toEqual(['Google', 'Facebook']);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/v1/account/external/providers');
+  });
+
+  it('names the field when the answer has the wrong shape', async () => {
+    stubFetch({ providers: 'Google' });
+
+    await expect(getExternalProviders()).rejects.toThrow(/externalProviders\.providers/);
+  });
+
+  it('builds the addresses that the browser opens, with the provider escaped', () => {
+    expect(externalSignInAddress('Google')).toBe('/api/v1/account/external/Google/start');
+    expect(externalLinkAddress('Facebook')).toBe(
+      '/api/v1/account/external/Facebook/start?mode=link',
+    );
+    expect(externalSignInAddress('a/b')).toBe('/api/v1/account/external/a%2Fb/start');
+  });
+
+  it('asks to connect a provider with the protective header', async () => {
+    const fetchMock = stubFetch(null, 204);
+
+    await prepareExternalLink('Google');
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe('/api/v1/account/external/Google/link');
+    expect(init?.method).toBe('POST');
+    expect(new Headers(init?.headers).get('X-Requested-With')).toBe('XMLHttpRequest');
   });
 });

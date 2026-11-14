@@ -15,6 +15,7 @@ const CUSTOMER = {
   displayName: 'Test Buyer',
   emailConfirmed: false,
   hasPassword: true,
+  linkedProviders: [],
 };
 
 type AccountResponder = (url: string, init?: RequestInit) => Response | Promise<Response>;

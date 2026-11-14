@@ -20,6 +20,8 @@ export interface Customer {
   emailConfirmed: boolean;
   /** False for an account made only by a social sign-in. */
   hasPassword: boolean;
+  /** The social providers connected to the account, such as `Google`. */
+  linkedProviders: string[];
 }
 
 const ACCOUNT = '/api/v1/account';
@@ -32,6 +34,7 @@ export function readCustomer(value: unknown): Customer {
     displayName: field(object, 'displayName', readString, 'customer'),
     emailConfirmed: field(object, 'emailConfirmed', readBoolean, 'customer'),
     hasPassword: field(object, 'hasPassword', readBoolean, 'customer'),
+    linkedProviders: field(object, 'linkedProviders', readArray(readString), 'customer'),
   };
 }
 
@@ -181,4 +184,34 @@ export async function getMyOrders(
  */
 export async function getMyOrder(number: number, signal?: AbortSignal): Promise<Order> {
   return readOrder(await apiRequest(`${ACCOUNT}/orders/${String(number)}`, { signal }));
+}
+
+/** The social providers that are turned on in this environment (`Google`, `Facebook`), in the order the buttons are shown. Empty when none is. */
+export async function getExternalProviders(signal?: AbortSignal): Promise<string[]> {
+  const object = readObject(
+    await apiRequest(`${ACCOUNT}/external/providers`, { signal }),
+    'externalProviders',
+  );
+  return field(object, 'providers', readArray(readString), 'externalProviders');
+}
+
+/**
+ * The address that sends the browser to a provider. It is opened by navigating (a link), not by a request: the provider asks the buyer on
+ * its own page and sends the browser back to the shop.
+ */
+export function externalSignInAddress(provider: string): string {
+  return `${ACCOUNT}/external/${encodeURIComponent(provider)}/start`;
+}
+
+/**
+ * Asks to connect a provider to the signed-in account. The answer is a short cookie that the connecting needs, so another site cannot do
+ * it in the buyer's name. After it the browser is sent to `externalLinkAddress`. A refusal is an ApiError: 401, 404.
+ */
+export async function prepareExternalLink(provider: string, signal?: AbortSignal): Promise<void> {
+  await apiAct('POST', `${ACCOUNT}/external/${encodeURIComponent(provider)}/link`, signal);
+}
+
+/** The address that sends the browser to a provider to connect it to the signed-in account (after `prepareExternalLink`). */
+export function externalLinkAddress(provider: string): string {
+  return `${externalSignInAddress(provider)}?mode=link`;
 }

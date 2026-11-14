@@ -17,6 +17,9 @@ public sealed partial class ClosedByDefaultTests(PostgresFixture postgres)
     [
         "DELETE api/v1/cart",
         "DELETE api/v1/cart/items/{variantId:guid}",
+        "GET api/v1/account/external/callback",
+        "GET api/v1/account/external/providers",
+        "GET api/v1/account/external/{provider}/start",
         "GET api/v1/cart",
         "GET api/v1/cart/items/{variantId:guid}",
         "POST api/v1/cart/items",

@@ -12,6 +12,18 @@ export function loginFailure(error: unknown): MessageKey {
   return error.status === 429 ? 'account.error.tooMany' : 'account.error.generic';
 }
 
+const EXTERNAL_ERRORS: Readonly<Record<string, MessageKey>> = {
+  external_failed: 'account.external.error.external_failed',
+  account_exists: 'account.external.error.account_exists',
+  email_not_verified: 'account.external.error.email_not_verified',
+  already_linked: 'account.external.error.already_linked',
+};
+
+/** The text for the `error` that the shop was sent back to the sign-in with after a social provider. An unknown reason shows nothing. */
+export function externalSignInError(code: string | null): MessageKey | undefined {
+  return code === null ? undefined : EXTERNAL_ERRORS[code];
+}
+
 /** The text for a refused registration or a refused new password. */
 export function passwordFailure(error: unknown): MessageKey {
   if (!(error instanceof ApiError)) {

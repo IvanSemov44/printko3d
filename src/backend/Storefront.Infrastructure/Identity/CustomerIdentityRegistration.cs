@@ -26,6 +26,7 @@ public static class CustomerIdentityRegistration
         services.AddScoped<SignInManager<CustomerUser>>();
         services.TryAddScoped<IUserConfirmation<CustomerUser>, DefaultUserConfirmation<CustomerUser>>();
         services.AddScoped<ICustomerAccountService, CustomerAccountService>();
+        services.AddScoped<ICustomerExternalLoginService, CustomerExternalLoginService>();
         return services;
     }
 }
