@@ -15,7 +15,8 @@ public sealed class ServiceManager(
     IShippingProvider? shippingProvider = null,
     PaymentOptions? paymentOptions = null,
     IPaymentProvider? paymentProvider = null,
-    IPaymentSimulator? paymentSimulator = null) : IServiceManager
+    IPaymentSimulator? paymentSimulator = null,
+    OrderLookupThrottle? lookupThrottle = null) : IServiceManager
 {
     private readonly Lazy<ICategoryService> _category = new(() => new CategoryService(repositories));
     private readonly Lazy<IProductService> _product = new(() => new ProductService(repositories, imageStorage));
@@ -42,6 +43,10 @@ public sealed class ServiceManager(
         timeProvider ?? TimeProvider.System,
         paymentOptions ?? new PaymentOptions(),
         orderOptions ?? new OrderOptions()));
+
+    private readonly Lazy<IOrderLookupService> _orderLookup = new(() => new OrderLookupService(
+        repositories,
+        lookupThrottle ?? new OrderLookupThrottle(timeProvider ?? TimeProvider.System, orderOptions ?? new OrderOptions())));
 
     private readonly Lazy<IOrderStatusService> _orderStatuses = new(() => new OrderStatusService(repositories, orderOptions ?? new OrderOptions()));
 
@@ -70,4 +75,6 @@ public sealed class ServiceManager(
     public IShippingTariffService ShippingTariff => _shippingTariff.Value;
 
     public IOrderStatusService OrderStatuses => _orderStatuses.Value;
+
+    public IOrderLookupService OrderLookup => _orderLookup.Value;
 }

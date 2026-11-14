@@ -21,6 +21,11 @@ internal sealed class OrderRepository(StorefrontDbContext context)
             .Include(o => o.Items)
             .SingleOrDefaultAsync(o => o.Number == number, cancellationToken);
 
+    public Task<Order?> GetByAccessTokenAsync(string token, CancellationToken cancellationToken) =>
+        Query(trackChanges: false)
+            .Include(o => o.Items)
+            .SingleOrDefaultAsync(o => o.AccessToken == token, cancellationToken);
+
     public async Task<bool> TryMarkPaidAsync(Guid orderId, CancellationToken cancellationToken)
     {
         var now = Context.Now;

@@ -32,6 +32,11 @@ const OrderConfirmationPage = lazy(() =>
   })),
 );
 
+// The page "My order" is opened from a link in an email, so it is loaded when it is opened.
+const MyOrderPage = lazy(() =>
+  import('./features/orders/MyOrderPage').then((module) => ({ default: module.MyOrderPage })),
+);
+
 /** Needs a router and a QueryClientProvider above it (see main.tsx). */
 export function App() {
   return (
@@ -62,6 +67,14 @@ export function App() {
             element={
               <Suspense fallback={<LoadingStatus />}>
                 <OrderConfirmationPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="my-order"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <MyOrderPage />
               </Suspense>
             }
           />

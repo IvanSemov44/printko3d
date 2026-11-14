@@ -1,6 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from './client';
-import { placeOrder, readOrder, type PlaceOrderInput } from './orders';
+import {
+  findOrder,
+  findOrderByToken,
+  ORDER_STATUSES,
+  placeOrder,
+  readOrder,
+  type PlaceOrderInput,
+} from './orders';
 import { UnexpectedResponseError } from './decode';
 
 const INPUT: PlaceOrderInput = {
@@ -131,5 +138,76 @@ describe('readOrder', () => {
 
   it('refuses a deadline that is not a string', () => {
     expect(() => readOrder({ ...DTO, paymentDueAt: 5 })).toThrow(/order\.paymentDueAt/);
+  });
+});
+
+describe('findOrder', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('sends the number and the email in the body, with the protective header, and reads the order', async () => {
+    const fetchMock = stubFetch(DTO, 200);
+
+    const order = await findOrder(12345678, 'buyer@example.test');
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe('/api/v1/orders/lookup');
+    expect(init?.method).toBe('POST');
+    expect(new Headers(init?.headers).get('X-Requested-With')).toBe('XMLHttpRequest');
+    expect(typeof init?.body === 'string' ? (JSON.parse(init.body) as unknown) : undefined).toEqual(
+      { number: 12345678, email: 'buyer@example.test' },
+    );
+    expect(order.number).toBe(12345678);
+  });
+
+  it('keeps the email out of the address', async () => {
+    const fetchMock = stubFetch(DTO, 200);
+
+    await findOrder(12345678, 'buyer@example.test');
+
+    expect(fetchMock.mock.calls[0]?.[0]).not.toContain('buyer');
+  });
+
+  it('turns the refusal for an unknown order into an ApiError with the code', async () => {
+    stubFetch({ code: 'order.not_found' }, 404);
+
+    const error: unknown = await findOrder(1, 'a@b.test').catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({ status: 404, code: 'order.not_found' });
+  });
+});
+
+describe('findOrderByToken', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('sends the token in the body, not in the address, and reads the order', async () => {
+    const fetchMock = stubFetch(DTO, 200);
+
+    const order = await findOrderByToken('secret-token');
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe('/api/v1/orders/lookup-by-token');
+    expect(typeof init?.body === 'string' ? (JSON.parse(init.body) as unknown) : undefined).toEqual(
+      { token: 'secret-token' },
+    );
+    expect(order.number).toBe(12345678);
+  });
+});
+
+describe('ORDER_STATUSES', () => {
+  it('lists the statuses of the lifecycle in order, with the cancelled one last', () => {
+    expect(ORDER_STATUSES).toEqual([
+      'New',
+      'Paid',
+      'InProduction',
+      'ReadyToShip',
+      'Shipped',
+      'Completed',
+      'Cancelled',
+    ]);
   });
 });

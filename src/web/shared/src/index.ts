@@ -89,7 +89,7 @@ export type {
 export type { TranslationParams } from './i18n';
 export { addCartItem, clearCart, getCart, removeCartItem, setCartItemQuantity } from './api/cart';
 export type { Cart, CartLine, CartLineImage, CartLineState } from './api/cart';
-export { placeOrder, readOrder } from './api/orders';
+export { findOrder, findOrderByToken, ORDER_STATUSES, placeOrder, readOrder } from './api/orders';
 export type { Order, OrderItem, PlaceOrderInput } from './api/orders';
 export { completeTestPayment, getPaymentMode, getPaymentState, startPayment } from './api/payments';
 export type { PaymentSession, PaymentState, TestPaymentOutcome } from './api/payments';

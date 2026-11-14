@@ -19,6 +19,9 @@ public interface IOrderRepository
     /// </summary>
     Task<bool> TryMarkStockReleasedAsync(Guid orderId, CancellationToken cancellationToken);
 
+    /// <summary>The order with its lines, by the key of the link in the email, or null. Not tracked.</summary>
+    Task<Order?> GetByAccessTokenAsync(string token, CancellationToken cancellationToken);
+
     /// <summary>The order with its lines, by the number the buyer sees, or null. Not tracked.</summary>
     Task<Order?> GetByNumberAsync(int number, CancellationToken cancellationToken);
 

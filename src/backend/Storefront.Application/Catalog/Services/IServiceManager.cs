@@ -26,4 +26,6 @@ public interface IServiceManager
     IShippingTariffService ShippingTariff { get; }
 
     IOrderStatusService OrderStatuses { get; }
+
+    IOrderLookupService OrderLookup { get; }
 }

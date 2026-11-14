@@ -1,7 +1,9 @@
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Storefront.Api.Requests;
+using Storefront.Api.Setup;
 using Storefront.Application.Catalog;
 using Storefront.Application.Payments;
 
@@ -29,9 +31,11 @@ public sealed class PaymentsController(IServiceManager services, ILogger<Payment
     /// </summary>
     /// <remarks>
     /// Errors: 403 csrf.header_required, 404 order.not_found, 404 payment.disabled (payment is turned off),
-    /// 409 payment.order_not_payable (the order is paid, cancelled or past its deadline).
+    /// 409 payment.order_not_payable (the order is paid, cancelled or past its deadline), 429 (too many requests from this address).
     /// </remarks>
     [HttpPut("orders/{number:int}/payment")]
+    [EnableRateLimiting(OrderRateLimits.Lookup)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
     [ProducesResponseType<PaymentSessionDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -98,6 +102,8 @@ public sealed class PaymentsController(IServiceManager services, ILogger<Payment
     /// 404 payment.disabled, 422 payment.session_expired (a payment after the session ended).
     /// </remarks>
     [HttpPost("payments/test/{reference}/complete")]
+    [EnableRateLimiting(OrderRateLimits.Lookup)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
