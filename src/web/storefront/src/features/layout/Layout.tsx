@@ -3,6 +3,7 @@ import { CartPanelHost } from '../cart/CartPanelHost';
 import { CartNoticesProvider } from '../cart/CartNoticesProvider';
 import { CartPanelProvider } from '../cart/CartPanelProvider';
 import { DemoBanner } from './DemoBanner';
+import { TestPaymentBanner } from './TestPaymentBanner';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { MAIN_CONTENT_ID, SkipLink } from './SkipLink';
@@ -15,6 +16,7 @@ export function Layout() {
       <CartPanelProvider>
         <SkipLink />
         <DemoBanner />
+        <TestPaymentBanner />
         <Header />
         <main id={MAIN_CONTENT_ID} ref={mainRef} tabIndex={-1}>
           <Outlet />

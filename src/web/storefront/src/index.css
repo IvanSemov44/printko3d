@@ -1341,3 +1341,15 @@ body:has(.cart-panel[open]) {
   padding: 0;
   font-weight: 700;
 }
+
+/* Paying an order: the section of the order page and the actions of the test payment page. */
+.payment-section {
+  margin-block: 1rem;
+}
+
+.payment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-block: 1rem;
+}
