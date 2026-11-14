@@ -28,4 +28,6 @@ public interface IServiceManager
     IOrderStatusService OrderStatuses { get; }
 
     IOrderLookupService OrderLookup { get; }
+
+    IOrderAdminService OrderAdmin { get; }
 }

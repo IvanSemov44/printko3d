@@ -12,7 +12,9 @@
   "paths": {
     "/api/v1/admin/categories": {
       "get": {
-        "tags": ["AdminCategories"],
+        "tags": [
+          "AdminCategories"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -86,7 +88,9 @@
         }
       },
       "post": {
-        "tags": ["AdminCategories"],
+        "tags": [
+          "AdminCategories"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -233,7 +237,9 @@
     },
     "/api/v1/admin/categories/{id}": {
       "get": {
-        "tags": ["AdminCategories"],
+        "tags": [
+          "AdminCategories"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -329,7 +335,9 @@
         }
       },
       "put": {
-        "tags": ["AdminCategories"],
+        "tags": [
+          "AdminCategories"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -487,7 +495,9 @@
     },
     "/api/v1/admin/categories/{id}/activate": {
       "post": {
-        "tags": ["AdminCategories"],
+        "tags": [
+          "AdminCategories"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -625,7 +635,9 @@
     },
     "/api/v1/admin/categories/{id}/deactivate": {
       "post": {
-        "tags": ["AdminCategories"],
+        "tags": [
+          "AdminCategories"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -763,7 +775,9 @@
     },
     "/api/v1/admin/categories/{id}/move": {
       "post": {
-        "tags": ["AdminCategories"],
+        "tags": [
+          "AdminCategories"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -928,9 +942,246 @@
         }
       }
     },
+    "/api/v1/admin/orders": {
+      "get": {
+        "tags": [
+          "AdminOrders"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfOrderAdminListItemDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfOrderAdminListItemDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfOrderAdminListItemDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/orders/{number}": {
+      "get": {
+        "tags": [
+          "AdminOrders"
+        ],
+        "parameters": [
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderAdminDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderAdminDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderAdminDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/products/{id}/images": {
       "post": {
-        "tags": ["AdminProductImages"],
+        "tags": [
+          "AdminProductImages"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1110,7 +1361,9 @@
     },
     "/api/v1/admin/products/{id}/images/{imageId}": {
       "put": {
-        "tags": ["AdminProductImages"],
+        "tags": [
+          "AdminProductImages"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1255,7 +1508,9 @@
         }
       },
       "delete": {
-        "tags": ["AdminProductImages"],
+        "tags": [
+          "AdminProductImages"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1362,7 +1617,9 @@
     },
     "/api/v1/admin/products/{id}/images/{imageId}/primary": {
       "put": {
-        "tags": ["AdminProductImages"],
+        "tags": [
+          "AdminProductImages"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1489,7 +1746,9 @@
     },
     "/api/v1/admin/products/{id}/images/{imageId}/move": {
       "post": {
-        "tags": ["AdminProductImages"],
+        "tags": [
+          "AdminProductImages"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1636,7 +1895,9 @@
     },
     "/api/v1/admin/products": {
       "get": {
-        "tags": ["AdminProducts"],
+        "tags": [
+          "AdminProducts"
+        ],
         "parameters": [
           {
             "name": "status",
@@ -1665,7 +1926,10 @@
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": ["integer", "string"],
+              "type": [
+                "integer",
+                "string"
+              ],
               "format": "int32",
               "default": 1
             }
@@ -1675,7 +1939,10 @@
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": ["integer", "string"],
+              "type": [
+                "integer",
+                "string"
+              ],
               "format": "int32",
               "default": 20
             }
@@ -1765,7 +2032,9 @@
         }
       },
       "post": {
-        "tags": ["AdminProducts"],
+        "tags": [
+          "AdminProducts"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1912,7 +2181,9 @@
     },
     "/api/v1/admin/products/{id}": {
       "get": {
-        "tags": ["AdminProducts"],
+        "tags": [
+          "AdminProducts"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -2008,7 +2279,9 @@
         }
       },
       "put": {
-        "tags": ["AdminProducts"],
+        "tags": [
+          "AdminProducts"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -2166,7 +2439,9 @@
     },
     "/api/v1/admin/products/{id}/status": {
       "put": {
-        "tags": ["AdminProducts"],
+        "tags": [
+          "AdminProducts"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -2324,7 +2599,9 @@
     },
     "/api/v1/admin/products/{id}/variants": {
       "post": {
-        "tags": ["AdminProducts"],
+        "tags": [
+          "AdminProducts"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -2482,7 +2759,9 @@
     },
     "/api/v1/admin/products/{id}/variants/{variantId}": {
       "put": {
-        "tags": ["AdminProducts"],
+        "tags": [
+          "AdminProducts"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -2649,7 +2928,9 @@
     },
     "/api/v1/admin/products/{id}/variants/{variantId}/active": {
       "put": {
-        "tags": ["AdminProducts"],
+        "tags": [
+          "AdminProducts"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -2816,7 +3097,9 @@
     },
     "/api/v1/admin/products/{id}/variants/{variantId}/move": {
       "post": {
-        "tags": ["AdminProducts"],
+        "tags": [
+          "AdminProducts"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -2963,7 +3246,9 @@
     },
     "/api/v1/admin/shipping-tariff": {
       "get": {
-        "tags": ["AdminShippingTariff"],
+        "tags": [
+          "AdminShippingTariff"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3028,7 +3313,9 @@
         }
       },
       "put": {
-        "tags": ["AdminShippingTariff"],
+        "tags": [
+          "AdminShippingTariff"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3155,7 +3442,9 @@
     },
     "/api/v1/admin/store-settings": {
       "get": {
-        "tags": ["AdminStoreSettings"],
+        "tags": [
+          "AdminStoreSettings"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3240,7 +3529,9 @@
         }
       },
       "put": {
-        "tags": ["AdminStoreSettings"],
+        "tags": [
+          "AdminStoreSettings"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3387,7 +3678,9 @@
     },
     "/api/v1/auth/login": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3514,7 +3807,9 @@
     },
     "/api/v1/auth/logout": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "responses": {
           "204": {
             "description": "No Content"
@@ -3544,7 +3839,9 @@
     },
     "/api/v1/auth/me": {
       "get": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3611,7 +3908,9 @@
     },
     "/api/v1/cart": {
       "get": {
-        "tags": ["Cart"],
+        "tags": [
+          "Cart"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3636,7 +3935,9 @@
         }
       },
       "delete": {
-        "tags": ["Cart"],
+        "tags": [
+          "Cart"
+        ],
         "responses": {
           "204": {
             "description": "No Content"
@@ -3686,7 +3987,9 @@
     },
     "/api/v1/cart/items/{variantId}": {
       "get": {
-        "tags": ["Cart"],
+        "tags": [
+          "Cart"
+        ],
         "parameters": [
           {
             "name": "variantId",
@@ -3742,7 +4045,9 @@
         }
       },
       "put": {
-        "tags": ["Cart"],
+        "tags": [
+          "Cart"
+        ],
         "parameters": [
           {
             "name": "variantId",
@@ -3898,7 +4203,9 @@
         }
       },
       "delete": {
-        "tags": ["Cart"],
+        "tags": [
+          "Cart"
+        ],
         "parameters": [
           {
             "name": "variantId",
@@ -3979,7 +4286,9 @@
     },
     "/api/v1/cart/items": {
       "post": {
-        "tags": ["Cart"],
+        "tags": [
+          "Cart"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4146,7 +4455,9 @@
     },
     "/api/v1/categories": {
       "get": {
-        "tags": ["Categories"],
+        "tags": [
+          "Categories"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4182,7 +4493,9 @@
     },
     "/health": {
       "get": {
-        "tags": ["Health"],
+        "tags": [
+          "Health"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4229,7 +4542,9 @@
     },
     "/api/v1/orders": {
       "post": {
-        "tags": ["Orders"],
+        "tags": [
+          "Orders"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4376,7 +4691,9 @@
     },
     "/api/v1/orders/lookup": {
       "post": {
-        "tags": ["Orders"],
+        "tags": [
+          "Orders"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4503,7 +4820,9 @@
     },
     "/api/v1/orders/lookup-by-token": {
       "post": {
-        "tags": ["Orders"],
+        "tags": [
+          "Orders"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4630,7 +4949,9 @@
     },
     "/api/v1/orders/{number}/payment": {
       "put": {
-        "tags": ["Payments"],
+        "tags": [
+          "Payments"
+        ],
         "parameters": [
           {
             "name": "number",
@@ -4749,7 +5070,9 @@
     },
     "/api/v1/payments/mode": {
       "get": {
-        "tags": ["Payments"],
+        "tags": [
+          "Payments"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4776,7 +5099,9 @@
     },
     "/api/v1/payments/{paymentId}": {
       "get": {
-        "tags": ["Payments"],
+        "tags": [
+          "Payments"
+        ],
         "parameters": [
           {
             "name": "paymentId",
@@ -4834,7 +5159,9 @@
     },
     "/api/v1/payments/notifications": {
       "post": {
-        "tags": ["Payments"],
+        "tags": [
+          "Payments"
+        ],
         "responses": {
           "204": {
             "description": "No Content"
@@ -4884,7 +5211,9 @@
     },
     "/api/v1/payments/test/{reference}/complete": {
       "post": {
-        "tags": ["Payments"],
+        "tags": [
+          "Payments"
+        ],
         "parameters": [
           {
             "name": "reference",
@@ -5024,7 +5353,9 @@
     },
     "/api/v1/products": {
       "get": {
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "parameters": [
           {
             "name": "category",
@@ -5052,7 +5383,10 @@
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": ["integer", "string"],
+              "type": [
+                "integer",
+                "string"
+              ],
               "format": "int32",
               "default": 1
             }
@@ -5062,7 +5396,10 @@
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": ["integer", "string"],
+              "type": [
+                "integer",
+                "string"
+              ],
               "format": "int32",
               "default": 12
             }
@@ -5114,7 +5451,9 @@
     },
     "/api/v1/products/{slug}": {
       "get": {
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "parameters": [
           {
             "name": "slug",
@@ -5171,7 +5510,9 @@
     },
     "/api/v1/shipping/quotes": {
       "get": {
-        "tags": ["Shipping"],
+        "tags": [
+          "Shipping"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5218,7 +5559,9 @@
     },
     "/api/v1/store-settings": {
       "get": {
-        "tags": ["StoreSettings"],
+        "tags": [
+          "StoreSettings"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5267,7 +5610,10 @@
   "components": {
     "schemas": {
       "AddCartItemRequest": {
-        "required": ["variantId", "quantity"],
+        "required": [
+          "variantId",
+          "quantity"
+        ],
         "type": "object",
         "properties": {
           "variantId": {
@@ -5276,13 +5622,18 @@
           },
           "quantity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
         }
       },
       "AdminUserDto": {
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "type": "object",
         "properties": {
           "email": {
@@ -5291,7 +5642,11 @@
         }
       },
       "CartDto": {
-        "required": ["lines", "itemCount", "total"],
+        "required": [
+          "lines",
+          "itemCount",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "lines": {
@@ -5302,12 +5657,18 @@
           },
           "itemCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "total": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           }
         }
@@ -5358,17 +5719,26 @@
           },
           "unitPrice": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "quantity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "linePrice": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "state": {
@@ -5379,18 +5749,31 @@
           },
           "leadTimeDays": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "availableQuantity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
         }
       },
       "CartLineState": {
-        "enum": ["Available", "InsufficientStock", "Inactive", "Archived"]
+        "enum": [
+          "Available",
+          "InsufficientStock",
+          "Inactive",
+          "Archived"
+        ]
       },
       "CategoryAdminDto": {
         "required": [
@@ -5411,7 +5794,10 @@
             "format": "uuid"
           },
           "parentId": {
-            "type": ["null", "string"],
+            "type": [
+              "null",
+              "string"
+            ],
             "format": "uuid"
           },
           "name": {
@@ -5421,11 +5807,17 @@
             "type": "string"
           },
           "description": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "sortOrder": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "isActive": {
@@ -5433,18 +5825,32 @@
           },
           "productCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "uint32"
           }
         }
       },
       "CategoryDto": {
-        "required": ["id", "parentId", "name", "slug", "description", "imageKey", "sortOrder"],
+        "required": [
+          "id",
+          "parentId",
+          "name",
+          "slug",
+          "description",
+          "imageKey",
+          "sortOrder"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -5452,7 +5858,10 @@
             "format": "uuid"
           },
           "parentId": {
-            "type": ["null", "string"],
+            "type": [
+              "null",
+              "string"
+            ],
             "format": "uuid"
           },
           "name": {
@@ -5462,31 +5871,47 @@
             "type": "string"
           },
           "description": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "imageKey": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "sortOrder": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
         }
       },
       "CategoryVersionRequest": {
-        "required": ["version"],
+        "required": [
+          "version"
+        ],
         "type": "object",
         "properties": {
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "uint32"
           }
         }
       },
       "CompleteTestPaymentRequest": {
-        "required": ["outcome"],
+        "required": [
+          "outcome"
+        ],
         "type": "object",
         "properties": {
           "outcome": {
@@ -5495,7 +5920,12 @@
         }
       },
       "CreateCategoryRequest": {
-        "required": ["name", "slug", "parentId", "description"],
+        "required": [
+          "name",
+          "slug",
+          "parentId",
+          "description"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -5505,15 +5935,24 @@
             "type": "string"
           },
           "parentId": {
-            "type": ["null", "string"],
+            "type": [
+              "null",
+              "string"
+            ],
             "format": "uuid"
           },
           "description": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "sortOrder": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32",
             "default": 0
           },
@@ -5558,14 +5997,24 @@
           },
           "leadTimeDays": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "seoTitle": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "seoDescription": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -5589,26 +6038,43 @@
           },
           "price": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "weightGrams": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "compareAtPrice": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "stockQuantity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "attributes": {
-            "type": ["null", "object"],
+            "type": [
+              "null",
+              "object"
+            ],
             "additionalProperties": {
               "type": "string"
             }
@@ -5619,17 +6085,26 @@
           },
           "sortOrder": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32",
             "default": 0
           }
         }
       },
       "FulfilmentType": {
-        "enum": ["InStock", "MadeToOrder"]
+        "enum": [
+          "InStock",
+          "MadeToOrder"
+        ]
       },
       "HealthStatus": {
-        "required": ["isHealthy", "databaseReachable"],
+        "required": [
+          "isHealthy",
+          "databaseReachable"
+        ],
         "type": "object",
         "properties": {
           "isHealthy": {
@@ -5645,7 +6120,10 @@
         "format": "binary"
       },
       "ImageRefDto": {
-        "required": ["storageKey", "altText"],
+        "required": [
+          "storageKey",
+          "altText"
+        ],
         "type": "object",
         "properties": {
           "storageKey": {
@@ -5657,7 +6135,10 @@
         }
       },
       "LoginRequest": {
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password"
+        ],
         "type": "object",
         "properties": {
           "email": {
@@ -5669,7 +6150,10 @@
         }
       },
       "MoveCategoryRequest": {
-        "required": ["direction", "version"],
+        "required": [
+          "direction",
+          "version"
+        ],
         "type": "object",
         "properties": {
           "direction": {
@@ -5677,16 +6161,24 @@
           },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "uint32"
           }
         }
       },
       "MoveDirection": {
-        "enum": ["Up", "Down"]
+        "enum": [
+          "Up",
+          "Down"
+        ]
       },
       "MoveImageRequest": {
-        "required": ["direction"],
+        "required": [
+          "direction"
+        ],
         "type": "object",
         "properties": {
           "direction": {
@@ -5695,11 +6187,86 @@
         }
       },
       "MoveVariantRequest": {
-        "required": ["direction"],
+        "required": [
+          "direction"
+        ],
         "type": "object",
         "properties": {
           "direction": {
             "$ref": "#/components/schemas/MoveDirection"
+          }
+        }
+      },
+      "OrderAdminDto": {
+        "required": [
+          "order",
+          "nextStatuses"
+        ],
+        "type": "object",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderDto"
+          },
+          "nextStatuses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "OrderAdminListItemDto": {
+        "required": [
+          "number",
+          "status",
+          "currency",
+          "total",
+          "customerName",
+          "email",
+          "itemCount",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "number": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "status": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "itemCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -5726,7 +6293,10 @@
         "properties": {
           "number": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "status": {
@@ -5737,7 +6307,10 @@
           },
           "total": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "shippingMethod": {
@@ -5745,7 +6318,10 @@
           },
           "shippingAmount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "customerName": {
@@ -5774,7 +6350,10 @@
             "format": "date-time"
           },
           "paymentDueAt": {
-            "type": ["null", "string"],
+            "type": [
+              "null",
+              "string"
+            ],
             "format": "date-time"
           },
           "items": {
@@ -5809,17 +6388,26 @@
           },
           "unitPrice": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "quantity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "lineTotal": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "fulfilmentType": {
@@ -5827,18 +6415,28 @@
           },
           "leadTimeDays": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
         }
       },
       "OrderLookupRequest": {
-        "required": ["number", "email"],
+        "required": [
+          "number",
+          "email"
+        ],
         "type": "object",
         "properties": {
           "number": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "email": {
@@ -5847,7 +6445,9 @@
         }
       },
       "OrderTokenLookupRequest": {
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "type": "object",
         "properties": {
           "token": {
@@ -5855,8 +6455,62 @@
           }
         }
       },
+      "PagedResultOfOrderAdminListItemDto": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderAdminListItemDto"
+            }
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "PagedResultOfProductAdminListItemDto": {
-        "required": ["items", "page", "pageSize", "totalCount"],
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
         "type": "object",
         "properties": {
           "items": {
@@ -5867,28 +6521,45 @@
           },
           "page": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "pageSize": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "totalCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "totalPages": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
         }
       },
       "PagedResultOfProductListItemDto": {
-        "required": ["items", "page", "pageSize", "totalCount"],
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
         "type": "object",
         "properties": {
           "items": {
@@ -5899,28 +6570,42 @@
           },
           "page": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "pageSize": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "totalCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "totalPages": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
         }
       },
       "PaymentModeDto": {
-        "required": ["isTest"],
+        "required": [
+          "isTest"
+        ],
         "type": "object",
         "properties": {
           "isTest": {
@@ -5929,10 +6614,17 @@
         }
       },
       "PaymentOutcome": {
-        "enum": ["Paid", "Failed"]
+        "enum": [
+          "Paid",
+          "Failed"
+        ]
       },
       "PaymentSessionDto": {
-        "required": ["paymentId", "redirectUrl", "expiresAt"],
+        "required": [
+          "paymentId",
+          "redirectUrl",
+          "expiresAt"
+        ],
         "type": "object",
         "properties": {
           "paymentId": {
@@ -5949,7 +6641,9 @@
         }
       },
       "PaymentStatusDto": {
-        "required": ["status"],
+        "required": [
+          "status"
+        ],
         "type": "object",
         "properties": {
           "status": {
@@ -5997,7 +6691,10 @@
           },
           "expectedTotal": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           }
         }
@@ -6006,21 +6703,37 @@
         "type": "object",
         "properties": {
           "type": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "title": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "status": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "detail": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "instance": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -6068,21 +6781,34 @@
           },
           "leadTimeDays": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "status": {
             "$ref": "#/components/schemas/ProductStatus"
           },
           "seoTitle": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "seoDescription": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "uint32"
           },
           "variants": {
@@ -6140,22 +6866,36 @@
           },
           "variantCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "minPrice": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "totalStock": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "uint32"
           }
         }
@@ -6198,7 +6938,11 @@
           },
           "leadTimeDays": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "seoTitle": {
@@ -6225,7 +6969,14 @@
         }
       },
       "ProductImageDto": {
-        "required": ["id", "variantId", "storageKey", "altText", "sortOrder", "isPrimary"],
+        "required": [
+          "id",
+          "variantId",
+          "storageKey",
+          "altText",
+          "sortOrder",
+          "isPrimary"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -6233,7 +6984,10 @@
             "format": "uuid"
           },
           "variantId": {
-            "type": ["null", "string"],
+            "type": [
+              "null",
+              "string"
+            ],
             "format": "uuid"
           },
           "storageKey": {
@@ -6244,7 +6998,10 @@
           },
           "sortOrder": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "isPrimary": {
@@ -6284,12 +7041,19 @@
           },
           "leadTimeDays": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "minPrice": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "primaryImage": {
@@ -6308,7 +7072,11 @@
         }
       },
       "ProductStatus": {
-        "enum": ["Draft", "Published", "Archived"]
+        "enum": [
+          "Draft",
+          "Published",
+          "Archived"
+        ]
       },
       "ProductVariantDto": {
         "required": [
@@ -6336,12 +7104,19 @@
           },
           "price": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "compareAtPrice": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "isAvailable": {
@@ -6349,7 +7124,10 @@
           },
           "weightGrams": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "attributes": {
@@ -6360,13 +7138,18 @@
           },
           "sortOrder": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
         }
       },
       "ReplaceShippingTariffRequest": {
-        "required": ["steps"],
+        "required": [
+          "steps"
+        ],
         "type": "object",
         "properties": {
           "steps": {
@@ -6378,18 +7161,26 @@
         }
       },
       "SetCartItemQuantityRequest": {
-        "required": ["quantity"],
+        "required": [
+          "quantity"
+        ],
         "type": "object",
         "properties": {
           "quantity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
         }
       },
       "SetProductStatusRequest": {
-        "required": ["status", "version"],
+        "required": [
+          "status",
+          "version"
+        ],
         "type": "object",
         "properties": {
           "status": {
@@ -6397,13 +7188,18 @@
           },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "uint32"
           }
         }
       },
       "SetVariantActiveRequest": {
-        "required": ["isActive"],
+        "required": [
+          "isActive"
+        ],
         "type": "object",
         "properties": {
           "isActive": {
@@ -6412,12 +7208,18 @@
         }
       },
       "ShippingOptionsDto": {
-        "required": ["itemsTotal", "methods"],
+        "required": [
+          "itemsTotal",
+          "methods"
+        ],
         "type": "object",
         "properties": {
           "itemsTotal": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "methods": {
@@ -6429,7 +7231,10 @@
         }
       },
       "ShippingQuote": {
-        "required": ["code", "amount"],
+        "required": [
+          "code",
+          "amount"
+        ],
         "type": "object",
         "properties": {
           "code": {
@@ -6437,29 +7242,43 @@
           },
           "amount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           }
         }
       },
       "ShippingStepRequest": {
-        "required": ["maxWeightGrams", "price"],
+        "required": [
+          "maxWeightGrams",
+          "price"
+        ],
         "type": "object",
         "properties": {
           "maxWeightGrams": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "price": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           }
         }
       },
       "ShippingTariffDto": {
-        "required": ["steps"],
+        "required": [
+          "steps"
+        ],
         "type": "object",
         "properties": {
           "steps": {
@@ -6471,17 +7290,26 @@
         }
       },
       "ShippingTariffStep": {
-        "required": ["maxWeightGrams", "price"],
+        "required": [
+          "maxWeightGrams",
+          "price"
+        ],
         "type": "object",
         "properties": {
           "maxWeightGrams": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "price": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           }
         }
@@ -6516,7 +7344,10 @@
             "type": "string"
           },
           "logoKey": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "primaryColor": {
             "type": "string"
@@ -6526,7 +7357,10 @@
           },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "uint32"
           }
         }
@@ -6560,7 +7394,10 @@
             "type": "string"
           },
           "logoKey": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "primaryColor": {
             "type": "string"
@@ -6571,7 +7408,15 @@
         }
       },
       "UpdateCategoryRequest": {
-        "required": ["name", "slug", "parentId", "description", "sortOrder", "isActive", "version"],
+        "required": [
+          "name",
+          "slug",
+          "parentId",
+          "description",
+          "sortOrder",
+          "isActive",
+          "version"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -6581,15 +7426,24 @@
             "type": "string"
           },
           "parentId": {
-            "type": ["null", "string"],
+            "type": [
+              "null",
+              "string"
+            ],
             "format": "uuid"
           },
           "description": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "sortOrder": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "isActive": {
@@ -6597,20 +7451,29 @@
           },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "uint32"
           }
         }
       },
       "UpdateImageRequest": {
-        "required": ["altText", "variantId"],
+        "required": [
+          "altText",
+          "variantId"
+        ],
         "type": "object",
         "properties": {
           "altText": {
             "type": "string"
           },
           "variantId": {
-            "type": ["null", "string"],
+            "type": [
+              "null",
+              "string"
+            ],
             "format": "uuid"
           }
         }
@@ -6651,25 +7514,44 @@
           },
           "leadTimeDays": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "seoTitle": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "seoDescription": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "uint32"
           },
           "variantStock": {
-            "type": ["null", "object"],
+            "type": [
+              "null",
+              "object"
+            ],
             "additionalProperties": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": ["integer", "string"],
+              "type": [
+                "integer",
+                "string"
+              ],
               "format": "int32"
             }
           }
@@ -6701,7 +7583,10 @@
             "type": "string"
           },
           "contactPhone": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "primaryColor": {
             "type": "string"
@@ -6711,7 +7596,10 @@
           },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "uint32"
           }
         }
@@ -6736,26 +7624,43 @@
           },
           "price": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "weightGrams": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "compareAtPrice": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "stockQuantity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "attributes": {
-            "type": ["null", "object"],
+            "type": [
+              "null",
+              "object"
+            ],
             "additionalProperties": {
               "type": "string"
             }
@@ -6766,21 +7671,37 @@
         "type": "object",
         "properties": {
           "type": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "title": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "status": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "detail": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "instance": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "errors": {
             "type": "object",
@@ -6820,22 +7741,36 @@
           },
           "price": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "compareAtPrice": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int64"
           },
           "stockQuantity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "weightGrams": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "attributes": {
@@ -6849,7 +7784,10 @@
           },
           "sortOrder": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["integer", "string"],
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
         }
@@ -6859,6 +7797,9 @@
   "tags": [
     {
       "name": "AdminCategories"
+    },
+    {
+      "name": "AdminOrders"
     },
     {
       "name": "AdminProductImages"

@@ -23,7 +23,11 @@ internal sealed class RepositoryManager(StorefrontDbContext context) : IReposito
 
     private readonly Lazy<ICatalogQueries> _catalog = new(() => new CatalogQueries(context));
 
+    private readonly Lazy<IOrderQueries> _orderQueries = new(() => new OrderQueries(context));
+
     public ICatalogQueries Catalog => _catalog.Value;
+
+    public IOrderQueries OrderQueries => _orderQueries.Value;
 
     public ICategoryRepository Category => _category.Value;
 

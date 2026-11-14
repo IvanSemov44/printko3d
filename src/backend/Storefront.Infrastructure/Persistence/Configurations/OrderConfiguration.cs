@@ -44,6 +44,8 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.AccessToken).HasMaxLength(64);
         builder.HasIndex(o => o.AccessToken).IsUnique();
         builder.HasIndex(o => o.CreatedAt);
+        // The admin list filters by status and shows the newest first (task 28a).
+        builder.HasIndex(o => new { o.Status, o.CreatedAt });
 
         builder.HasMany(o => o.Items)
             .WithOne()

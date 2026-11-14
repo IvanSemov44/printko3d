@@ -816,6 +816,8 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                     b.HasIndex("Number")
                         .IsUnique();
 
+                    b.HasIndex("Status", "CreatedAt");
+
                     b.ToTable("orders", null, t =>
                         {
                             t.HasCheckConstraint("ck_orders_currency", "char_length(currency) = 3");

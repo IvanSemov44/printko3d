@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261114112224_AddOrderAccessToken`
+Последна миграция: `20261114123536_AddOrderStatusCreatedIndex`
 
 ## Връзки
 
@@ -365,6 +365,7 @@ erDiagram
 | IX_orders_access_token | `CREATE UNIQUE INDEX "IX_orders_access_token" ON public.orders USING btree (access_token)` |
 | IX_orders_created_at | `CREATE INDEX "IX_orders_created_at" ON public.orders USING btree (created_at)` |
 | IX_orders_number | `CREATE UNIQUE INDEX "IX_orders_number" ON public.orders USING btree (number)` |
+| IX_orders_status_created_at | `CREATE INDEX "IX_orders_status_created_at" ON public.orders USING btree (status, created_at)` |
 
 ### outgoing_emails
 

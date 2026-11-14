@@ -40,4 +40,19 @@ public sealed class OrderTransitionsTests
 
     [Fact]
     public void ANewOrder_CannotSkipThePayment() => Assert.False(OrderTransitions.CanMove(OrderStatus.New, OrderStatus.Shipped));
+
+    [Theory]
+    [InlineData(OrderStatus.New)]
+    [InlineData(OrderStatus.Cancelled)]
+    [InlineData(OrderStatus.Completed)]
+    public void TheAdministrator_HasNoForwardMove_FromNewCancelledOrCompleted(OrderStatus from) =>
+        Assert.Empty(OrderTransitions.AdminMoves(from));
+
+    [Theory]
+    [InlineData(OrderStatus.Paid, OrderStatus.InProduction)]
+    [InlineData(OrderStatus.InProduction, OrderStatus.ReadyToShip)]
+    [InlineData(OrderStatus.ReadyToShip, OrderStatus.Shipped)]
+    [InlineData(OrderStatus.Shipped, OrderStatus.Completed)]
+    public void TheAdministrator_MovesTheProductionOneStepForward(OrderStatus from, OrderStatus to) =>
+        Assert.Equal([to], OrderTransitions.AdminMoves(from));
 }

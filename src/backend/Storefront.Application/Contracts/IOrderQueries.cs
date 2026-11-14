@@ -1,0 +1,11 @@
+using Storefront.Application.Catalog.Queries;
+using Storefront.Application.Orders;
+
+namespace Storefront.Application.Contracts;
+
+/// <summary>Read side of orders for the admin panel.</summary>
+public interface IOrderQueries
+{
+    /// <summary>Every order, the newest first, one page at a time. The search matches the number exactly and the email and the name by a part.</summary>
+    Task<PagedResult<OrderAdminListItemDto>> GetAdminOrdersAsync(OrderAdminListQuery query, CancellationToken cancellationToken);
+}
