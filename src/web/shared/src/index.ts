@@ -91,12 +91,19 @@ export { addCartItem, clearCart, getCart, removeCartItem, setCartItemQuantity } 
 export type { Cart, CartLine, CartLineImage, CartLineState } from './api/cart';
 export { findOrder, findOrderByToken, ORDER_STATUSES, placeOrder, readOrder } from './api/orders';
 export type { Order, OrderItem, OrderStatus, PlaceOrderInput } from './api/orders';
-export { cancelOrder, changeOrderStatus, getAdminOrder, getAdminOrders } from './api/adminOrders';
+export {
+  cancelOrder,
+  changeOrderStatus,
+  getAdminOrder,
+  getAdminOrders,
+  getOrderStatusCounts,
+} from './api/adminOrders';
 export type {
   AdminOrder,
   AdminOrderListItem,
   AdminOrderPage,
   AdminOrderQuery,
+  OrderStatusCounts,
   CancelledOrder,
 } from './api/adminOrders';
 export { completeTestPayment, getPaymentMode, getPaymentState, startPayment } from './api/payments';

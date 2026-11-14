@@ -1,9 +1,17 @@
 import { formatMoney, ORDER_STATUSES, type OrderStatus } from '@storefront/shared';
 import { Link, useSearchParams } from 'react-router';
 import { t } from '../../i18n';
-import { useStoreMoney } from '../products/useProducts';
-import { ORDER_STATUS_KEYS, orderDateText, orderNumberText } from './orderLabels';
-import { useAdminOrders } from './useOrders';
+import { DataTable } from '../../components/DataTable';
+import { StatusBadge } from '../../components/StatusBadge';
+import { useStoreMoney } from '../../components/useStoreMoney';
+import {
+  ORDER_STATUS_KEYS,
+  ORDER_STATUS_TONES,
+  orderDateText,
+  orderNumberText,
+} from './orderLabels';
+import { OrderStatusFilter } from './OrderStatusFilter';
+import { useAdminOrders, useOrderStatusCounts } from './useOrders';
 
 const PAGE_SIZE = 20;
 const MAX_PAGE = 10_000;
@@ -49,6 +57,7 @@ export function OrderListPage() {
     pageSize: PAGE_SIZE,
   });
   const money = useStoreMoney();
+  const counts = useOrderStatusCounts();
 
   /** Any change of a filter goes back to the first page. */
   function change(changes: Partial<Filters>) {
@@ -88,25 +97,15 @@ export function OrderListPage() {
         <h2>{t('orders.title')}</h2>
       </div>
 
-      <div className="filters" role="group" aria-label={t('orders.filters.label')}>
-        <div className="field">
-          <label htmlFor="filter-status">{t('orders.filters.status')}</label>
-          <select
-            id="filter-status"
-            value={filters.status ?? ''}
-            onChange={(event) => {
-              change({ status: ORDER_STATUSES.find((item) => item === event.target.value) });
-            }}
-          >
-            <option value="">{t('orders.filters.allStatuses')}</option>
-            {ORDER_STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {t(ORDER_STATUS_KEYS[status])}
-              </option>
-            ))}
-          </select>
-        </div>
+      <OrderStatusFilter
+        selected={filters.status}
+        counts={counts.data}
+        onSelect={(status) => {
+          change({ status });
+        }}
+      />
 
+      <div className="filters" role="group" aria-label={t('orders.filters.label')}>
         {/* The key starts the form again when the search in the address changes, for example after "Clear". */}
         <form
           key={filters.search}
@@ -147,45 +146,46 @@ export function OrderListPage() {
       {page.items.length === 0 ? (
         <p>{hasFilters ? t('orders.empty') : t('orders.emptyAll')}</p>
       ) : (
-        <div className="table-wrap">
-          <table className="product-table">
-            <caption className="visually-hidden">{t('orders.table.caption')}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{t('orders.table.number')}</th>
-                <th scope="col">{t('orders.table.date')}</th>
-                <th scope="col">{t('orders.table.customer')}</th>
-                <th scope="col">{t('orders.table.status')}</th>
-                <th scope="col">{t('orders.table.items')}</th>
-                <th scope="col">{t('orders.table.total')}</th>
+        <DataTable caption={t('orders.table.caption')}>
+          <thead>
+            <tr>
+              <th scope="col">{t('orders.table.number')}</th>
+              <th scope="col">{t('orders.table.date')}</th>
+              <th scope="col">{t('orders.table.customer')}</th>
+              <th scope="col">{t('orders.table.status')}</th>
+              <th scope="col" className="num">
+                {t('orders.table.items')}
+              </th>
+              <th scope="col" className="num">
+                {t('orders.table.total')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {page.items.map((order) => (
+              <tr key={order.number}>
+                <th scope="row">
+                  <Link className="row-link mono" to={`/orders/${String(order.number)}`}>
+                    {orderNumberText(order.number)}
+                  </Link>
+                </th>
+                <td className="mono">{orderDateText(order.createdAt, locale)}</td>
+                <td>
+                  <strong>{order.customerName}</strong>
+                  <br />
+                  <span className="field-hint">{order.email}</span>
+                </td>
+                <td>
+                  <StatusBadge tone={ORDER_STATUS_TONES[order.status]}>
+                    {t(ORDER_STATUS_KEYS[order.status])}
+                  </StatusBadge>
+                </td>
+                <td className="num">{order.itemCount}</td>
+                <td className="num">{formatMoney(order.total, order.currency, locale)}</td>
               </tr>
-            </thead>
-            <tbody>
-              {page.items.map((order) => (
-                <tr key={order.number}>
-                  <th scope="row">
-                    <Link to={`/orders/${String(order.number)}`}>
-                      {orderNumberText(order.number)}
-                    </Link>
-                  </th>
-                  <td>{orderDateText(order.createdAt, locale)}</td>
-                  <td>
-                    <strong>{order.customerName}</strong>
-                    <br />
-                    <span className="field-hint">{order.email}</span>
-                  </td>
-                  <td>
-                    <span className={`badge order-${order.status}`}>
-                      {t(ORDER_STATUS_KEYS[order.status])}
-                    </span>
-                  </td>
-                  <td>{order.itemCount}</td>
-                  <td>{formatMoney(order.total, order.currency, locale)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </DataTable>
       )}
 
       {page.totalPages > 1 ? (

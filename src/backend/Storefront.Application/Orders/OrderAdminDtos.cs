@@ -11,6 +11,9 @@ public sealed record OrderAdminListItemDto(
     int ItemCount,
     DateTimeOffset CreatedAt);
 
+/// <summary>How many orders have a status. The list of the panel shows it next to each status filter.</summary>
+public sealed record OrderStatusCountDto(string Status, int Count);
+
 /// <summary>
 /// One order for the administrator. <paramref name="NextStatuses"/> are the production steps the administrator can take
 /// now (decision 0037), so the panel does not repeat the rules.

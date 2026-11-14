@@ -5,7 +5,7 @@ import {
   type StoreSettingsInput,
 } from '@storefront/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { STORE_MONEY_KEY } from '../products/useProducts';
+import { STORE_MONEY_KEY } from '../../components/useStoreMoney';
 
 // The first part is "admin", so signing out removes the settings with everything else loaded for the administrator.
 const SETTINGS_KEY = ['admin', 'store-settings'] as const;
@@ -32,6 +32,7 @@ export function useSaveStoreSettings() {
     onSuccess: (saved: AdminStoreSettings) => {
       queryClient.setQueryData(SETTINGS_KEY, saved);
       queryClient.setQueryData(STORE_MONEY_KEY, {
+        storeName: saved.storeName,
         currency: saved.defaultCurrency,
         locale: saved.defaultLocale,
       });

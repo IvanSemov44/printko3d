@@ -8,7 +8,7 @@ import { useRef, useState, type SubmitEvent } from 'react';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { focusField } from '../../components/useFormValues';
 import { t, type MessageKey } from '../../i18n';
-import { useStoreMoney } from '../products/useProducts';
+import { useStoreMoney } from '../../components/useStoreMoney';
 import { MAX_STEPS, validateTariff, type StepErrors, type StepValues } from './shippingValidation';
 import { TariffStepFields } from './TariffStepFields';
 import { useSaveShippingTariff, useShippingTariff } from './useShippingTariff';

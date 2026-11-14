@@ -1,6 +1,7 @@
 import { ApiStatus, useApiHealth, type AdminUser } from '@storefront/shared';
 import { lazy, Suspense } from 'react';
-import { Link, Navigate, NavLink, Route, Routes } from 'react-router';
+import { Link, Navigate, Route, Routes } from 'react-router';
+import { AdminLayout } from '../../components/AdminLayout';
 import { PageLoadBoundary } from '../../components/PageLoadBoundary';
 import { t } from '../../i18n';
 import { useLogout } from './useAdminSession';
@@ -38,7 +39,7 @@ export function SignedIn({ user }: { user: AdminUser }) {
   const apiState = useApiHealth();
   const logout = useLogout();
 
-  return (
+  const footer = (
     <>
       <p>
         {t('auth.signedInAs')} <strong>{user.email}</strong>
@@ -65,15 +66,11 @@ export function SignedIn({ user }: { user: AdminUser }) {
       >
         {t('auth.logout')}
       </button>
+    </>
+  );
 
-      <nav aria-label={t('nav.label')}>
-        <NavLink to="/products">{t('nav.products')}</NavLink>
-        <NavLink to="/categories">{t('nav.categories')}</NavLink>
-        <NavLink to="/orders">{t('nav.orders')}</NavLink>
-        <NavLink to="/shipping">{t('nav.shipping')}</NavLink>
-        <NavLink to="/settings">{t('nav.settings')}</NavLink>
-      </nav>
-
+  return (
+    <AdminLayout footer={footer}>
       <PageLoadBoundary>
         <Suspense fallback={<p role="status">{t('auth.loading')}</p>}>
           <Routes>
@@ -100,6 +97,6 @@ export function SignedIn({ user }: { user: AdminUser }) {
           </Routes>
         </Suspense>
       </PageLoadBoundary>
-    </>
+    </AdminLayout>
   );
 }

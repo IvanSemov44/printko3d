@@ -1,5 +1,8 @@
 {
   "app.title": "Админ панел",
+  "app.adminLabel": "Админ",
+  "nav.menu": "Меню",
+  "nav.closeMenu": "Затвори менюто",
   "api.checking": "Проверка на връзката с API…",
   "api.available": "API е достъпно",
   "api.unavailable": "API не е достъпно",

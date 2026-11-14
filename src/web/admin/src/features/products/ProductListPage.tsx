@@ -2,9 +2,12 @@ import { formatMoney, type AdminProductListItem, type ProductStatus } from '@sto
 import { Link, useSearchParams } from 'react-router';
 import { t } from '../../i18n';
 import { useAdminCategories } from '../categories/useCategories';
-import { FULFILMENT_KEYS, PRODUCT_STATUSES, STATUS_KEYS } from './productLabels';
+import { FULFILMENT_KEYS, PRODUCT_STATUSES, STATUS_KEYS, STATUS_TONES } from './productLabels';
 import { parseWholeNumber } from './productValidation';
-import { useAdminProducts, useStoreMoney } from './useProducts';
+import { DataTable } from '../../components/DataTable';
+import { StatusBadge } from '../../components/StatusBadge';
+import { useStoreMoney } from '../../components/useStoreMoney';
+import { useAdminProducts } from './useProducts';
 
 const PAGE_SIZE = 20;
 const SEARCH_MAX_LENGTH = 100;
@@ -61,17 +64,21 @@ function ProductRow({
       </th>
       <td>{product.categoryName}</td>
       <td>
-        <span className={`badge status-${product.status}`}>{t(STATUS_KEYS[product.status])}</span>
+        <StatusBadge tone={STATUS_TONES[product.status]}>
+          {t(STATUS_KEYS[product.status])}
+        </StatusBadge>
       </td>
       <td>{t(FULFILMENT_KEYS[product.fulfilmentType])}</td>
-      <td>{product.variantCount}</td>
-      <td>
+      <td className="num">{product.variantCount}</td>
+      <td className="num">
         {product.minPrice === null ? t('products.table.noPrice') : priceText(product.minPrice)}
       </td>
-      <td>{product.totalStock === null ? t('products.table.noStock') : product.totalStock}</td>
+      <td className="num">
+        {product.totalStock === null ? t('products.table.noStock') : product.totalStock}
+      </td>
       <td>
         <Link
-          className="button secondary"
+          className="button secondary row-link"
           to={`/products/${product.id}`}
           aria-label={t('products.edit', { name: product.name })}
         >
@@ -215,30 +222,33 @@ export function ProductListPage() {
       {page.items.length === 0 ? (
         <p>{hasFilters ? t('products.empty') : t('products.emptyAll')}</p>
       ) : (
-        <div className="table-wrap">
-          <table className="product-table">
-            <caption className="visually-hidden">{t('products.table.caption')}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{t('products.table.name')}</th>
-                <th scope="col">{t('products.table.category')}</th>
-                <th scope="col">{t('products.table.status')}</th>
-                <th scope="col">{t('products.table.fulfilment')}</th>
-                <th scope="col">{t('products.table.variants')}</th>
-                <th scope="col">{t('products.table.price')}</th>
-                <th scope="col">{t('products.table.stock')}</th>
-                <th scope="col">
-                  <span className="visually-hidden">{t('products.table.actions')}</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {page.items.map((product) => (
-                <ProductRow key={product.id} product={product} priceText={priceText} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable caption={t('products.table.caption')}>
+          <thead>
+            <tr>
+              <th scope="col">{t('products.table.name')}</th>
+              <th scope="col">{t('products.table.category')}</th>
+              <th scope="col">{t('products.table.status')}</th>
+              <th scope="col">{t('products.table.fulfilment')}</th>
+              <th scope="col" className="num">
+                {t('products.table.variants')}
+              </th>
+              <th scope="col" className="num">
+                {t('products.table.price')}
+              </th>
+              <th scope="col" className="num">
+                {t('products.table.stock')}
+              </th>
+              <th scope="col">
+                <span className="visually-hidden">{t('products.table.actions')}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {page.items.map((product) => (
+              <ProductRow key={product.id} product={product} priceText={priceText} />
+            ))}
+          </tbody>
+        </DataTable>
       )}
 
       {page.totalPages > 1 ? (

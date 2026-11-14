@@ -1,3 +1,4 @@
+import type { BadgeTone } from '../../components/StatusBadge';
 import type { AdminFulfilmentType, ProductStatus } from '@storefront/shared';
 import type { MessageKey } from '../../i18n';
 
@@ -9,6 +10,13 @@ export const STATUS_KEYS = {
   Published: 'products.status.Published',
   Archived: 'products.status.Archived',
 } as const satisfies Record<ProductStatus, MessageKey>;
+
+/** The colour of each status of a product (docs/design.md section 11). */
+export const STATUS_TONES = {
+  Draft: 'info',
+  Published: 'success',
+  Archived: 'muted',
+} as const satisfies Record<ProductStatus, BadgeTone>;
 
 export const FULFILMENT_KEYS = {
   InStock: 'products.fulfilment.InStock',

@@ -1,8 +1,9 @@
 import { ApiError } from '@storefront/shared';
 import { Link, useParams } from 'react-router';
+import { StatusBadge } from '../../components/StatusBadge';
+import { useStoreMoney } from '../../components/useStoreMoney';
 import { t } from '../../i18n';
-import { useStoreMoney } from '../products/useProducts';
-import { orderDateText, orderNumberText, orderStatusText } from './orderLabels';
+import { orderDateText, orderNumberText, orderStatusText, orderStatusTone } from './orderLabels';
 import { OrderActions } from './OrderActions';
 import { OrderLines } from './OrderLines';
 import { useAdminOrder } from './useOrders';
@@ -56,7 +57,9 @@ export function OrderDetailPage() {
       {back}
       <div className="page-header">
         <h2>{t('orders.detail.title', { number: orderNumberText(placed.number) })}</h2>
-        <span className={`badge order-${placed.status}`}>{orderStatusText(placed.status)}</span>
+        <StatusBadge tone={orderStatusTone(placed.status)}>
+          {orderStatusText(placed.status)}
+        </StatusBadge>
       </div>
 
       <section className="section" aria-labelledby="order-actions">

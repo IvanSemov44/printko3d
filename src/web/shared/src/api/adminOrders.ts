@@ -108,6 +108,32 @@ const readCancelled: Reader<CancelledOrder> = (value, path) => {
   };
 };
 
+/** How many orders have each status. Every status is there, zero when it has none. */
+export type OrderStatusCounts = Record<OrderStatus, number>;
+
+const readCount: Reader<{ status: OrderStatus; count: number }> = (value, path) => {
+  const object = readObject(value, path);
+  return {
+    status: field(object, 'status', readStatus, path),
+    count: field(object, 'count', readInteger, path),
+  };
+};
+
+/** The number of orders of each status, for the filter of the list. */
+export async function getOrderStatusCounts(signal?: AbortSignal): Promise<OrderStatusCounts> {
+  const rows = readArray(readCount)(
+    await apiRequest(`${ORDERS_PATH}/status-counts`, { signal }),
+    'orderStatusCounts',
+  );
+  const counts = Object.fromEntries(
+    ORDER_STATUSES.map((status) => [status, 0]),
+  ) as OrderStatusCounts;
+  for (const row of rows) {
+    counts[row.status] = row.count;
+  }
+  return counts;
+}
+
 /** A page of orders of every status, the newest first. */
 export async function getAdminOrders(
   query: AdminOrderQuery,

@@ -79,6 +79,15 @@ function fakeApi(
       if (url === '/api/v1/store-settings') {
         return Promise.resolve(Response.json({ defaultCurrency: 'EUR', defaultLocale: 'bg' }));
       }
+      if (url === '/api/v1/admin/orders/status-counts') {
+        return Promise.resolve(
+          Response.json([
+            { status: 'New', count: 2 },
+            { status: 'Paid', count: 3 },
+            { status: 'InProduction', count: 1 },
+          ]),
+        );
+      }
       if (url.startsWith('/api/v1/admin/orders?')) {
         api.listUrls.push(url);
         return Promise.resolve(
@@ -171,7 +180,7 @@ describe('the list of orders', () => {
     renderAt('/orders');
     await screen.findByRole('row', { name: /PR-12345678/ });
 
-    await user.selectOptions(screen.getByLabelText('Статус'), 'Платена');
+    await user.click(screen.getByRole('button', { name: /Платена/ }));
     await waitFor(() => {
       expect(api.listUrls.at(-1)).toContain('status=Paid');
     });
@@ -182,6 +191,31 @@ describe('the list of orders', () => {
       expect(api.listUrls.at(-1)).toContain('search=anna');
     });
     expect(api.listUrls.at(-1)).toContain('status=Paid');
+  });
+
+  it('shows the number of orders next to each status and marks the chosen one', async () => {
+    fakeApi();
+    const user = userEvent.setup();
+    renderAt('/orders');
+
+    const paid = await screen.findByRole('button', { name: 'Платена 3' });
+    expect(screen.getByRole('button', { name: 'Нова 2' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Всички статуси 6' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Отказана 0' })).toBeTruthy();
+
+    await user.click(paid);
+
+    expect(screen.getByRole('button', { name: 'Платена 3' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Всички статуси 6' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
   });
 
   it('goes to the next page when there is one', async () => {

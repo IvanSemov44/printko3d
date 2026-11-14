@@ -1,24 +1,131 @@
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
+/* Latin and Cyrillic subsets of variable fonts, served from the same origin (OFL licences are next to the files). */
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url('/fonts/unbounded-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 
-main {
-  max-width: 40rem;
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url('/fonts/unbounded-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/manrope-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/manrope-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+ * Design tokens (docs/design.md). The only place with literal colours.
+ * The panel uses the default theme; the store colours are only for the shop window.
+ */
+:root {
+  --color-bg: #faf7f2;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f1ece4;
+  --color-ink: #1c1a17;
+  --color-ink-muted: #6b655c;
+  --color-border: #e3dcd1;
+  --color-primary: #f25a18;
+  --color-primary-hover: #da5115;
+  --color-on-primary: #000000;
+  --color-secondary: #0f766e;
+  --color-on-secondary: #ffffff;
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-error: #b91c1c;
+  --color-info: #1d4ed8;
+  --color-accent-yellow: #ffc531;
+  --color-production: #c2410c;
+  --color-production-fill: rgb(255 107 44 / 18%);
+
+  --font-display: 'Unbounded', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+
+  --sidebar-width: 15rem;
+  --content-width: 80rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-ink);
+  background: var(--color-bg);
+}
+
+main.narrow {
+  max-width: 28rem;
   margin: 2rem auto;
   padding: 0 1rem;
 }
 
 [data-state='available'] {
-  color: #1a7f37;
+  color: var(--color-success);
 }
 
 [data-state='unavailable'] {
-  color: #b42318;
+  color: var(--color-error);
 }
 
 :focus-visible {
-  outline: 3px solid #1f2328;
+  outline: 3px solid var(--color-ink);
   outline-offset: 2px;
 }
 
@@ -35,27 +142,27 @@ form {
 input {
   font: inherit;
   padding: 0.5rem;
-  border: 2px solid #57606a;
+  border: 2px solid var(--color-ink-muted);
   border-radius: 0.25rem;
 }
 
 input[aria-invalid='true'] {
-  border-color: #b42318;
+  border-color: var(--color-error);
 }
 
 .field-error,
 .form-error {
   margin: 0;
-  color: #b42318;
+  color: var(--color-error);
 }
 
 button {
   font: inherit;
   padding: 0.5rem 1rem;
-  border: 2px solid #2f5d8a;
+  border: 2px solid var(--color-primary);
   border-radius: 0.25rem;
-  background: #2f5d8a;
-  color: #ffffff;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   cursor: pointer;
 }
 
@@ -64,46 +171,27 @@ button:disabled {
   cursor: progress;
 }
 
-main {
-  max-width: 60rem;
-}
-
-nav {
-  display: flex;
-  gap: 1rem;
-  margin: 1rem 0;
-}
-
-nav a {
-  color: #1f2328;
-  font-weight: 600;
-}
-
-nav a[aria-current='page'] {
-  text-decoration-thickness: 3px;
-}
-
 a.button {
   display: inline-block;
   font: inherit;
   padding: 0.5rem 1rem;
-  border: 2px solid #2f5d8a;
+  border: 2px solid var(--color-primary);
   border-radius: 0.25rem;
-  background: #2f5d8a;
-  color: #ffffff;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   text-decoration: none;
 }
 
 button.secondary,
 a.button.secondary {
-  background: #ffffff;
-  color: #1f2328;
-  border-color: #57606a;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border-color: var(--color-ink-muted);
 }
 
 button.danger {
-  background: #b42318;
-  border-color: #b42318;
+  background: var(--color-error);
+  border-color: var(--color-error);
 }
 
 .page-header {
@@ -133,15 +221,15 @@ button.danger {
   flex-wrap: wrap;
   margin: 0.5rem 0;
   padding: 0.5rem 0.75rem;
-  border: 2px solid #d0d7de;
+  border: 2px solid var(--color-border);
   border-radius: 0.25rem;
 }
 
 /* Not only a different colour: the row has a dashed border and a text badge as well. */
 .category-row.inactive {
-  background: #f6f8fa;
+  background: var(--color-surface-alt);
   border-style: dashed;
-  color: #57606a;
+  color: var(--color-ink-muted);
 }
 
 .category-info {
@@ -156,7 +244,7 @@ button.danger {
 .badge {
   justify-self: start;
   padding: 0 0.5rem;
-  border: 1px solid #57606a;
+  border: 1px solid var(--color-ink-muted);
   border-radius: 1rem;
   font-size: 0.875rem;
 }
@@ -172,7 +260,7 @@ button.danger {
 .field-hint {
   margin: 0;
   font-size: 0.875rem;
-  color: #57606a;
+  color: var(--color-ink-muted);
 }
 
 .field-check {
@@ -185,23 +273,23 @@ select,
 textarea {
   font: inherit;
   padding: 0.5rem;
-  border: 2px solid #57606a;
+  border: 2px solid var(--color-ink-muted);
   border-radius: 0.25rem;
 }
 
 select[aria-invalid='true'],
 textarea[aria-invalid='true'] {
-  border-color: #b42318;
+  border-color: var(--color-error);
 }
 
 dialog {
   max-width: 32rem;
-  border: 2px solid #1f2328;
+  border: 2px solid var(--color-ink);
   border-radius: 0.5rem;
 }
 
 dialog::backdrop {
-  background: rgb(0 0 0 / 50%);
+  background: var(--color-scrim);
 }
 
 .visually-hidden {
@@ -230,34 +318,6 @@ dialog::backdrop {
   gap: 0.5rem;
 }
 
-.table-wrap {
-  overflow-x: auto;
-}
-
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.product-table th,
-.product-table td {
-  padding: 0.5rem 0.75rem;
-  border-bottom: 2px solid #d0d7de;
-  text-align: left;
-  vertical-align: top;
-}
-
-/* The state is a word in a badge, never only a colour. */
-.badge.status-Published {
-  border-color: #1a7f37;
-  color: #1a7f37;
-}
-
-.badge.status-Archived {
-  border-style: dashed;
-  color: #57606a;
-}
-
 .pagination {
   display: flex;
   align-items: center;
@@ -268,7 +328,7 @@ dialog::backdrop {
 .section {
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 2px solid #d0d7de;
+  border-top: 2px solid var(--color-border);
 }
 
 .variant-list {
@@ -280,10 +340,10 @@ dialog::backdrop {
 .warning {
   margin: 0;
   padding: 0.5rem 0.75rem;
-  border: 2px solid #9a6700;
+  border: 2px solid var(--color-warning);
   border-radius: 0.25rem;
-  background: #fff8c5;
-  color: #1f2328;
+  background: var(--color-surface-alt);
+  color: var(--color-ink);
 }
 
 .image-row {
@@ -303,9 +363,9 @@ dialog::backdrop {
   width: 6rem;
   height: 6rem;
   object-fit: cover;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border);
   border-radius: 0.25rem;
-  background: #f6f8fa;
+  background: var(--color-surface-alt);
 }
 
 .image-placeholder {
@@ -314,7 +374,7 @@ dialog::backdrop {
   padding: 0.25rem;
   font-size: 0.75rem;
   text-align: center;
-  color: #57606a;
+  color: var(--color-ink-muted);
 }
 
 /* The main image is marked with a thicker border and a text badge, never only with a colour. */
@@ -349,9 +409,9 @@ input[type='color'] {
   width: 3rem;
   height: 2.5rem;
   padding: 0.125rem;
-  border: 2px solid #57606a;
+  border: 2px solid var(--color-ink-muted);
   border-radius: 0.25rem;
-  background: #ffffff;
+  background: var(--color-surface);
   cursor: pointer;
 }
 
@@ -375,19 +435,8 @@ input[type='color'] {
   max-width: 28rem;
   margin: 0 0 1rem;
   padding: 0.75rem 1rem;
-  border: 1px solid #57606a;
+  border: 1px solid var(--color-ink-muted);
   border-radius: 0.25rem;
-}
-
-/* The state of an order is a word in a badge, never only a colour. */
-.badge.order-Completed {
-  border-color: #1a7f37;
-  color: #1a7f37;
-}
-
-.badge.order-Cancelled {
-  border-style: dashed;
-  color: #57606a;
 }
 
 .detail-list {
@@ -402,4 +451,297 @@ input[type='color'] {
 
 .detail-list dd {
   margin: 0;
+}
+
+/* The frame of the signed-in panel (docs/design.md section 11). */
+.admin-shell {
+  min-height: 100vh;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.admin-wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.admin-sidebar {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.admin-sidebar[data-open='true'] {
+  display: flex;
+}
+
+.admin-sidebar .admin-wordmark {
+  font-size: 1.125rem;
+}
+
+.admin-brand {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-brand-label {
+  color: var(--color-ink-muted);
+}
+
+.admin-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-sidebar nav a {
+  display: block;
+  min-height: 2.75rem;
+  padding: 0.625rem 0.75rem;
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-sidebar nav a:hover {
+  background: var(--color-surface-alt);
+}
+
+.admin-sidebar nav a[aria-current='page'] {
+  border-left-color: var(--color-primary);
+  background: var(--color-surface-alt);
+}
+
+.admin-sidebar-foot {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-sidebar-foot p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-content {
+  max-width: var(--content-width);
+  padding: 1rem;
+}
+
+.admin-content h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+@media (min-width: 64rem) {
+  .admin-topbar {
+    display: none;
+  }
+
+  .admin-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    display: flex;
+    width: var(--sidebar-width);
+    border-right: 1px solid var(--color-border);
+    border-bottom: 0;
+    overflow-y: auto;
+  }
+
+  .admin-content {
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+  }
+}
+
+/* Data tables (docs/design.md section 11). */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-surface-alt);
+  color: var(--color-ink-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.data-table tbody tr {
+  position: relative;
+}
+
+.data-table tbody tr:hover {
+  background: var(--color-surface-alt);
+}
+
+.data-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.data-table .num {
+  text-align: right;
+}
+
+.data-table .num,
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* The link of a row covers the whole row, so the row opens with one click and the page has one link per row. */
+.data-table a.row-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+/* Status pills (docs/design.md section 11): a tint of the colour with the colour as text. */
+.pill {
+  display: inline-block;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pill-info {
+  background: color-mix(in srgb, var(--color-info) 12%, transparent);
+  color: var(--color-info);
+}
+
+.pill-production {
+  background: var(--color-production-fill);
+  color: var(--color-production);
+}
+
+.pill-success {
+  background: color-mix(in srgb, var(--color-success) 12%, transparent);
+  color: var(--color-success);
+}
+
+.pill-teal {
+  background: color-mix(in srgb, var(--color-secondary) 12%, transparent);
+  color: var(--color-secondary);
+}
+
+.pill-error {
+  background: color-mix(in srgb, var(--color-error) 10%, transparent);
+  color: var(--color-error);
+}
+
+.pill-muted {
+  background: var(--color-surface-alt);
+  color: var(--color-ink-muted);
+}
+
+/* The status filter of a list: pills with the number of rows; the chosen one is dark. */
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+}
+
+.filter-pill {
+  padding: 0.375rem 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.filter-pill[aria-pressed='true'] {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+.filter-count {
+  font-family: var(--font-mono);
+}
+
+/* Pages other than lists: the title row, and forms and sections as panels (docs/design.md section 11). */
+.page-header {
+  margin-bottom: 1rem;
+}
+
+.admin-content > form,
+.admin-content > .section {
+  max-width: 48rem;
+  margin-top: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.admin-content .section {
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-content > .section + .section,
+.admin-content > .section + form {
+  margin-top: 1rem;
+}
+
+input,
+select {
+  min-height: 2.5rem;
+}
+
+.category-row {
+  border-width: 1px;
+  background: var(--color-surface);
+}
+
+.data-table a.row-link:not(.button) {
+  color: var(--color-ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.data-table tbody tr:hover a.row-link:not(.button) {
+  text-decoration: underline;
+}
+
+.data-table .mono,
+.data-table .num {
+  white-space: nowrap;
 }

@@ -1,4 +1,5 @@
 import { ORDER_STATUSES, type OrderStatus } from '@storefront/shared';
+import type { BadgeTone } from '../../components/StatusBadge';
 import { t, type MessageKey } from '../../i18n';
 
 /** The words for the statuses of an order, one key each. */
@@ -10,6 +11,17 @@ export const ORDER_STATUS_KEYS: Record<OrderStatus, MessageKey> = {
   Shipped: 'orders.status.Shipped',
   Completed: 'orders.status.Completed',
   Cancelled: 'orders.status.Cancelled',
+};
+
+/** The colour of each status (docs/design.md section 11, decision 0038): paid reads as new, completed as ready. */
+export const ORDER_STATUS_TONES: Record<OrderStatus, BadgeTone> = {
+  New: 'info',
+  Paid: 'info',
+  InProduction: 'production',
+  ReadyToShip: 'success',
+  Shipped: 'teal',
+  Completed: 'success',
+  Cancelled: 'error',
 };
 
 /** The button that takes the order to this status. Only the four production steps have one. */
@@ -36,4 +48,10 @@ export function orderDateText(iso: string, locale: string): string {
 export function orderStatusText(status: string): string {
   const known = ORDER_STATUSES.find((item) => item === status);
   return known ? t(ORDER_STATUS_KEYS[known]) : status;
+}
+
+/** The colour of a status the API sent as text; a status that is not known is grey. */
+export function orderStatusTone(status: string): BadgeTone {
+  const known = ORDER_STATUSES.find((item) => item === status);
+  return known ? ORDER_STATUS_TONES[known] : 'muted';
 }

@@ -3,6 +3,7 @@ import {
   changeOrderStatus,
   getAdminOrder,
   getAdminOrders,
+  getOrderStatusCounts,
   type AdminOrder,
   type AdminOrderQuery,
   type OrderStatus,
@@ -19,6 +20,15 @@ export function useAdminOrders(query: AdminOrderQuery) {
   return useQuery({
     queryKey: [...LIST_KEY, query],
     queryFn: ({ signal }) => getAdminOrders(query, signal),
+    placeholderData: (previous) => previous,
+  });
+}
+
+/** How many orders each status has, for the filter of the list. Loaded again after every change of an order. */
+export function useOrderStatusCounts() {
+  return useQuery({
+    queryKey: [...LIST_KEY, 'counts'],
+    queryFn: ({ signal }) => getOrderStatusCounts(signal),
     placeholderData: (previous) => previous,
   });
 }

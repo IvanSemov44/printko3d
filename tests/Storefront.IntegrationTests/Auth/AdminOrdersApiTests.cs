@@ -40,6 +40,7 @@ public sealed class AdminOrdersApiTests(PostgresFixture postgres)
     public static TheoryData<string, string> Addresses => new()
     {
         { "GET", Base },
+        { "GET", Base + "/status-counts" },
         { "GET", Base + "/12345678" },
         { "POST", Base + "/12345678/status" },
         { "POST", Base + "/12345678/cancel" },
@@ -88,6 +89,26 @@ public sealed class AdminOrdersApiTests(PostgresFixture postgres)
         Assert.Equal("New", item.GetProperty("status").GetString());
         Assert.False(item.TryGetProperty("phone", out _));
         Assert.False(item.TryGetProperty("shippingStreet", out _));
+    }
+
+    [Fact]
+    public async Task TheStatusCounts_HasEveryStatus_WithZeroForTheOnesWithoutOrders()
+    {
+        await using var host = await AuthApiHost.CreateAsync(postgres);
+        await SeedAsync(host, 12345671, OrderStatus.New);
+        await SeedAsync(host, 12345672, OrderStatus.New);
+        await SeedAsync(host, 12345673, OrderStatus.InProduction);
+        var cookie = await host.LoginAsync();
+
+        var response = await host.SendAsync(HttpMethod.Get, Base + "/status-counts", cookie: cookie);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var counts = (await JsonOf(response)).EnumerateArray()
+            .ToDictionary(item => item.GetProperty("status").GetString()!, item => item.GetProperty("count").GetInt32());
+        Assert.Equal(Enum.GetNames<OrderStatus>().Order(), counts.Keys.Order());
+        Assert.Equal(2, counts["New"]);
+        Assert.Equal(1, counts["InProduction"]);
+        Assert.Equal(0, counts["Shipped"]);
     }
 
     [Theory]
