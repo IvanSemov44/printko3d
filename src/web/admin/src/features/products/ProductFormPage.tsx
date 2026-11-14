@@ -7,12 +7,13 @@ import {
 import { useState, type SubmitEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { FormField } from '../../components/FormField';
+import { StatusBadge } from '../../components/StatusBadge';
 import { focusField, useFormValues } from '../../components/useFormValues';
 import { t, type MessageKey } from '../../i18n';
 import { buildCategoryTree } from '../categories/categoryTree';
 import { SLUG_MAX_LENGTH, slugFromName } from '../categories/slug';
 import { useAdminCategories } from '../categories/useCategories';
-import { FULFILMENT_KEYS, FULFILMENT_TYPES, STATUS_KEYS } from './productLabels';
+import { FULFILMENT_KEYS, FULFILMENT_TYPES, STATUS_KEYS, STATUS_TONES } from './productLabels';
 import { ImagesSection } from './ImagesSection';
 import { ProductStatusSection } from './ProductStatusSection';
 import {
@@ -206,9 +207,9 @@ function ProductForm({ product, categories, onReload }: FormProps) {
         {product ? (
           <>
             {' '}
-            <span className={`badge status-${product.status}`}>
+            <StatusBadge tone={STATUS_TONES[product.status]}>
               {t(STATUS_KEYS[product.status])}
-            </span>
+            </StatusBadge>
           </>
         ) : null}
       </h2>

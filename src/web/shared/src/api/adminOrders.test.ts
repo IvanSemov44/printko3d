@@ -1,7 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from './client';
 import { UnexpectedResponseError } from './decode';
-import { cancelOrder, changeOrderStatus, getAdminOrder, getAdminOrders } from './adminOrders';
+import {
+  cancelOrder,
+  changeOrderStatus,
+  getAdminOrder,
+  getAdminOrders,
+  getOrderStatusCounts,
+} from './adminOrders';
 
 const ORDER = {
   number: 12345678,
@@ -37,6 +43,32 @@ function bodyOf(init: RequestInit | undefined): unknown {
 describe('the orders of the admin API', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it('reads the count of each status, with zero for a status the answer leaves out', async () => {
+    const fetchMock = stubFetch([
+      { status: 'New', count: 2 },
+      { status: 'Shipped', count: 5 },
+    ]);
+
+    const counts = await getOrderStatusCounts();
+
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/v1/admin/orders/status-counts');
+    expect(counts).toEqual({
+      New: 2,
+      Paid: 0,
+      InProduction: 0,
+      ReadyToShip: 0,
+      Shipped: 5,
+      Completed: 0,
+      Cancelled: 0,
+    });
+  });
+
+  it('refuses a status it does not know', async () => {
+    stubFetch([{ status: 'Nonsense', count: 1 }]);
+
+    await expect(getOrderStatusCounts()).rejects.toBeInstanceOf(UnexpectedResponseError);
   });
 
   it('asks for a page with every status repeated, and reads the rows (a 64-bit total may be text)', async () => {
