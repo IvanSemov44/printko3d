@@ -29,6 +29,11 @@ internal static class CustomerAuthSetup
         builder.Services.AddSingleton(services => services.GetRequiredService<IOptions<CustomerOptions>>().Value);
 
         builder.Services.AddCustomerIdentity();
+        // The link in an email works for as long as the setting says (the administrator has no such links).
+        builder.Services
+            .AddOptions<DataProtectionTokenProviderOptions>()
+            .Configure<IOptions<CustomerOptions>>((token, customer) =>
+                token.TokenLifespan = TimeSpan.FromMinutes(customer.Value.TokenLifetimeMinutes));
         builder.Services.AddAuthentication().AddCookie(CustomerAuthentication.Scheme, _ => { });
         builder.Services
             .AddOptions<CookieAuthenticationOptions>(CustomerAuthentication.Scheme)

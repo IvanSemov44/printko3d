@@ -71,3 +71,36 @@ export async function changeCustomerPassword(
 ): Promise<void> {
   await apiSend('POST', `${ACCOUNT}/change-password`, input, signal);
 }
+
+/**
+ * Confirms the address with the two values of the link in the email. A refusal is an ApiError: 422 `account.token_invalid`
+ * (wrong, expired or for another address), 429.
+ */
+export async function confirmCustomerEmail(
+  email: string,
+  token: string,
+  signal?: AbortSignal,
+): Promise<void> {
+  await apiSend('POST', `${ACCOUNT}/confirm-email`, { email, token }, signal);
+}
+
+/** Sends the confirmation email again to the signed-in buyer. Nothing is sent when the address is already confirmed. */
+export async function resendCustomerConfirmation(signal?: AbortSignal): Promise<void> {
+  await apiAct('POST', `${ACCOUNT}/resend-confirmation`, signal);
+}
+
+/** Asks for the link for a new password. The answer is the same for an address that has an account and one that has not. */
+export async function requestPasswordReset(email: string, signal?: AbortSignal): Promise<void> {
+  await apiSend('POST', `${ACCOUNT}/forgot-password`, { email }, signal);
+}
+
+/**
+ * Sets a new password with the two values of the link in the email. It does not sign the buyer in. A refusal is an ApiError:
+ * 400 `validation.failed` (the password is not allowed), 422 `account.token_invalid`, 429.
+ */
+export async function resetCustomerPassword(
+  input: { email: string; token: string; newPassword: string },
+  signal?: AbortSignal,
+): Promise<void> {
+  await apiSend('POST', `${ACCOUNT}/reset-password`, input, signal);
+}

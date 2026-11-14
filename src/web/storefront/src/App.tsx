@@ -48,6 +48,22 @@ const AccountPage = lazy(() =>
   import('./features/account/AccountPage').then((module) => ({ default: module.AccountPage })),
 );
 
+const ConfirmEmailPage = lazy(() =>
+  import('./features/account/ConfirmEmailPage').then((module) => ({
+    default: module.ConfirmEmailPage,
+  })),
+);
+const ForgotPasswordPage = lazy(() =>
+  import('./features/account/ForgotPasswordPage').then((module) => ({
+    default: module.ForgotPasswordPage,
+  })),
+);
+const ResetPasswordPage = lazy(() =>
+  import('./features/account/ResetPasswordPage').then((module) => ({
+    default: module.ResetPasswordPage,
+  })),
+);
+
 /** Needs a router and a QueryClientProvider above it (see main.tsx). */
 export function App() {
   return (
@@ -102,6 +118,30 @@ export function App() {
             element={
               <Suspense fallback={<LoadingStatus />}>
                 <RegisterPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/confirm-email"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <ConfirmEmailPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/forgot-password"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <ForgotPasswordPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/reset-password"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <ResetPasswordPage />
               </Suspense>
             }
           />

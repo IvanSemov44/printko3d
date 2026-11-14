@@ -114,10 +114,14 @@ export { getShippingTariff, saveShippingTariff } from './api/adminShipping';
 export type { ShippingTariffStep } from './api/adminShipping';
 export {
   changeCustomerPassword,
+  confirmCustomerEmail,
   getCurrentCustomer,
   loginCustomer,
   logoutCustomer,
   readCustomer,
   registerCustomer,
+  requestPasswordReset,
+  resendCustomerConfirmation,
+  resetCustomerPassword,
 } from './api/account';
 export type { Customer } from './api/account';

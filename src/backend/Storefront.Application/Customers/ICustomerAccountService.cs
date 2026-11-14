@@ -12,6 +12,28 @@ public interface ICustomerAccountService
     /// </summary>
     Task RegisterAsync(string email, string password, string displayName, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Confirms the address with the token of the link in the email. Errors: 422 account.token_invalid (wrong, expired or for
+    /// another address). A link that is opened again does no harm.
+    /// </summary>
+    Task ConfirmEmailAsync(string email, string token, CancellationToken cancellationToken);
+
+    /// <summary>Sends the confirmation email again to the signed-in buyer. Nothing is sent when the address is already confirmed. Errors: 401.</summary>
+    Task ResendConfirmationAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Sends the link for a new password. The call gives the same answer for an address that has an account and one that has not,
+    /// so it does not tell who is registered.
+    /// </summary>
+    Task ForgotPasswordAsync(string email, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Sets a new password with the token of the link in the email. It ends every session, lifts a lockout and confirms the
+    /// address (the buyer read the email). The link works once. Errors: 400 validation.failed (the password is not allowed),
+    /// 422 account.token_invalid.
+    /// </summary>
+    Task ResetPasswordAsync(string email, string token, string newPassword, CancellationToken cancellationToken);
+
     /// <summary>Signs in with the password. Null when it did not work, and does not say why (wrong email, wrong password and a locked account look the same).</summary>
     Task<CustomerDto?> SignInAsync(string email, string password, CancellationToken cancellationToken);
 

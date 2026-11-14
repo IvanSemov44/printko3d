@@ -90,6 +90,9 @@ export function LoginPage() {
         </button>
       </form>
       <p>
+        <Link to="/account/forgot-password">{t('account.forgot.title')}</Link>
+      </p>
+      <p>
         {t('account.login.noAccount')}{' '}
         <Link to="/account/register">{t('account.register.title')}</Link>
       </p>

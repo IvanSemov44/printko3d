@@ -2,6 +2,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from './client';
 import {
   changeCustomerPassword,
+  confirmCustomerEmail,
+  requestPasswordReset,
+  resendCustomerConfirmation,
+  resetCustomerPassword,
   getCurrentCustomer,
   loginCustomer,
   logoutCustomer,
@@ -117,5 +121,54 @@ describe('the account of a buyer', () => {
     for (const [, init] of fetchMock.mock.calls) {
       expect(new Headers(init?.headers).get('X-Requested-With')).toBe('XMLHttpRequest');
     }
+  });
+});
+
+describe('the emails of an account', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('sends the address and the token of the link in a body, with the protective header', async () => {
+    const fetchMock = stubFetch(null, 204);
+
+    await confirmCustomerEmail('buyer@example.test', 'a/token+with=marks');
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe('/api/v1/account/confirm-email');
+    expect(new Headers(init?.headers).get('X-Requested-With')).toBe('XMLHttpRequest');
+    expect(typeof init?.body === 'string' ? (JSON.parse(init.body) as unknown) : undefined).toEqual(
+      {
+        email: 'buyer@example.test',
+        token: 'a/token+with=marks',
+      },
+    );
+  });
+
+  it('turns an old or wrong link into an ApiError with the code', async () => {
+    stubFetch({ code: 'account.token_invalid' }, 422);
+
+    await expect(confirmCustomerEmail('buyer@example.test', 'old')).rejects.toMatchObject({
+      status: 422,
+      code: 'account.token_invalid',
+    });
+  });
+
+  it('asks for the link, resends the confirmation and sets the new password', async () => {
+    const fetchMock = stubFetch(null, 204);
+
+    await requestPasswordReset('buyer@example.test');
+    await resendCustomerConfirmation();
+    await resetCustomerPassword({
+      email: 'buyer@example.test',
+      token: 'token',
+      newPassword: 'a made-up password',
+    });
+
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      '/api/v1/account/forgot-password',
+      '/api/v1/account/resend-confirmation',
+      '/api/v1/account/reset-password',
+    ]);
   });
 });

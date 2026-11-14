@@ -1,6 +1,11 @@
-import { changeCustomerPassword, logoutCustomer, type Customer } from '@storefront/shared';
+import {
+  changeCustomerPassword,
+  logoutCustomer,
+  resendCustomerConfirmation,
+  type Customer,
+} from '@storefront/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, type SyntheticEvent } from 'react';
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import { CART_KEY } from '../../components/cartKeys';
 import { FormField } from '../../components/FormField';
@@ -88,27 +93,64 @@ function PasswordForm() {
   );
 }
 
+function ResendConfirmation() {
+  const t = useT();
+  const resend = useMutation({ mutationFn: () => resendCustomerConfirmation() });
+
+  return (
+    <div>
+      <p role="status">
+        {resend.isSuccess ? t('account.confirm.sent') : t('account.emailNotConfirmed')}
+      </p>
+      {resend.isError && <p role="alert">{t('account.error.generic')}</p>}
+      {!resend.isSuccess && (
+        <button
+          type="button"
+          className="button button-secondary"
+          disabled={resend.isPending}
+          onClick={() => {
+            resend.mutate();
+          }}
+        >
+          {t('account.confirm.resend')}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function Profile({ customer }: { customer: Customer }) {
   const t = useT();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const signedOut = useRef(false);
   const signOut = useMutation({
     mutationFn: () => logoutCustomer(),
     onSettled: () => {
       // The buyer is out also when the server could not be told: the cookie is the server's, and it ends on its own.
-      // Leave the page first: with no buyer it would send the visitor to the sign-in instead.
+      signedOut.current = true;
       void navigate('/');
-      queryClient.setQueryData(CUSTOMER_KEY, null);
       void queryClient.invalidateQueries({ queryKey: CART_KEY });
     },
   });
+
+  // The known buyer is cleared when this page is gone: cleared sooner, the page would send the visitor to the sign-in
+  // instead of the home page.
+  useEffect(
+    () => () => {
+      if (signedOut.current) {
+        queryClient.setQueryData(CUSTOMER_KEY, null);
+      }
+    },
+    [queryClient],
+  );
 
   return (
     <>
       <p>
         {t('account.signedInAs')} <strong>{customer.displayName}</strong> ({customer.email})
       </p>
-      {!customer.emailConfirmed && <p role="status">{t('account.emailNotConfirmed')}</p>}
+      {!customer.emailConfirmed && <ResendConfirmation />}
       {customer.hasPassword ? <PasswordForm /> : <p>{t('account.noPassword')}</p>}
       <button
         type="button"

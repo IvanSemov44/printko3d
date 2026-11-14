@@ -35,6 +35,71 @@ public sealed class AccountController(ICustomerAccountService accounts) : Contro
         return Accepted();
     }
 
+    /// <summary>Confirms the address with the two values of the link in the email.</summary>
+    /// <remarks>Errors: 400 validation.failed, 403 csrf.header_required, 422 account.token_invalid (wrong, expired or for another address), 429.</remarks>
+    [HttpPost("confirm-email")]
+    [AllowAnonymous]
+    [EnableRateLimiting(CustomerAuthSetup.RateLimit)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
+    public async Task<ActionResult> ConfirmEmail(ConfirmEmailRequest request, CancellationToken cancellationToken)
+    {
+        await accounts.ConfirmEmailAsync(request.Email, request.Token, cancellationToken);
+        return NoContent();
+    }
+
+    /// <summary>Sends the confirmation email again to the signed-in buyer. Nothing is sent when the address is already confirmed.</summary>
+    /// <remarks>Errors: 401 when there is no session, 403 csrf.header_required.</remarks>
+    [HttpPost("resend-confirmation")]
+    [Authorize(AuthenticationSchemes = CustomerAuthentication.Scheme)]
+    [EnableRateLimiting(CustomerAuthSetup.RateLimit)]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
+    public async Task<ActionResult> ResendConfirmation(CancellationToken cancellationToken)
+    {
+        await accounts.ResendConfirmationAsync(cancellationToken);
+        return Accepted();
+    }
+
+    /// <summary>Sends the link for a new password. The answer is the same for an address that has an account and one that has not.</summary>
+    /// <remarks>Errors: 400 validation.failed, 403 csrf.header_required, 429.</remarks>
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    [EnableRateLimiting(CustomerAuthSetup.RateLimit)]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
+    public async Task<ActionResult> ForgotPassword(ForgotPasswordRequest request, CancellationToken cancellationToken)
+    {
+        await accounts.ForgotPasswordAsync(request.Email, cancellationToken);
+        return Accepted();
+    }
+
+    /// <summary>
+    /// Sets a new password with the two values of the link in the email. Every session ends, a lockout is lifted and the address is confirmed.
+    /// The link works once. It does not sign the buyer in.
+    /// </summary>
+    /// <remarks>Errors: 400 validation.failed (the password is not allowed), 403 csrf.header_required, 422 account.token_invalid, 429.</remarks>
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    [EnableRateLimiting(CustomerAuthSetup.RateLimit)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
+    public async Task<ActionResult> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken)
+    {
+        await accounts.ResetPasswordAsync(request.Email, request.Token, request.NewPassword, cancellationToken);
+        return NoContent();
+    }
+
     /// <summary>Signs the buyer in and sets the cookie. A wrong email, a wrong password and a locked account give the same answer.</summary>
     /// <remarks>Errors: 400 validation.failed, 401 auth.invalid_credentials, 403 csrf.header_required, 429.</remarks>
     [HttpPost("login")]
