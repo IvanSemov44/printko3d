@@ -215,6 +215,28 @@ public sealed class PaymentsApiTests(PostgresFixture postgres)
     }
 
     [Fact]
+    public async Task TheMode_SaysThePaymentIsATestOne_ToAnyoneWithoutAHeader()
+    {
+        await using var host = await CreateHostAsync();
+
+        var response = await host.SendAsync(HttpMethod.Get, "/api/v1/payments/mode", csrfHeader: false);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.True((await JsonOf(response)).GetProperty("isTest").GetBoolean());
+    }
+
+    [Fact]
+    public async Task TheMode_IsNotATestOne_WhenPaymentIsTurnedOff()
+    {
+        await using var host = await CreateHostAsync(
+            settings: new Dictionary<string, string> { ["Payment:Enabled"] = "false" });
+
+        var response = await host.SendAsync(HttpMethod.Get, "/api/v1/payments/mode");
+
+        Assert.False((await JsonOf(response)).GetProperty("isTest").GetBoolean());
+    }
+
+    [Fact]
     public async Task TheStatus_OfAnUnknownPayment_Is404()
     {
         await using var host = await CreateHostAsync();

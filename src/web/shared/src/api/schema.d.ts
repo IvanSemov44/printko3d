@@ -2907,6 +2907,43 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/payments/mode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['PaymentModeDto'];
+            'application/json': components['schemas']['PaymentModeDto'];
+            'text/json': components['schemas']['PaymentModeDto'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/payments/{paymentId}': {
     parameters: {
       query?: never;
@@ -3511,6 +3548,9 @@ export interface components {
       totalCount: number | string;
       /** Format: int32 */
       totalPages?: number | string;
+    };
+    PaymentModeDto: {
+      isTest: boolean;
     };
     /** @enum {unknown} */
     PaymentOutcome: 'Paid' | 'Failed';

@@ -40,6 +40,15 @@ public sealed class PaymentsController(IServiceManager services, ILogger<Payment
         Ok(await services.Payments.StartAsync(number, cancellationToken));
 
     /// <summary>
+    /// Whether the payment is a test one. The storefront shows the notice "test payment and delivery" for as long as this
+    /// is true, so it goes away by itself when a real provider replaces the test one. False when payment is turned off.
+    /// </summary>
+    [HttpGet("payments/mode")]
+    [ProducesResponseType<PaymentModeDto>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<PaymentModeDto>> GetMode(CancellationToken cancellationToken) =>
+        Ok(await services.Payments.GetModeAsync(cancellationToken));
+
+    /// <summary>
     /// The state of a payment, by the random identifier from <c>PUT /api/v1/orders/{number}/payment</c>: only
     /// <c>Pending</c>, <c>Succeeded</c>, <c>Failed</c>, <c>PaidWithoutOrder</c> or <c>Expired</c>, nothing about the buyer.
     /// </summary>

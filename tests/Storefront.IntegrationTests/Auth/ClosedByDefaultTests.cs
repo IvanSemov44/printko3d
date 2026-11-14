@@ -26,6 +26,7 @@ public sealed partial class ClosedByDefaultTests(PostgresFixture postgres)
         "GET api/v1/shipping/quotes",
         // A buyer without an account pays an order; the provider calls the notifications address with a signature (decision 0035, task 26c2).
         "PUT api/v1/orders/{number:int}/payment",
+        "GET api/v1/payments/mode",
         "GET api/v1/payments/{paymentId:guid}",
         "POST api/v1/payments/notifications",
         "POST api/v1/payments/test/{reference}/complete",

@@ -63,6 +63,9 @@ internal sealed class PaymentService(
         return ToSession(payment, expiresAt);
     }
 
+    public Task<PaymentModeDto> GetModeAsync(CancellationToken cancellationToken) =>
+        Task.FromResult(new PaymentModeDto(options.Enabled && provider.IsTest));
+
     public async Task<PaymentStatusDto> GetStatusAsync(Guid paymentId, CancellationToken cancellationToken)
     {
         var payment = await repositories.Payments.GetByPublicIdAsync(paymentId, cancellationToken)

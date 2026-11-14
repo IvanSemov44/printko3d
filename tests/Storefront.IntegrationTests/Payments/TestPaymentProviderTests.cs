@@ -215,5 +215,6 @@ public sealed class TestPaymentProviderTests
 
         Assert.Same(provider, factory.Services.GetRequiredService<IPaymentSimulator>());
         Assert.Equal(TestPaymentProvider.ProviderCode, provider.Code);
+        Assert.True(provider.IsTest);
     }
 }

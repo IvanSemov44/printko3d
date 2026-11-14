@@ -10,6 +10,9 @@ public interface IPaymentService
     /// </summary>
     Task<PaymentSessionDto> StartAsync(int orderNumber, CancellationToken cancellationToken);
 
+    /// <summary>Whether the payment is a test one, for the notice of the storefront.</summary>
+    Task<PaymentModeDto> GetModeAsync(CancellationToken cancellationToken);
+
     /// <summary>Only the state of the payment, by its random identifier. Errors: 404 payment.not_found.</summary>
     Task<PaymentStatusDto> GetStatusAsync(Guid paymentId, CancellationToken cancellationToken);
 

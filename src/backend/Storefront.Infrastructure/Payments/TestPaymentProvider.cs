@@ -33,6 +33,8 @@ public sealed class TestPaymentProvider : IPaymentProvider, IPaymentSimulator
 
     public string Code => ProviderCode;
 
+    public bool IsTest => true;
+
     public Task<PaymentSession> CreateSessionAsync(PaymentSessionRequest request, CancellationToken cancellationToken)
     {
         // The reference carries the last moment to pay, so the provider needs no memory to refuse a late payment.

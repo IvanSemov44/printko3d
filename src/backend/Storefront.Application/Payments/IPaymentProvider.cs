@@ -30,6 +30,9 @@ public interface IPaymentProvider
     /// <summary>Stable code of the provider, stored with every payment, for example <c>test</c>.</summary>
     string Code { get; }
 
+    /// <summary>True for a provider that takes no real money. The storefront shows a notice for as long as this is true.</summary>
+    bool IsTest { get; }
+
     /// <summary>
     /// Opens a payment that cannot be paid after <see cref="PaymentSessionRequest.ExpiresAt"/>. Nothing about the buyer
     /// is sent: only the number, the sum and the currency.

@@ -4453,6 +4453,33 @@
         }
       }
     },
+    "/api/v1/payments/mode": {
+      "get": {
+        "tags": ["Payments"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentModeDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentModeDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentModeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/payments/{paymentId}": {
       "get": {
         "tags": ["Payments"],
@@ -5552,6 +5579,15 @@
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": ["integer", "string"],
             "format": "int32"
+          }
+        }
+      },
+      "PaymentModeDto": {
+        "required": ["isTest"],
+        "type": "object",
+        "properties": {
+          "isTest": {
+            "type": "boolean"
           }
         }
       },

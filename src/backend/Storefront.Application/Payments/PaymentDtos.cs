@@ -13,6 +13,9 @@ public sealed record PaymentSessionDto(Guid PaymentId, string RedirectUrl, DateT
 /// </summary>
 public sealed record PaymentStatusDto(string Status);
 
+/// <summary>Whether the shop takes real money. <paramref name="IsTest"/> is true while the provider is a test one, and false when payment is turned off.</summary>
+public sealed record PaymentModeDto(bool IsTest);
+
 /// <summary>What a message of the provider led to. The API writes it to the journal, without anything about the buyer.</summary>
 public enum PaymentNotificationResult
 {
