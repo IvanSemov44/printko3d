@@ -1,6 +1,111 @@
+/* Latin and Cyrillic subsets of variable fonts, served from the same origin (OFL licences are next to the files). */
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url('/fonts/unbounded-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url('/fonts/unbounded-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/manrope-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/manrope-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+ * Design tokens (docs/design.md). The only place with literal colours.
+ * The panel uses the default theme; the store colours are only for the shop window.
+ */
+:root {
+  --color-bg: #faf7f2;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f1ece4;
+  --color-ink: #1c1a17;
+  --color-ink-muted: #6b655c;
+  --color-border: #e3dcd1;
+  --color-primary: #f25a18;
+  --color-primary-hover: #da5115;
+  --color-on-primary: #000000;
+  --color-secondary: #0f766e;
+  --color-on-secondary: #ffffff;
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-error: #b91c1c;
+  --color-info: #1d4ed8;
+  --color-accent-yellow: #ffc531;
+
+  --font-display: 'Unbounded', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+
+  --sidebar-width: 15rem;
+  --content-width: 80rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-ink);
+  background: var(--color-bg);
 }
 
 main {
@@ -10,15 +115,15 @@ main {
 }
 
 [data-state='available'] {
-  color: #1a7f37;
+  color: var(--color-success);
 }
 
 [data-state='unavailable'] {
-  color: #b42318;
+  color: var(--color-error);
 }
 
 :focus-visible {
-  outline: 3px solid #1f2328;
+  outline: 3px solid var(--color-ink);
   outline-offset: 2px;
 }
 
@@ -35,27 +140,27 @@ form {
 input {
   font: inherit;
   padding: 0.5rem;
-  border: 2px solid #57606a;
+  border: 2px solid var(--color-ink-muted);
   border-radius: 0.25rem;
 }
 
 input[aria-invalid='true'] {
-  border-color: #b42318;
+  border-color: var(--color-error);
 }
 
 .field-error,
 .form-error {
   margin: 0;
-  color: #b42318;
+  color: var(--color-error);
 }
 
 button {
   font: inherit;
   padding: 0.5rem 1rem;
-  border: 2px solid #2f5d8a;
+  border: 2px solid var(--color-primary);
   border-radius: 0.25rem;
-  background: #2f5d8a;
-  color: #ffffff;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   cursor: pointer;
 }
 
@@ -75,7 +180,7 @@ nav {
 }
 
 nav a {
-  color: #1f2328;
+  color: var(--color-ink);
   font-weight: 600;
 }
 
@@ -87,23 +192,23 @@ a.button {
   display: inline-block;
   font: inherit;
   padding: 0.5rem 1rem;
-  border: 2px solid #2f5d8a;
+  border: 2px solid var(--color-primary);
   border-radius: 0.25rem;
-  background: #2f5d8a;
-  color: #ffffff;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   text-decoration: none;
 }
 
 button.secondary,
 a.button.secondary {
-  background: #ffffff;
-  color: #1f2328;
-  border-color: #57606a;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border-color: var(--color-ink-muted);
 }
 
 button.danger {
-  background: #b42318;
-  border-color: #b42318;
+  background: var(--color-error);
+  border-color: var(--color-error);
 }
 
 .page-header {
@@ -133,15 +238,15 @@ button.danger {
   flex-wrap: wrap;
   margin: 0.5rem 0;
   padding: 0.5rem 0.75rem;
-  border: 2px solid #d0d7de;
+  border: 2px solid var(--color-border);
   border-radius: 0.25rem;
 }
 
 /* Not only a different colour: the row has a dashed border and a text badge as well. */
 .category-row.inactive {
-  background: #f6f8fa;
+  background: var(--color-surface-alt);
   border-style: dashed;
-  color: #57606a;
+  color: var(--color-ink-muted);
 }
 
 .category-info {
@@ -156,7 +261,7 @@ button.danger {
 .badge {
   justify-self: start;
   padding: 0 0.5rem;
-  border: 1px solid #57606a;
+  border: 1px solid var(--color-ink-muted);
   border-radius: 1rem;
   font-size: 0.875rem;
 }
@@ -172,7 +277,7 @@ button.danger {
 .field-hint {
   margin: 0;
   font-size: 0.875rem;
-  color: #57606a;
+  color: var(--color-ink-muted);
 }
 
 .field-check {
@@ -185,23 +290,23 @@ select,
 textarea {
   font: inherit;
   padding: 0.5rem;
-  border: 2px solid #57606a;
+  border: 2px solid var(--color-ink-muted);
   border-radius: 0.25rem;
 }
 
 select[aria-invalid='true'],
 textarea[aria-invalid='true'] {
-  border-color: #b42318;
+  border-color: var(--color-error);
 }
 
 dialog {
   max-width: 32rem;
-  border: 2px solid #1f2328;
+  border: 2px solid var(--color-ink);
   border-radius: 0.5rem;
 }
 
 dialog::backdrop {
-  background: rgb(0 0 0 / 50%);
+  background: var(--color-scrim);
 }
 
 .visually-hidden {
@@ -242,20 +347,20 @@ dialog::backdrop {
 .product-table th,
 .product-table td {
   padding: 0.5rem 0.75rem;
-  border-bottom: 2px solid #d0d7de;
+  border-bottom: 2px solid var(--color-border);
   text-align: left;
   vertical-align: top;
 }
 
 /* The state is a word in a badge, never only a colour. */
 .badge.status-Published {
-  border-color: #1a7f37;
-  color: #1a7f37;
+  border-color: var(--color-success);
+  color: var(--color-success);
 }
 
 .badge.status-Archived {
   border-style: dashed;
-  color: #57606a;
+  color: var(--color-ink-muted);
 }
 
 .pagination {
@@ -268,7 +373,7 @@ dialog::backdrop {
 .section {
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 2px solid #d0d7de;
+  border-top: 2px solid var(--color-border);
 }
 
 .variant-list {
@@ -280,10 +385,10 @@ dialog::backdrop {
 .warning {
   margin: 0;
   padding: 0.5rem 0.75rem;
-  border: 2px solid #9a6700;
+  border: 2px solid var(--color-warning);
   border-radius: 0.25rem;
-  background: #fff8c5;
-  color: #1f2328;
+  background: var(--color-surface-alt);
+  color: var(--color-ink);
 }
 
 .image-row {
@@ -303,9 +408,9 @@ dialog::backdrop {
   width: 6rem;
   height: 6rem;
   object-fit: cover;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border);
   border-radius: 0.25rem;
-  background: #f6f8fa;
+  background: var(--color-surface-alt);
 }
 
 .image-placeholder {
@@ -314,7 +419,7 @@ dialog::backdrop {
   padding: 0.25rem;
   font-size: 0.75rem;
   text-align: center;
-  color: #57606a;
+  color: var(--color-ink-muted);
 }
 
 /* The main image is marked with a thicker border and a text badge, never only with a colour. */
@@ -349,9 +454,9 @@ input[type='color'] {
   width: 3rem;
   height: 2.5rem;
   padding: 0.125rem;
-  border: 2px solid #57606a;
+  border: 2px solid var(--color-ink-muted);
   border-radius: 0.25rem;
-  background: #ffffff;
+  background: var(--color-surface);
   cursor: pointer;
 }
 
@@ -375,19 +480,19 @@ input[type='color'] {
   max-width: 28rem;
   margin: 0 0 1rem;
   padding: 0.75rem 1rem;
-  border: 1px solid #57606a;
+  border: 1px solid var(--color-ink-muted);
   border-radius: 0.25rem;
 }
 
 /* The state of an order is a word in a badge, never only a colour. */
 .badge.order-Completed {
-  border-color: #1a7f37;
-  color: #1a7f37;
+  border-color: var(--color-success);
+  color: var(--color-success);
 }
 
 .badge.order-Cancelled {
   border-style: dashed;
-  color: #57606a;
+  color: var(--color-ink-muted);
 }
 
 .detail-list {
