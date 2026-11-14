@@ -11,9 +11,6 @@ using Storefront.Infrastructure.Identity;
 
 namespace Storefront.Api.Controllers;
 
-/// <summary>The providers that are turned on, as the sign-in page and the profile read them.</summary>
-public sealed record ExternalProvidersDto(IReadOnlyList<string> Providers);
-
 /// <summary>
 /// Sign-in and connecting through Google and Facebook (decision 0039). The browser goes to a start address and away to the provider; the
 /// provider sends it back to the shop (`/signin-google`, `/signin-facebook`), which ends at the callback here and then at a page of the shop.

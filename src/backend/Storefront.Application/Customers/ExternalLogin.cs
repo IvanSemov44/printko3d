@@ -6,6 +6,9 @@ namespace Storefront.Application.Customers;
 /// </summary>
 public sealed record ExternalIdentity(string Provider, string ProviderKey, string? Email, bool EmailVerified, string? Name);
 
+/// <summary>The providers that are turned on, as the sign-in page and the profile read them.</summary>
+public sealed record ExternalProvidersDto(IReadOnlyList<string> Providers);
+
 /// <summary>What came of a sign-in through a provider.</summary>
 public enum ExternalSignInOutcome
 {
