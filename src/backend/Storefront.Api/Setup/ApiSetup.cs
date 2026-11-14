@@ -34,6 +34,7 @@ internal static class ApiSetup
         builder.Services.AddControllers();
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.AddAdminAuth();
+        builder.AddCustomerAuth();
         builder.Services.AddScoped<HealthService>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddApiCors(builder.Configuration);

@@ -38,6 +38,8 @@ public sealed partial class ClosedByDefaultTests(PostgresFixture postgres)
         "GET api/v1/products/{slug}",
         "GET api/v1/store-settings",
         "GET health",
+        "POST api/v1/account/login",
+        "POST api/v1/account/register",
         "POST api/v1/auth/login",
         "GET openapi/{documentName}.json",
         "GET sitemap.xml",

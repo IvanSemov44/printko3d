@@ -37,6 +37,17 @@ const MyOrderPage = lazy(() =>
   import('./features/orders/MyOrderPage').then((module) => ({ default: module.MyOrderPage })),
 );
 
+// The account pages are read by a buyer who has chosen to sign in, so they are loaded when they are opened (decision 0039).
+const LoginPage = lazy(() =>
+  import('./features/account/LoginPage').then((module) => ({ default: module.LoginPage })),
+);
+const RegisterPage = lazy(() =>
+  import('./features/account/RegisterPage').then((module) => ({ default: module.RegisterPage })),
+);
+const AccountPage = lazy(() =>
+  import('./features/account/AccountPage').then((module) => ({ default: module.AccountPage })),
+);
+
 /** Needs a router and a QueryClientProvider above it (see main.tsx). */
 export function App() {
   return (
@@ -67,6 +78,30 @@ export function App() {
             element={
               <Suspense fallback={<LoadingStatus />}>
                 <OrderConfirmationPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <AccountPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/login"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <LoginPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/register"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <RegisterPage />
               </Suspense>
             }
           />

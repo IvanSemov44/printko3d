@@ -863,11 +863,25 @@ main .product-card-link {
 }
 
 /* The cart: the button in the header, the panel from the right, and the add button on the product page. */
+.account-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-left: auto;
+  padding: 0 0.5rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.account-link:hover {
+  text-decoration: underline;
+}
+
 .cart-button {
   position: relative;
   min-width: 2.75rem;
   min-height: 2.75rem;
-  margin-left: auto;
+  margin-left: 0.5rem;
   padding: 0 0.5rem;
   color: var(--color-ink);
 }

@@ -32,6 +32,8 @@ export function stubNetwork(routes: {
   cart?: (url: string, init?: RequestInit) => Response | Promise<Response>;
   /** Gets every request to /api/v1/orders. Without it a test that never places an order fails loudly if one is sent. */
   orders?: (url: string, init?: RequestInit) => Response | Promise<Response>;
+  /** Gets every request to /api/v1/account. Without it nobody is signed in (401 for the profile). */
+  account?: (url: string, init?: RequestInit) => Response | Promise<Response>;
   /** Gets every request to /api/v1/shipping. Without it a test that never prices a delivery fails loudly if one is sent. */
   shipping?: (url: string, init?: RequestInit) => Response | Promise<Response>;
   /** Gets every request to /api/v1/payments except the mode. Without it a test that never pays fails loudly if one is sent. */
@@ -47,6 +49,14 @@ export function stubNetwork(routes: {
     }
     if (url.startsWith('/api/v1/cart')) {
       return Promise.resolve(routes.cart ? routes.cart(url, init) : Response.json(cartFixture()));
+    }
+    if (url.startsWith('/api/v1/account')) {
+      // Without an answer the buyer is not signed in: every page asks, for the link in the header.
+      return Promise.resolve(
+        routes.account
+          ? routes.account(url, init)
+          : Response.json({ code: 'auth.unauthenticated' }, { status: 401 }),
+      );
     }
     if (url === '/api/v1/payments/mode') {
       return Promise.resolve(Response.json({ isTest: routes.isTestPayment ?? false }));

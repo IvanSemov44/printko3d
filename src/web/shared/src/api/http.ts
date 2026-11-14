@@ -16,7 +16,8 @@ export async function apiRequest(url: string, init: RequestInit): Promise<unknow
     const fields = await readErrorFields(response);
     throw new ApiError(response.status, await readErrorCode(response), fields);
   }
-  if (response.status === 204) {
+  // 204 and 202 (an accepted request, such as a registration) have no body.
+  if (response.status === 204 || response.status === 202) {
     return undefined;
   }
   return response.json();
