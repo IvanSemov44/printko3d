@@ -18,6 +18,13 @@ const CheckoutPage = lazy(() =>
   import('./features/checkout/CheckoutPage').then((module) => ({ default: module.CheckoutPage })),
 );
 
+// The page of the test payment is opened by the buyer who pressed "Pay", so it is loaded when it is opened too.
+const TestPaymentPage = lazy(() =>
+  import('./features/checkout/TestPaymentPage').then((module) => ({
+    default: module.TestPaymentPage,
+  })),
+);
+
 // The confirmation is read once, right after the checkout, so it is loaded when it is opened too.
 const OrderConfirmationPage = lazy(() =>
   import('./features/checkout/OrderConfirmationPage').then((module) => ({
@@ -55,6 +62,14 @@ export function App() {
             element={
               <Suspense fallback={<LoadingStatus />}>
                 <OrderConfirmationPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="pay/test/:reference"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <TestPaymentPage />
               </Suspense>
             }
           />

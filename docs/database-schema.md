@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261114065425_AddOrderShipping`
+Последна миграция: `20261114084502_AddPaymentRedirectUrl`
 
 ## Връзки
 
@@ -21,6 +21,8 @@ erDiagram
     categories |o--o{ categories : "parent_id"
     orders ||--o{ order_items : "order_id"
     product_variants ||--o{ order_items : "variant_id"
+    payments ||--o{ payment_events : "payment_id"
+    orders ||--o{ payments : "order_id"
     products ||--o{ product_images : "product_id"
     product_variants |o--o{ product_images : "variant_id"
     products ||--o{ product_variants : "product_id"
@@ -340,6 +342,7 @@ erDiagram
 | stock_released_at | timestamp with time zone | да |  |
 | shipping_amount | bigint | не | `0` |
 | shipping_method | character varying(50) | не | `''::character varying` |
+| payment_due_at | timestamp with time zone | да |  |
 
 **Ограничения**
 
@@ -350,7 +353,7 @@ erDiagram
 | ck_orders_number | проверка | `CHECK (((number >= 10000000) AND (number <= 99999999)))` |
 | ck_orders_shipping_amount | проверка | `CHECK ((shipping_amount >= 0))` |
 | ck_orders_shipping_country | проверка | `CHECK ((char_length((shipping_country)::text) = 2))` |
-| ck_orders_status | проверка | `CHECK (((status)::text = 'New'::text))` |
+| ck_orders_status | проверка | `CHECK (((status)::text = ANY ((ARRAY['New'::character varying, 'Paid'::character varying, 'Cancelled'::character varying])::text[])))` |
 | ck_orders_total_amount | проверка | `CHECK ((total_amount >= 0))` |
 | ck_orders_total_covers_shipping | проверка | `CHECK ((total_amount >= shipping_amount))` |
 
@@ -360,6 +363,66 @@ erDiagram
 | --- | --- |
 | IX_orders_created_at | `CREATE INDEX "IX_orders_created_at" ON public.orders USING btree (created_at)` |
 | IX_orders_number | `CREATE UNIQUE INDEX "IX_orders_number" ON public.orders USING btree (number)` |
+
+### payment_events
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| payment_id | uuid | не |  |
+| provider | character varying(50) | не |  |
+| event_id | character varying(200) | не |  |
+| created_at | timestamp with time zone | не |  |
+| updated_at | timestamp with time zone | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_payment_events | първичен ключ | `PRIMARY KEY (id)` |
+| FK_payment_events_payments_payment_id | външен ключ | `FOREIGN KEY (payment_id) REFERENCES payments(id) ON DELETE RESTRICT` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_payment_events_payment_id | `CREATE INDEX "IX_payment_events_payment_id" ON public.payment_events USING btree (payment_id)` |
+| IX_payment_events_provider_event_id | `CREATE UNIQUE INDEX "IX_payment_events_provider_event_id" ON public.payment_events USING btree (provider, event_id)` |
+
+### payments
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| order_id | uuid | не |  |
+| provider | character varying(50) | не |  |
+| provider_reference | character varying(200) | не |  |
+| public_id | uuid | не |  |
+| amount | bigint | не |  |
+| currency | character varying(3) | не |  |
+| status | character varying(20) | не |  |
+| completed_at | timestamp with time zone | да |  |
+| created_at | timestamp with time zone | не |  |
+| updated_at | timestamp with time zone | не |  |
+| redirect_url | character varying(500) | не | `''::character varying` |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_payments | първичен ключ | `PRIMARY KEY (id)` |
+| FK_payments_orders_order_id | външен ключ | `FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE RESTRICT` |
+| ck_payments_amount | проверка | `CHECK ((amount > 0))` |
+| ck_payments_currency | проверка | `CHECK ((char_length((currency)::text) = 3))` |
+| ck_payments_status | проверка | `CHECK (((status)::text = ANY ((ARRAY['Pending'::character varying, 'Succeeded'::character varying, 'Failed'::character varying, 'PaidWithoutOrder'::character varying])::text[])))` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_payments_provider_provider_reference | `CREATE UNIQUE INDEX "IX_payments_provider_provider_reference" ON public.payments USING btree (provider, provider_reference)` |
+| IX_payments_public_id | `CREATE UNIQUE INDEX "IX_payments_public_id" ON public.payments USING btree (public_id)` |
+| ux_payments_one_open_payment_per_order | `CREATE UNIQUE INDEX ux_payments_one_open_payment_per_order ON public.payments USING btree (order_id) WHERE ((status)::text = ANY ((ARRAY['Pending'::character varying, 'Succeeded'::character varying, 'PaidWithoutOrder'::character varying])::text[]))` |
 
 ### product_images
 

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from './client';
-import { placeOrder, type PlaceOrderInput } from './orders';
+import { placeOrder, readOrder, type PlaceOrderInput } from './orders';
 import { UnexpectedResponseError } from './decode';
 
 const INPUT: PlaceOrderInput = {
@@ -30,6 +30,7 @@ const DTO = {
   shippingPostalCode: '1000',
   shippingCountry: 'BG',
   createdAt: '2026-11-13T10:00:00+00:00',
+  paymentDueAt: '2026-11-13T11:00:00+00:00',
   items: [
     {
       productName: 'Dragon',
@@ -119,5 +120,16 @@ describe('placeOrder', () => {
       code: 'validation.failed',
       fields: ['email', 'termsAccepted'],
     });
+  });
+});
+
+describe('readOrder', () => {
+  it('reads the deadline of the payment, and null for an order that has none', () => {
+    expect(readOrder(DTO).paymentDueAt).toBe('2026-11-13T11:00:00+00:00');
+    expect(readOrder({ ...DTO, paymentDueAt: null }).paymentDueAt).toBeNull();
+  });
+
+  it('refuses a deadline that is not a string', () => {
+    expect(() => readOrder({ ...DTO, paymentDueAt: 5 })).toThrow(/order\.paymentDueAt/);
   });
 });

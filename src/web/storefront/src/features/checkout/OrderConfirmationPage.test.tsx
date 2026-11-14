@@ -42,7 +42,7 @@ describe('order confirmation page', () => {
     vi.unstubAllGlobals();
   });
 
-  it('shows the number, the lines, the total, the address and that payment is not there yet', async () => {
+  it('shows the number, the lines, the total, the address and how to pay', async () => {
     const page = await open({
       order: orderFixture({
         items: [
@@ -85,7 +85,8 @@ describe('order confirmation page', () => {
     expect(within(page).getByText('До адрес').closest('p')).toHaveTextContent('6,00');
     expect(within(page).getByText('Test Buyer')).toBeInTheDocument();
     expect(within(page).getByText(/1 Test Street/)).toBeInTheDocument();
-    expect(within(page).getByText(/Плащането още не е включено/)).toBeInTheDocument();
+    expect(within(page).getByRole('button', { name: 'Плати' })).toBeEnabled();
+    expect(within(page).getByText(/Плати до/)).toBeInTheDocument();
     expect(within(page).getByRole('link', { name: 'Към началото' })).toHaveAttribute('href', '/');
   });
 

@@ -16,6 +16,35 @@ internal sealed class OrderRepository(StorefrontDbContext context)
             .Include(o => o.Items)
             .SingleOrDefaultAsync(o => o.Id == id, cancellationToken);
 
+    public Task<Order?> GetByNumberAsync(int number, CancellationToken cancellationToken) =>
+        Query(trackChanges: false)
+            .Include(o => o.Items)
+            .SingleOrDefaultAsync(o => o.Number == number, cancellationToken);
+
+    public async Task<bool> TryMarkPaidAsync(Guid orderId, CancellationToken cancellationToken)
+    {
+        var now = Context.Now;
+        var changed = await Context.Orders
+            .Where(o => o.Id == orderId && o.Status == OrderStatus.New)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(o => o.Status, OrderStatus.Paid).SetProperty(o => o.UpdatedAt, now),
+                cancellationToken);
+        return changed == 1;
+    }
+
+    public async Task<bool> TryReviveAsync(Guid orderId, CancellationToken cancellationToken)
+    {
+        var now = Context.Now;
+        var changed = await Context.Orders
+            .Where(o => o.Id == orderId && o.Status == OrderStatus.Cancelled)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(o => o.Status, OrderStatus.Paid)
+                    .SetProperty(o => o.StockReleasedAt, (DateTimeOffset?)null)
+                    .SetProperty(o => o.UpdatedAt, now),
+                cancellationToken);
+        return changed == 1;
+    }
+
     public async Task<bool> TryMarkStockReleasedAsync(Guid orderId, CancellationToken cancellationToken)
     {
         var now = Context.Now;
@@ -23,6 +52,28 @@ internal sealed class OrderRepository(StorefrontDbContext context)
             .Where(o => o.Id == orderId && o.StockReleasedAt == null)
             .ExecuteUpdateAsync(
                 s => s.SetProperty(o => o.StockReleasedAt, now).SetProperty(o => o.UpdatedAt, now),
+                cancellationToken);
+        return changed == 1;
+    }
+
+    public async Task<IReadOnlyList<Order>> ListExpiredAsync(
+        DateTimeOffset cutoff,
+        int batchSize,
+        CancellationToken cancellationToken) =>
+        await Query(trackChanges: false)
+            .Include(o => o.Items)
+            .Where(o => o.Status == OrderStatus.New && o.PaymentDueAt < cutoff)
+            .OrderBy(o => o.PaymentDueAt)
+            .Take(batchSize)
+            .ToListAsync(cancellationToken);
+
+    public async Task<bool> TryCancelExpiredAsync(Guid orderId, DateTimeOffset cutoff, CancellationToken cancellationToken)
+    {
+        var now = Context.Now;
+        var changed = await Context.Orders
+            .Where(o => o.Id == orderId && o.Status == OrderStatus.New && o.PaymentDueAt < cutoff)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(o => o.Status, OrderStatus.Cancelled).SetProperty(o => o.UpdatedAt, now),
                 cancellationToken);
         return changed == 1;
     }

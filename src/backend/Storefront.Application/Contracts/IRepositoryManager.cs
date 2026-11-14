@@ -16,6 +16,8 @@ public interface IRepositoryManager
 
     IShippingRateRepository ShippingRates { get; }
 
+    IPaymentRepository Payments { get; }
+
     ICatalogQueries Catalog { get; }
 
     Task SaveAsync(CancellationToken cancellationToken);

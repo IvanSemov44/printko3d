@@ -51,6 +51,9 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
     // Orders are tested against a real database (OrderServiceDatabaseTests); no unit test places one.
     public IOrderRepository Order => throw new NotSupportedException("The unit tests do not place orders.");
 
+    // Payments are tested against a real database (PaymentServiceDatabaseTests).
+    public IPaymentRepository Payments => throw new NotSupportedException("The unit tests do not pay orders.");
+
     private readonly FakeShippingRateRepository _shippingRates = new();
 
     public IShippingRateRepository ShippingRates => _shippingRates;

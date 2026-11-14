@@ -5,10 +5,12 @@ using Microsoft.Extensions.Options;
 using Storefront.Application.Contracts;
 using Storefront.Application.Health;
 using Storefront.Application.Migrations;
+using Storefront.Application.Payments;
 using Storefront.Application.Seeding;
 using Storefront.Application.Shipping;
 using Storefront.Infrastructure.Email;
 using Storefront.Infrastructure.Health;
+using Storefront.Infrastructure.Payments;
 using Storefront.Infrastructure.Persistence;
 using Storefront.Infrastructure.Repositories;
 using Storefront.Infrastructure.Shipping;
@@ -42,6 +44,11 @@ public static class DependencyInjection
             serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString));
         services.AddScoped<IRepositoryManager, RepositoryManager>();
         services.AddScoped<IShippingProvider, TestShippingProvider>();
+        // Not validated at startup: the secret is optional (a random key is made when it is empty).
+        services.AddOptions<TestPaymentOptions>().Bind(configuration.GetSection(TestPaymentOptions.SectionName));
+        services.AddSingleton<TestPaymentProvider>();
+        services.AddSingleton<IPaymentProvider>(sp => sp.GetRequiredService<TestPaymentProvider>());
+        services.AddSingleton<IPaymentSimulator>(sp => sp.GetRequiredService<TestPaymentProvider>());
         services.AddScoped<IDatabaseProbe, NpgsqlDatabaseProbe>();
         services.AddScoped<ISchemaProbe, MigrationSchemaProbe>();
         services.AddScoped<IDatabaseMigrator, EfDatabaseMigrator>();

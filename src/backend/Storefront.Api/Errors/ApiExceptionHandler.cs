@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Storefront.Application.Exceptions;
 using Storefront.Application.Orders;
+using Storefront.Application.Payments;
 
 namespace Storefront.Api.Errors;
 
@@ -28,11 +29,20 @@ internal sealed class ApiExceptionHandler(IProblemDetailsService problemDetails,
                 e.Message,
                 e.Code),
             ValidationFailedException e => ApiProblems.Validation(e.Message, e.Errors),
+            // The reason is for the journal only: whoever sent the message is not told what was wrong with it.
+            PaymentMessageRejectedException => ApiProblems.Create(
+                StatusCodes.Status400BadRequest, "Message rejected", "The message was rejected.", "payment.message_rejected"),
             _ => null,
         };
         if (details is null)
         {
             return false;
+        }
+
+        if (exception is PaymentMessageRejectedException rejected)
+        {
+            // The text names the failed check, never the body, the signature or a buyer.
+            logger.LogWarning("A message of the payment provider was rejected: {Reason}", rejected.Message);
         }
 
         if (exception is ConflictException { Code: OrderErrorCodes.StockChanged })

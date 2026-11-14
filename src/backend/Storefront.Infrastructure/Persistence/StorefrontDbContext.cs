@@ -7,6 +7,7 @@ using Storefront.Domain;
 using Storefront.Domain.Carts;
 using Storefront.Domain.Catalog;
 using Storefront.Domain.Orders;
+using Storefront.Domain.Payments;
 using Storefront.Domain.Shipping;
 using Storefront.Infrastructure.Identity;
 using Storefront.Infrastructure.Persistence.Configurations;
@@ -35,6 +36,10 @@ public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> op
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
     public DbSet<ShippingRate> ShippingRates => Set<ShippingRate>();
+
+    public DbSet<Payment> Payments => Set<Payment>();
+
+    public DbSet<PaymentEvent> PaymentEvents => Set<PaymentEvent>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 

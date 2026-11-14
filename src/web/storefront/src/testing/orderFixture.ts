@@ -15,6 +15,7 @@ export function orderFixture(overrides: Record<string, unknown> = {}) {
     shippingPostalCode: '1000',
     shippingCountry: 'BG',
     createdAt: '2026-11-13T10:00:00+00:00',
+    paymentDueAt: '2026-11-13T11:00:00+00:00',
     items: [
       {
         productName: 'Dragon',

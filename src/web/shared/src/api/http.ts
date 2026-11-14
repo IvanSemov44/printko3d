@@ -49,3 +49,8 @@ export function apiSend(
 export function apiDelete(url: string, signal?: AbortSignal): Promise<unknown> {
   return apiRequest(url, { method: 'DELETE', headers: CSRF_HEADERS, signal });
 }
+
+/** A request that changes data and has no body, such as opening a payment for an order. */
+export function apiAct(method: string, url: string, signal?: AbortSignal): Promise<unknown> {
+  return apiRequest(url, { method, headers: CSRF_HEADERS, signal });
+}
