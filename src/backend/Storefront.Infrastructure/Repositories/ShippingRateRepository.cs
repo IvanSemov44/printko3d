@@ -14,6 +14,9 @@ internal sealed class ShippingRateRepository(StorefrontDbContext context)
             .OrderBy(r => r.MaxWeightGrams)
             .ToListAsync(cancellationToken);
 
+    public Task DeleteAllAsync(string methodCode, CancellationToken cancellationToken) =>
+        Context.ShippingRates.Where(r => r.MethodCode == methodCode).ExecuteDeleteAsync(cancellationToken);
+
     public Task<bool> AnyAsync(string methodCode, CancellationToken cancellationToken) =>
         Query(trackChanges: false).AnyAsync(r => r.MethodCode == methodCode, cancellationToken);
 }

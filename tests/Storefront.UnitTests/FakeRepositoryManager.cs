@@ -141,6 +141,12 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
         public Task<bool> AnyAsync(string methodCode, CancellationToken cancellationToken) =>
             Task.FromResult(Items.Any(r => r.MethodCode == methodCode));
+
+        public Task DeleteAllAsync(string methodCode, CancellationToken cancellationToken)
+        {
+            Items.RemoveAll(r => r.MethodCode == methodCode);
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class FakeStoreSettingsRepository : IStoreSettingsRepository

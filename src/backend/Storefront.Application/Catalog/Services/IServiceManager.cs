@@ -19,4 +19,6 @@ public interface IServiceManager
     IOrderService Orders { get; }
 
     IShippingService Shipping { get; }
+
+    IShippingTariffService ShippingTariff { get; }
 }

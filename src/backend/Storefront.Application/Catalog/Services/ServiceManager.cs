@@ -33,6 +33,8 @@ public sealed class ServiceManager(
         repositories,
         shippingProvider ?? new NoShippingProvider()));
 
+    private readonly Lazy<IShippingTariffService> _shippingTariff = new(() => new ShippingTariffService(repositories));
+
     public ICategoryService Category => _category.Value;
 
     public IProductService Product => _product.Value;
@@ -46,4 +48,6 @@ public sealed class ServiceManager(
     public IOrderService Orders => _orders.Value;
 
     public IShippingService Shipping => _shipping.Value;
+
+    public IShippingTariffService ShippingTariff => _shippingTariff.Value;
 }

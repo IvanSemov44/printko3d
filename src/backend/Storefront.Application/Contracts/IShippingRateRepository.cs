@@ -10,4 +10,7 @@ public interface IShippingRateRepository
     Task<IReadOnlyList<ShippingRate>> ListAsync(string methodCode, CancellationToken cancellationToken);
 
     Task<bool> AnyAsync(string methodCode, CancellationToken cancellationToken);
+
+    /// <summary>Deletes every step of a method at once. It does not wait for a save, so call it inside a transaction.</summary>
+    Task DeleteAllAsync(string methodCode, CancellationToken cancellationToken);
 }
