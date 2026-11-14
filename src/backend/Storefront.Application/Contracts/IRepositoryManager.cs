@@ -14,6 +14,8 @@ public interface IRepositoryManager
 
     IOrderRepository Order { get; }
 
+    IShippingRateRepository ShippingRates { get; }
+
     ICatalogQueries Catalog { get; }
 
     Task SaveAsync(CancellationToken cancellationToken);

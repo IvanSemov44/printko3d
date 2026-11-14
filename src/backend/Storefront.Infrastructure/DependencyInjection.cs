@@ -6,10 +6,12 @@ using Storefront.Application.Contracts;
 using Storefront.Application.Health;
 using Storefront.Application.Migrations;
 using Storefront.Application.Seeding;
+using Storefront.Application.Shipping;
 using Storefront.Infrastructure.Email;
 using Storefront.Infrastructure.Health;
 using Storefront.Infrastructure.Persistence;
 using Storefront.Infrastructure.Repositories;
+using Storefront.Infrastructure.Shipping;
 using Storefront.Infrastructure.Storage;
 
 namespace Storefront.Infrastructure;
@@ -39,6 +41,7 @@ public static class DependencyInjection
         services.AddDbContext<StorefrontDbContext>((serviceProvider, options) => options.UseNpgsql(
             serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString));
         services.AddScoped<IRepositoryManager, RepositoryManager>();
+        services.AddScoped<IShippingProvider, TestShippingProvider>();
         services.AddScoped<IDatabaseProbe, NpgsqlDatabaseProbe>();
         services.AddScoped<ISchemaProbe, MigrationSchemaProbe>();
         services.AddScoped<IDatabaseMigrator, EfDatabaseMigrator>();

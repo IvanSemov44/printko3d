@@ -58,3 +58,4 @@
 - [0031 – Имейлът е зад `IEmailSender`, с MailKit и локален прихващач Mailpit](0031-email-behind-iemailsender-with-mailkit.md)
 - [0032 – Поръчката пази копия и има случаен номер, а гостът няма `Customer`](0032-guest-order-keeps-copies-and-a-random-number.md)
 - [0033 – Наличността се взема при потвърждение на поръчката, в същата транзакция](0033-stock-is-taken-at-checkout-in-one-transaction.md)
+- [0034 – Доставката се цени по тегло и е зад `IShippingProvider`](0034-shipping-priced-by-weight-behind-a-provider.md)

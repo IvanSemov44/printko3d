@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261113145451_AddOrderStockReleasedAt`
+Последна миграция: `20261114063503_AddShippingRates`
 
 ## Връзки
 
@@ -456,6 +456,31 @@ erDiagram
 | --- | --- |
 | IX_products_category_id_status | `CREATE INDEX "IX_products_category_id_status" ON public.products USING btree (category_id, status)` |
 | IX_products_slug | `CREATE UNIQUE INDEX "IX_products_slug" ON public.products USING btree (slug)` |
+
+### shipping_rates
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| method_code | character varying(50) | не |  |
+| max_weight_grams | integer | не |  |
+| price | bigint | не |  |
+| created_at | timestamp with time zone | не |  |
+| updated_at | timestamp with time zone | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_shipping_rates | първичен ключ | `PRIMARY KEY (id)` |
+| ck_shipping_rates_max_weight_grams | проверка | `CHECK ((max_weight_grams > 0))` |
+| ck_shipping_rates_price | проверка | `CHECK ((price >= 0))` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_shipping_rates_method_code_max_weight_grams | `CREATE UNIQUE INDEX "IX_shipping_rates_method_code_max_weight_grams" ON public.shipping_rates USING btree (method_code, max_weight_grams)` |
 
 ### store_settings
 

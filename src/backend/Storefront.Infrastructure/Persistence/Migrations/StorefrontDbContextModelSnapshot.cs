@@ -825,6 +825,47 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Storefront.Domain.Shipping.ShippingRate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("MaxWeightGrams")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_weight_grams");
+
+                    b.Property<string>("MethodCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("method_code");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint")
+                        .HasColumnName("price");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MethodCode", "MaxWeightGrams")
+                        .IsUnique();
+
+                    b.ToTable("shipping_rates", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_shipping_rates_max_weight_grams", "max_weight_grams > 0");
+
+                            t.HasCheckConstraint("ck_shipping_rates_price", "price >= 0");
+                        });
+                });
+
             modelBuilder.Entity("Storefront.Infrastructure.Identity.AdminUser", b =>
                 {
                     b.Property<Guid>("Id")

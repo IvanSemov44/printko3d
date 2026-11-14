@@ -3,6 +3,7 @@ using Storefront.Application.Contracts;
 using Storefront.Application.Exceptions;
 using Storefront.Domain.Carts;
 using Storefront.Domain.Catalog;
+using Storefront.Domain.Shipping;
 
 namespace Storefront.UnitTests;
 
@@ -49,6 +50,12 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
 
     // Orders are tested against a real database (OrderServiceDatabaseTests); no unit test places one.
     public IOrderRepository Order => throw new NotSupportedException("The unit tests do not place orders.");
+
+    private readonly FakeShippingRateRepository _shippingRates = new();
+
+    public IShippingRateRepository ShippingRates => _shippingRates;
+
+    public List<ShippingRate> Rates => _shippingRates.Items;
 
     public Task<IRepositoryTransaction> BeginTransactionAsync(CancellationToken cancellationToken) =>
         throw new NotSupportedException("Transactions are covered by the database tests.");
@@ -120,6 +127,20 @@ internal sealed class FakeRepositoryManager : IRepositoryManager
         public Dictionary<Category, uint> Expected { get; } = [];
 
         public void ExpectVersion(Category category, uint version) => Expected[category] = version;
+    }
+
+    private sealed class FakeShippingRateRepository : IShippingRateRepository
+    {
+        public List<ShippingRate> Items { get; } = [];
+
+        public void Create(ShippingRate rate) => Items.Add(rate);
+
+        public Task<IReadOnlyList<ShippingRate>> ListAsync(string methodCode, CancellationToken cancellationToken) =>
+            Task.FromResult<IReadOnlyList<ShippingRate>>(
+                Items.Where(r => r.MethodCode == methodCode).OrderBy(r => r.MaxWeightGrams).ToList());
+
+        public Task<bool> AnyAsync(string methodCode, CancellationToken cancellationToken) =>
+            Task.FromResult(Items.Any(r => r.MethodCode == methodCode));
     }
 
     private sealed class FakeStoreSettingsRepository : IStoreSettingsRepository

@@ -1,6 +1,8 @@
 using Storefront.Application.Catalog;
 using Storefront.Application.Contracts;
+using Storefront.Application.Shipping;
 using Storefront.Domain.Catalog;
+using Storefront.Domain.Shipping;
 
 namespace Storefront.Application.Seeding;
 
@@ -59,7 +61,29 @@ public sealed class DemoDataSeeder(
         }
 
         var settingsCreated = await services.StoreSettings.EnsureAsync(DemoCatalog.Settings, cancellationToken);
+        await EnsureShippingRatesAsync(cancellationToken);
         return new SeedResult(categoriesCreated, productsCreated, productsSkipped, settingsCreated);
+    }
+
+    // Like the settings: a tariff that exists is never overwritten, so a change made by hand survives a second run.
+    private async Task EnsureShippingRatesAsync(CancellationToken cancellationToken)
+    {
+        if (await repositories.ShippingRates.AnyAsync(ShippingMethods.Address, cancellationToken))
+        {
+            return;
+        }
+
+        foreach (var step in DemoCatalog.ShippingSteps)
+        {
+            repositories.ShippingRates.Create(new ShippingRate
+            {
+                MethodCode = ShippingMethods.Address,
+                MaxWeightGrams = step.MaxWeightGrams,
+                Price = step.Price,
+            });
+        }
+
+        await repositories.SaveAsync(cancellationToken);
     }
 
     private async Task CreateProductAsync(PlannedProduct plan, Guid categoryId, CancellationToken cancellationToken)

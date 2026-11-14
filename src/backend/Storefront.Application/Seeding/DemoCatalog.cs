@@ -26,6 +26,9 @@ public sealed record PlannedProduct(
     ProductStatus Status,
     IReadOnlyList<PlannedVariant> Variants);
 
+/// <summary>A step of the demo delivery tariff: up to this weight, this price (smallest currency unit).</summary>
+public sealed record PlannedShippingStep(int MaxWeightGrams, long Price);
+
 public sealed record DemoCatalogPlan(IReadOnlyList<PlannedCategory> Categories, IReadOnlyList<PlannedProduct> Products);
 
 /// <summary>
@@ -45,6 +48,14 @@ public static class DemoCatalog
         ContactPhone: "+359 000 000 000",
         PrimaryColor: "#F25A18",
         IsDemo: true);
+
+    /// <summary>The demo tariff of delivery to the address, in EUR cents. The first values of a real store are its own.</summary>
+    public static readonly IReadOnlyList<PlannedShippingStep> ShippingSteps =
+    [
+        new(1_000, 600),
+        new(5_000, 900),
+        new(20_000, 1_500),
+    ];
 
     private const string Puzzles = "3d-puzzles";
     private const string Figurines = "figurines";
