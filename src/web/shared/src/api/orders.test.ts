@@ -11,14 +11,17 @@ const INPUT: PlaceOrderInput = {
   city: 'Sofia',
   postalCode: '1000',
   termsAccepted: true,
-  expectedTotal: 3000,
+  shippingMethod: 'address',
+  expectedTotal: 3600,
 };
 
 const DTO = {
   number: 12345678,
   status: 'New',
   currency: 'BGN',
-  total: '3000',
+  total: '3600',
+  shippingMethod: 'address',
+  shippingAmount: '600',
   customerName: 'Test Buyer',
   email: 'buyer@example.test',
   phone: '+359 88 000 0000',
@@ -70,7 +73,9 @@ describe('placeOrder', () => {
       number: 12345678,
       status: 'New',
       currency: 'BGN',
-      total: 3000,
+      total: 3600,
+      shippingMethod: 'address',
+      shippingAmount: 600,
       shippingCountry: 'BG',
     });
     expect(order.items).toEqual([

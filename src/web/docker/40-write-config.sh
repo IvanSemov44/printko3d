@@ -92,10 +92,10 @@ else
         printf '}\n'
     } > "$SITEMAP_CONF"
     # The cart cookie belongs to the shop's own address, so the browser reaches the cart through it (decision 0027).
-    # The order is placed with the same cookie (decision 0032), so it goes the same way.
-    # Only the cart and the orders are forwarded, never the admin addresses. With no URI in proxy_pass, nginx keeps the path as it came.
+    # The order is placed, and its delivery priced, with the same cookie (decisions 0032 and 0034), so they go the same way.
+    # Only the cart, the orders and the delivery prices are forwarded, never the admin addresses. With no URI in proxy_pass, nginx keeps the path as it came.
     {
-        printf 'location ~ ^/api/v1/(cart|orders)(/|$) {\n'
+        printf 'location ~ ^/api/v1/(cart|orders|shipping)(/|$) {\n'
         printf '    proxy_pass %s;\n' "$API_ADDRESS"
         printf '    proxy_http_version 1.1;\n'
         printf '    proxy_set_header Host $proxy_host;\n'

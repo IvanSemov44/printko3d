@@ -17,6 +17,8 @@ import {
 import { CheckoutFields } from './CheckoutFields';
 import { CheckoutLines } from './CheckoutLines';
 import { usePlaceOrder } from './usePlaceOrder';
+import { ShippingSection } from './ShippingSection';
+import { useShippingQuery } from './useShippingQuery';
 
 const EMPTY_VALUES: CheckoutValues = {
   name: '',
@@ -55,6 +57,7 @@ export function CheckoutPage() {
   const { defaultCurrency, defaultLocale } = useStoreSettings();
   const { data: cart, isError, refetch } = useCartQuery();
   const placeOrder = usePlaceOrder();
+  const [chosenCode, setChosenCode] = useState<string | null>(null);
   const form = useRef<HTMLFormElement>(null);
   const [values, setValues] = useState<CheckoutValues>(EMPTY_VALUES);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -63,6 +66,10 @@ export function CheckoutPage() {
   const failure = placeOrder.error ? checkoutFailure(placeOrder.error) : null;
   // A line that cannot be bought stops the order here; the server would refuse it too.
   const hasBlockedLine = cart?.lines.some((line) => line.state !== 'Available') ?? false;
+  // The delivery is priced for the lines that can be ordered, so it waits for a cart with something to deliver.
+  const shipping = useShippingQuery(cart !== undefined && cart.lines.length > 0 && !hasBlockedLine);
+  const methods = shipping.data?.methods ?? [];
+  const chosen = methods.find((method) => method.code === chosenCode) ?? methods[0];
 
   function clearError(field: CheckoutField) {
     setErrors((current) => withoutError(current, field));
@@ -70,7 +77,7 @@ export function CheckoutPage() {
 
   function submit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (cart === undefined || placeOrder.isPending || hasBlockedLine) {
+    if (cart === undefined || chosen === undefined || placeOrder.isPending || hasBlockedLine) {
       return;
     }
     const found = validateCheckout(values, termsAccepted);
@@ -88,7 +95,8 @@ export function CheckoutPage() {
         city: values.city.trim(),
         postalCode: values.postalCode.trim(),
         termsAccepted,
-        expectedTotal: cart.total,
+        shippingMethod: chosen.code,
+        expectedTotal: cart.total + chosen.amount,
       },
       {
         onError: (error) => {
@@ -138,11 +146,23 @@ export function CheckoutPage() {
             <p className="cart-made-to-order-note">{t('cart.madeToOrderNote')}</p>
           )}
           <CheckoutLines cart={cart} />
+          <ShippingSection query={shipping} chosen={chosen} onChoose={setChosenCode} />
+          <p className="cart-subtotal">
+            <span>{t('checkout.itemsTotal')}</span>
+            <span>{formatMoney(cart.total, defaultCurrency, defaultLocale)}</span>
+          </p>
+          {chosen !== undefined && (
+            <p className="cart-subtotal">
+              <span>{t('checkout.shippingTotal')}</span>
+              <span>{formatMoney(chosen.amount, defaultCurrency, defaultLocale)}</span>
+            </p>
+          )}
           <p className="cart-subtotal checkout-total">
             <span>{t('checkout.total')}</span>
-            <strong>{formatMoney(cart.total, defaultCurrency, defaultLocale)}</strong>
+            <strong>
+              {formatMoney(cart.total + (chosen?.amount ?? 0), defaultCurrency, defaultLocale)}
+            </strong>
           </p>
-          <p className="cart-delivery-note">{t('cart.deliveryNote')}</p>
           {hasBlockedLine && (
             <p className="checkout-blocked">
               {t('checkout.blockedLine')} <Link to="/cart">{t('checkout.toCart')}</Link>
@@ -174,7 +194,10 @@ export function CheckoutPage() {
               </p>
             )}
           </div>
-          <button type="submit" aria-disabled={placeOrder.isPending || hasBlockedLine}>
+          <button
+            type="submit"
+            aria-disabled={placeOrder.isPending || hasBlockedLine || chosen === undefined}
+          >
             {placeOrder.isPending ? t('checkout.submitting') : t('checkout.submit')}
           </button>
         </section>

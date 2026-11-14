@@ -7,7 +7,9 @@ public interface IOrderService
     /// the lines that are in stock. Prices, names and the total come from the variants, never from the buyer.
     /// Errors: 400 validation (a field), 409 order.total_changed, 409 cart.changed (the cart changed while the order was made),
     /// 409 order.stock_changed (someone took the last pieces between the check and the save),
-    /// 422 order.cart_empty, 422 order.cart_not_orderable (a line is archived, inactive or over the stock).
+    /// 422 order.cart_empty, 422 order.cart_not_orderable (a line is archived, inactive or over the stock),
+    /// 422 order.shipping_unavailable (the delivery method is not offered for this parcel), 422 shipping.too_heavy.
+    /// The expected total includes the delivery, so a changed price of delivery is 409 order.total_changed.
     /// </summary>
     Task<OrderDto> PlaceAsync(string? cartToken, PlaceOrderInput input, CancellationToken cancellationToken);
 

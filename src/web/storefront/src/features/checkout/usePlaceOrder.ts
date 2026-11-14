@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { CART_KEY } from '../../components/cartKeys';
 import { checkoutFailure } from './checkoutErrors';
+import { SHIPPING_KEY } from './useShippingQuery';
 
 const EMPTY_CART: Cart = { lines: [], itemCount: 0, total: 0 };
 
@@ -18,6 +19,7 @@ export function usePlaceOrder() {
     mutationFn: (input: PlaceOrderInput) => placeOrder(input),
     onSuccess: (order) => {
       queryClient.setQueryData(CART_KEY, EMPTY_CART);
+      queryClient.removeQueries({ queryKey: SHIPPING_KEY });
       void navigate(`/order/${String(order.number)}`, { state: { order } });
     },
     onError: (error) => {

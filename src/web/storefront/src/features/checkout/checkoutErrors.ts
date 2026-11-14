@@ -32,6 +32,10 @@ export function checkoutFailure(error: unknown): CheckoutFailure {
       return { kind: 'notice', message: 'checkout.error.notOrderable', toCart: true };
     case 'order.stock_changed':
       return { kind: 'notice', message: 'checkout.error.stockChanged', toCart: true };
+    case 'order.shipping_unavailable':
+      return { kind: 'notice', message: 'checkout.error.shippingUnavailable', toCart: false };
+    case 'shipping.too_heavy':
+      return { kind: 'notice', message: 'checkout.error.tooHeavy', toCart: true };
     case 'cart.changed':
       return { kind: 'notice', message: 'checkout.error.cartChanged', toCart: false };
     case 'order.cart_empty':

@@ -18,8 +18,14 @@ public sealed class Order : Entity
     /// <summary>ISO 4217 code copied from the store settings.</summary>
     public string Currency { get; set; } = string.Empty;
 
-    /// <summary>Sum of the lines in the smallest currency unit.</summary>
+    /// <summary>The lines plus <see cref="ShippingAmount"/>, in the smallest currency unit.</summary>
     public long TotalAmount { get; set; }
+
+    /// <summary>Code of the delivery method the buyer chose, copied at the moment of purchase (decision 0034). Empty for an order made before delivery was priced.</summary>
+    public string ShippingMethod { get; set; } = string.Empty;
+
+    /// <summary>The price of the delivery in the smallest currency unit, copied at the moment of purchase. Part of <see cref="TotalAmount"/>.</summary>
+    public long ShippingAmount { get; set; }
 
     public string CustomerName { get; set; } = string.Empty;
 

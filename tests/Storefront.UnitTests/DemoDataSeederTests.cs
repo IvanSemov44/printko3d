@@ -137,6 +137,21 @@ public sealed class DemoDataSeederTests
     }
 
     [Fact]
+    public async Task Seeding_CreatesTheDemoShippingTariff_AndKeepsAChangedOneOnASecondRun()
+    {
+        await CreateSeeder().SeedAsync("Development", default);
+
+        Assert.Equal(DemoCatalog.ShippingSteps.Count, _repositories.Rates.Count);
+        Assert.All(_repositories.Rates, r => Assert.Equal("address", r.MethodCode));
+
+        _repositories.Rates[0].Price = 12345;
+        await CreateSeeder().SeedAsync("Development", default);
+
+        Assert.Equal(DemoCatalog.ShippingSteps.Count, _repositories.Rates.Count);
+        Assert.Equal(12345, _repositories.Rates[0].Price);
+    }
+
+    [Fact]
     public async Task Seeding_Twice_DoesNotDuplicateAnything()
     {
         await CreateSeeder().SeedAsync("Development", default);

@@ -1327,3 +1327,17 @@ body:has(.cart-panel[open]) {
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--color-border);
 }
+
+/* The delivery of the cart on the checkout: the methods as radio rows, in the look of the other fields. */
+.checkout-shipping {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.checkout-shipping legend {
+  padding: 0;
+  font-weight: 700;
+}

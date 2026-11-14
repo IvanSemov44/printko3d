@@ -27,7 +27,9 @@ public sealed class OrdersController(IServiceManager services) : ControllerBase
     /// and ask again), 409 order.stock_changed (someone took the last pieces at the same moment: read the cart and
     /// check it), 409 cart.changed (the cart was changed at the same moment: read it and try again),
     /// 422 order.cart_empty (no cart, an unknown cookie, or no lines), 422 order.cart_not_orderable (a line is archived,
-    /// inactive or over the stock: remove it from the cart).
+    /// inactive or over the stock: remove it from the cart), 422 order.shipping_unavailable (the chosen delivery is not
+    /// offered for this parcel: read the quotes and choose again), 422 shipping.too_heavy (the parcel is heavier than
+    /// any delivery carries). `expectedTotal` includes the delivery.
     /// </remarks>
     [HttpPost]
     [ProducesResponseType<OrderDto>(StatusCodes.Status201Created)]

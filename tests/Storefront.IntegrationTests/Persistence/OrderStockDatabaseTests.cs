@@ -26,7 +26,7 @@ public sealed class OrderStockDatabaseTests(PostgresFixture postgres)
     }
 
     private static PlaceOrderInput Input(long expectedTotal) =>
-        new("Test Buyer", "buyer@example.com", "+359 88 000 0000", "1 Test Street", "Sofia", "1000", true, expectedTotal);
+        new("Test Buyer", "buyer@example.com", "+359 88 000 0000", "1 Test Street", "Sofia", "1000", true, "address", expectedTotal);
 
     /// <summary>
     /// One in-stock variant (price 1500) and one made to order (price 1500, no stock figure). The second is only there
@@ -39,6 +39,7 @@ public sealed class OrderStockDatabaseTests(PostgresFixture postgres)
         var category = CatalogData.Category();
         context.Add(category);
         context.Add(CatalogData.Settings());
+        context.Add(CatalogData.FreeShipping());
 
         var first = CatalogData.Product(category.Id, "dragon");
         first.Status = ProductStatus.Published;

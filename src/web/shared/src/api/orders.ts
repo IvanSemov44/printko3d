@@ -22,7 +22,9 @@ export interface PlaceOrderInput {
   city: string;
   postalCode: string;
   termsAccepted: boolean;
-  /** The total of the cart the buyer saw, in the smallest unit of the currency. The server refuses a different one. */
+  /** The code of the delivery method the buyer chose, from `getShippingOptions` (decision 0034). */
+  shippingMethod: string;
+  /** The total the buyer saw, with the delivery, in the smallest unit of the currency. The server refuses a different one. */
   expectedTotal: number;
 }
 
@@ -45,7 +47,11 @@ export interface Order {
   /** Only `New` exists for now; more come with payment and the statuses (tasks 26 and 27). */
   status: string;
   currency: string;
+  /** The lines plus `shippingAmount`. */
   total: number;
+  /** The delivery the buyer chose, copied at the moment of purchase. Empty for an order made before delivery was priced. */
+  shippingMethod: string;
+  shippingAmount: number;
   customerName: string;
   email: string;
   phone: string;
@@ -79,6 +85,8 @@ export function readOrder(value: unknown): Order {
     status: field(object, 'status', readString, 'order'),
     currency: field(object, 'currency', readString, 'order'),
     total: field(object, 'total', readInteger, 'order'),
+    shippingMethod: field(object, 'shippingMethod', readString, 'order'),
+    shippingAmount: field(object, 'shippingAmount', readInteger, 'order'),
     customerName: field(object, 'customerName', readString, 'order'),
     email: field(object, 'email', readString, 'order'),
     phone: field(object, 'phone', readString, 'order'),
@@ -94,7 +102,7 @@ export function readOrder(value: unknown): Order {
 /**
  * Turns the cart of the cookie into an order. The server reads the prices again and empties the cart.
  * A refusal is an ApiError: 400 `validation.failed` (with the fields), 409 `order.total_changed`, `order.stock_changed` or `cart.changed`,
- * 422 `order.cart_empty` or `order.cart_not_orderable`.
+ * 422 `order.cart_empty`, `order.cart_not_orderable`, `order.shipping_unavailable` or `shipping.too_heavy`.
  */
 export async function placeOrder(input: PlaceOrderInput, signal?: AbortSignal): Promise<Order> {
   return readOrder(await apiSend('POST', '/api/v1/orders', input, signal));

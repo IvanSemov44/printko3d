@@ -56,7 +56,9 @@ describe('cart page', () => {
     const page = await findContent();
     expect(await within(page).findAllByRole('listitem')).toHaveLength(2);
     expect(sum(page)).toContain('45,00');
-    expect(within(page).getByText('Доставката се изчислява при плащане.')).toBeInTheDocument();
+    expect(
+      within(page).getByText('Цената на доставката се вижда при поръчка.'),
+    ).toBeInTheDocument();
     expect(within(page).queryByRole('link', { name: /плащане/i })).not.toBeInTheDocument();
     expect(within(page).getByRole('link', { name: 'Към поръчката' })).toHaveAttribute(
       'href',

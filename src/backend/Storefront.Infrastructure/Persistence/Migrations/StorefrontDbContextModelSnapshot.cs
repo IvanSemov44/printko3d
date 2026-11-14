@@ -664,6 +664,10 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(30)")
                         .HasColumnName("phone");
 
+                    b.Property<long>("ShippingAmount")
+                        .HasColumnType("bigint")
+                        .HasColumnName("shipping_amount");
+
                     b.Property<string>("ShippingCity")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -675,6 +679,12 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                         .HasMaxLength(2)
                         .HasColumnType("character varying(2)")
                         .HasColumnName("shipping_country");
+
+                    b.Property<string>("ShippingMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("shipping_method");
 
                     b.Property<string>("ShippingPostalCode")
                         .IsRequired()
@@ -735,11 +745,15 @@ namespace Storefront.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("ck_orders_number", "number BETWEEN 10000000 AND 99999999");
 
+                            t.HasCheckConstraint("ck_orders_shipping_amount", "shipping_amount >= 0");
+
                             t.HasCheckConstraint("ck_orders_shipping_country", "char_length(shipping_country) = 2");
 
                             t.HasCheckConstraint("ck_orders_status", "status IN ('New')");
 
                             t.HasCheckConstraint("ck_orders_total_amount", "total_amount >= 0");
+
+                            t.HasCheckConstraint("ck_orders_total_covers_shipping", "total_amount >= shipping_amount");
                         });
                 });
 
@@ -822,6 +836,47 @@ namespace Storefront.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("ck_order_items_quantity", "quantity >= 1");
 
                             t.HasCheckConstraint("ck_order_items_unit_price", "unit_price >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("Storefront.Domain.Shipping.ShippingRate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("MaxWeightGrams")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_weight_grams");
+
+                    b.Property<string>("MethodCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("method_code");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint")
+                        .HasColumnName("price");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MethodCode", "MaxWeightGrams")
+                        .IsUnique();
+
+                    b.ToTable("shipping_rates", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_shipping_rates_max_weight_grams", "max_weight_grams > 0");
+
+                            t.HasCheckConstraint("ck_shipping_rates_price", "price >= 0");
                         });
                 });
 

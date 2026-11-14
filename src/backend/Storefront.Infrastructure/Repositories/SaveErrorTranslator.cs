@@ -23,6 +23,8 @@ internal static class SaveErrorTranslator
         ["IX_product_variants_sku"] = ("The SKU is already used.", "variant.sku_taken"),
         ["IX_cart_items_cart_id_variant_id"] =
             ("The variant was added to the cart at the same moment. Try again.", "cart.item_conflict"),
+        ["IX_shipping_rates_method_code_max_weight_grams"] =
+            ("The tariff was changed at the same moment. Reload it and try again.", "shipping.tariff_conflict"),
         // Backstop only: the order service looks for a free number first.
         ["IX_orders_number"] = ("The order number is taken. Try again.", "order.number_taken"),
     };

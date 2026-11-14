@@ -97,6 +97,30 @@ public sealed class OrderConstraintTests(PostgresFixture postgres)
         Assert.Equal(isAccepted ? null : PostgresErrorCodes.CheckViolation, state);
     }
 
+    [Theory]
+    [InlineData(-1, 3000, false)]
+    [InlineData(0, 3000, true)]
+    [InlineData(700, 3000, true)]
+    [InlineData(3000, 3000, true)]
+    [InlineData(3001, 3000, false)]
+    public async Task Order_AcceptsADeliveryThatIsNotNegativeAndFitsInTheTotal_Only(
+        long shippingAmount,
+        long total,
+        bool isAccepted)
+    {
+        var database = await postgres.CreateDatabaseAsync();
+        await using var context = database.CreateContext();
+        var order = NewOrder();
+        order.ShippingMethod = "address";
+        order.ShippingAmount = shippingAmount;
+        order.TotalAmount = total;
+        context.Add(order);
+
+        var state = await SqlStateOfAsync(() => context.SaveChangesAsync());
+
+        Assert.Equal(isAccepted ? null : PostgresErrorCodes.CheckViolation, state);
+    }
+
     [Fact]
     public async Task Order_RejectsNegativeTotal()
     {

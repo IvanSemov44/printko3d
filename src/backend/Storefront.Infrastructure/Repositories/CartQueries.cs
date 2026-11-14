@@ -30,6 +30,7 @@ internal sealed class CartQueries(StorefrontDbContext context) : ICartQueries
                 variant.Price,
                 variant.IsActive,
                 variant.StockQuantity,
+                variant.WeightGrams,
                 product.Status,
                 product.FulfilmentType,
                 product.LeadTimeDays,
@@ -52,7 +53,8 @@ internal sealed class CartQueries(StorefrontDbContext context) : ICartQueries
             CartLineRules.StateOf(r.Status, r.FulfilmentType, r.IsActive, r.StockQuantity, r.Quantity),
             r.FulfilmentType,
             r.LeadTimeDays,
-            new VariantSupply(true, r.FulfilmentType, r.StockQuantity).Limit)).ToList();
+            new VariantSupply(true, r.FulfilmentType, r.StockQuantity).Limit,
+            r.WeightGrams)).ToList();
         return CartDto.From(lines);
     }
 }
