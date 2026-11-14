@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { findAccessibilityViolations } from '../../testing/axe';
@@ -189,15 +189,13 @@ describe('page "My order"', () => {
     stub(() => Response.json(orderFixture({ status: 'Paid' })));
     const user = userEvent.setup();
     renderApp('/my-order');
-    const page = await findContent();
+    await findContent();
     await screen.findByLabelText('Номер на поръчката');
-    expect(await findAccessibilityViolations(page)).toEqual([]);
+    expect(await findAccessibilityViolations()).toEqual([]);
 
     await fill(user, '12345678', 'buyer@example.test');
     await screen.findByText('PR-12345678');
-    await waitFor(async () => {
-      expect(await findAccessibilityViolations(await findContent())).toEqual([]);
-    });
+    expect(await findAccessibilityViolations()).toEqual([]);
   });
 });
 
