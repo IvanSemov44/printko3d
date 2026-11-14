@@ -19,6 +19,8 @@ internal sealed class RepositoryManager(StorefrontDbContext context) : IReposito
 
     private readonly Lazy<IPaymentRepository> _payments = new(() => new PaymentRepository(context));
 
+    private readonly Lazy<IOutgoingEmailRepository> _outgoingEmails = new(() => new OutgoingEmailRepository(context));
+
     private readonly Lazy<ICatalogQueries> _catalog = new(() => new CatalogQueries(context));
 
     public ICatalogQueries Catalog => _catalog.Value;
@@ -38,6 +40,8 @@ internal sealed class RepositoryManager(StorefrontDbContext context) : IReposito
     public IShippingRateRepository ShippingRates => _shippingRates.Value;
 
     public IPaymentRepository Payments => _payments.Value;
+
+    public IOutgoingEmailRepository OutgoingEmails => _outgoingEmails.Value;
 
 
     public async Task<IRepositoryTransaction> BeginTransactionAsync(CancellationToken cancellationToken) =>

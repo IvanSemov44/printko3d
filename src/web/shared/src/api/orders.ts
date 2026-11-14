@@ -44,7 +44,7 @@ export interface OrderItem {
 /** An order as it was placed. Its number is random and is shown as `PR-` and the digits. */
 export interface Order {
   number: number;
-  /** `New`, `Paid` or `Cancelled`; the other statuses come with task 27. */
+  /** One of `ORDER_STATUSES` (decision 0036). */
   status: string;
   currency: string;
   /** The lines plus `shippingAmount`. */
@@ -109,4 +109,33 @@ export function readOrder(value: unknown): Order {
  */
 export async function placeOrder(input: PlaceOrderInput, signal?: AbortSignal): Promise<Order> {
   return readOrder(await apiSend('POST', '/api/v1/orders', input, signal));
+}
+
+/** The statuses of an order in the order they follow each other, and `Cancelled` at the end (decision 0036). */
+export const ORDER_STATUSES = [
+  'New',
+  'Paid',
+  'InProduction',
+  'ReadyToShip',
+  'Shipped',
+  'Completed',
+  'Cancelled',
+] as const;
+
+/**
+ * Finds an order again by its number and the email of the order (page "My order", decision 0036). A refusal is an
+ * ApiError: 400 `validation.failed` (a field is empty), 404 `order.not_found` (the same for a wrong number and a wrong
+ * email, and for a number closed after too many wrong emails), 429 (too many requests).
+ */
+export async function findOrder(
+  number: number,
+  email: string,
+  signal?: AbortSignal,
+): Promise<Order> {
+  return readOrder(await apiSend('POST', '/api/v1/orders/lookup', { number, email }, signal));
+}
+
+/** Finds the order that the key in the link of an email belongs to. A refusal is an ApiError: 404 `order.not_found`, 429. */
+export async function findOrderByToken(token: string, signal?: AbortSignal): Promise<Order> {
+  return readOrder(await apiSend('POST', '/api/v1/orders/lookup-by-token', { token }, signal));
 }

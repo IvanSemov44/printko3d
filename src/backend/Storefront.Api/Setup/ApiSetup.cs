@@ -1,10 +1,13 @@
+using System.Threading.RateLimiting;
 using Microsoft.Extensions.Options;
 using Storefront.Api.Auth;
 using Storefront.Api.Background;
+using Storefront.Api.Cart;
 using Storefront.Api.Errors;
 using Storefront.Application.Carts;
 using Storefront.Application.Catalog;
 using Storefront.Application.Contracts;
+using Storefront.Application.Emails;
 using Storefront.Application.Health;
 using Storefront.Application.Orders;
 using Storefront.Application.Payments;
@@ -37,6 +40,7 @@ internal static class ApiSetup
         builder.AddCartCleanup();
         builder.AddOrders();
         builder.AddPayments();
+        builder.AddEmailOutbox();
         builder.Services
             .AddOptions<SiteOptions>()
             .Bind(builder.Configuration.GetSection(SiteOptions.SectionName))
@@ -75,19 +79,55 @@ internal static class ApiSetup
                 .AllowAnyHeader()));
     }
 
-    /// <summary>Placing an order (decision 0032): the number generator and the settings, checked at startup.</summary>
+    /// <summary>
+    /// Placing and finding an order (decisions 0032 and 0036): the settings, checked at startup, the number generator, the
+    /// count of wrong emails, and the limits of requests. The address in the emails is the one of the site (<c>Site:Url</c>)
+    /// when it is set.
+    /// </summary>
     private static void AddOrders(this WebApplicationBuilder builder)
     {
+        var siteUrl = builder.Configuration.GetSection(SiteOptions.SectionName).Get<SiteOptions>()?.Url ?? string.Empty;
         builder.Services
             .AddOptions<OrderOptions>()
             .Bind(builder.Configuration.GetSection(OrderOptions.SectionName))
+            .PostConfigure(options =>
+            {
+                if (siteUrl.Length > 0 && builder.Configuration[$"{OrderOptions.SectionName}:{nameof(OrderOptions.StorefrontUrl)}"] is null)
+                {
+                    options.StorefrontUrl = siteUrl;
+                }
+            })
             .Validate(
-                options => options.TermsVersion.Length is > 0 and <= 50,
-                "Checkout:TermsVersion must be between 1 and 50 characters.")
+                OrderOptions.IsValid,
+                "Checkout is not valid: TermsVersion must be 1 to 50 characters, StorefrontUrl an http(s) address, "
+                + "LookupAttemptsPerMinute and PlaceAttemptsPerMinute 1 to 1000, LookupFailuresPerOrder 1 to 100 and LookupFailureWindowMinutes 1 to 1440.")
             .ValidateOnStart();
         builder.Services.AddSingleton(services => services.GetRequiredService<IOptions<OrderOptions>>().Value);
         builder.Services.AddSingleton<IOrderNumberGenerator, RandomOrderNumberGenerator>();
+        builder.Services.AddSingleton(services => new OrderLookupThrottle(
+            services.GetRequiredService<TimeProvider>(),
+            services.GetRequiredService<OrderOptions>()));
+        builder.Services.AddOrderRateLimits();
     }
+
+    /// <summary>
+    /// Limits per minute for the open addresses of orders (debt D64). Finding an order is counted by address; placing one by
+    /// the cart of the buyer, because behind the proxy every request has the same address (decisions 0014 and 0027).
+    /// </summary>
+    private static void AddOrderRateLimits(this IServiceCollection services) =>
+        services.AddRateLimiter(limiter =>
+        {
+            limiter.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            limiter.AddPolicy(OrderRateLimits.Lookup, context => RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => Window(context.RequestServices.GetRequiredService<OrderOptions>().LookupAttemptsPerMinute)));
+            limiter.AddPolicy(OrderRateLimits.Place, context => RateLimitPartition.GetFixedWindowLimiter(
+                CartCookie.Read(context.Request) ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => Window(context.RequestServices.GetRequiredService<OrderOptions>().PlaceAttemptsPerMinute)));
+        });
+
+    private static FixedWindowRateLimiterOptions Window(int permits) =>
+        new() { PermitLimit = permits, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 };
 
     /// <summary>
     /// Paying an order (decision 0035): the settings, checked at startup, and the guard that keeps the test provider out of
@@ -117,6 +157,26 @@ internal static class ApiSetup
             // With payment off nobody can pay, so no order has a deadline and there is nothing to cancel.
             builder.Services.AddHostedService<PaymentExpiryWorker>();
         }
+    }
+
+    /// <summary>The queue of outgoing emails (decision 0036): its settings, checked at startup, and the worker that sends them.</summary>
+    private static void AddEmailOutbox(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .AddOptions<EmailOutboxOptions>()
+            .Bind(builder.Configuration.GetSection(EmailOutboxOptions.SectionName))
+            .Validate(
+                EmailOutboxOptions.IsValid,
+                "EmailOutbox values are out of range: IntervalSeconds 1 to 3600, InitialDelaySeconds 0 to 3600, BatchSize 1 to 500, "
+                + "MaxAttempts 1 to 20, RetryBaseSeconds 1 to 86400, LeaseSeconds 1 to 3600 and RetentionDays 1 to 3650.")
+            .ValidateOnStart();
+        builder.Services.AddSingleton(services => services.GetRequiredService<IOptions<EmailOutboxOptions>>().Value);
+        builder.Services.AddScoped<IEmailOutboxService>(services => new EmailOutboxService(
+            services.GetRequiredService<IRepositoryManager>(),
+            services.GetRequiredService<IEmailSender>(),
+            services.GetRequiredService<TimeProvider>(),
+            services.GetRequiredService<EmailOutboxOptions>()));
+        builder.Services.AddHostedService<EmailOutboxWorker>();
     }
 
     /// <summary>The daily cleanup of old carts (decision 0027), with its settings checked at startup.</summary>

@@ -18,6 +18,8 @@ public interface IRepositoryManager
 
     IPaymentRepository Payments { get; }
 
+    IOutgoingEmailRepository OutgoingEmails { get; }
+
     ICatalogQueries Catalog { get; }
 
     Task SaveAsync(CancellationToken cancellationToken);

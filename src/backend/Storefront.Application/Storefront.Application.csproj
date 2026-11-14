@@ -8,4 +8,9 @@
     <InternalsVisibleTo Include="Storefront.UnitTests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The texts of the emails are translations, not code (rule 1). -->
+    <EmbeddedResource Include="Emails\Texts\*.json" />
+  </ItemGroup>
+
 </Project>

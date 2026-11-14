@@ -24,4 +24,8 @@ public interface IServiceManager
     IPaymentService Payments { get; }
 
     IShippingTariffService ShippingTariff { get; }
+
+    IOrderStatusService OrderStatuses { get; }
+
+    IOrderLookupService OrderLookup { get; }
 }

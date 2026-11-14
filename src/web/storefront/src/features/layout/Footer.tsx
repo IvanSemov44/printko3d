@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { useStoreSettings, useT } from '../store-settings/useStoreSettings';
 
 function toTelHref(phone: string): string {
@@ -12,6 +13,9 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <p className="site-footer-name">{storeName}</p>
+      <p>
+        <Link to="/my-order">{t('layout.myOrder')}</Link>
+      </p>
       {hasContacts && (
         <address aria-label={t('layout.footerNav')}>
           {contactEmail !== '' && (

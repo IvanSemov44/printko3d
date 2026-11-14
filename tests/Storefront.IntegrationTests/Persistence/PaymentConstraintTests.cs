@@ -204,8 +204,12 @@ public sealed class PaymentConstraintTests(PostgresFixture postgres)
 
     [Theory]
     [InlineData(OrderStatus.Paid)]
+    [InlineData(OrderStatus.InProduction)]
+    [InlineData(OrderStatus.ReadyToShip)]
+    [InlineData(OrderStatus.Shipped)]
+    [InlineData(OrderStatus.Completed)]
     [InlineData(OrderStatus.Cancelled)]
-    public async Task Order_AcceptsThePaidAndCancelledStatuses(OrderStatus status)
+    public async Task Order_AcceptsEveryStatusOfTheLifecycle(OrderStatus status)
     {
         var database = await postgres.CreateDatabaseAsync();
         await using var context = database.CreateContext();
@@ -227,6 +231,6 @@ public sealed class PaymentConstraintTests(PostgresFixture postgres)
         Assert.Equal(
             CheckViolation,
             await SqlStateOfAsync(() => context.Database.ExecuteSqlAsync(
-                $"UPDATE orders SET status = 'Shipped' WHERE id = {orderId}")));
+                $"UPDATE orders SET status = 'Teleported' WHERE id = {orderId}")));
     }
 }

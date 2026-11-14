@@ -56,7 +56,9 @@ describe('App', () => {
       renderApp();
 
       const footer = await screen.findByRole('contentinfo');
-      expect(within(footer).queryByRole('link')).not.toBeInTheDocument();
+      // The only link left is the one to the page of the order; there is no email and no phone to call.
+      const links = within(footer).getAllByRole('link');
+      expect(links.map((link) => link.getAttribute('href'))).toEqual(['/my-order']);
     });
 
     it('starts with a skip link that targets the main content', async () => {

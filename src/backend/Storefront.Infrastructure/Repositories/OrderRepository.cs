@@ -21,6 +21,11 @@ internal sealed class OrderRepository(StorefrontDbContext context)
             .Include(o => o.Items)
             .SingleOrDefaultAsync(o => o.Number == number, cancellationToken);
 
+    public Task<Order?> GetByAccessTokenAsync(string token, CancellationToken cancellationToken) =>
+        Query(trackChanges: false)
+            .Include(o => o.Items)
+            .SingleOrDefaultAsync(o => o.AccessToken == token, cancellationToken);
+
     public async Task<bool> TryMarkPaidAsync(Guid orderId, CancellationToken cancellationToken)
     {
         var now = Context.Now;
@@ -28,6 +33,21 @@ internal sealed class OrderRepository(StorefrontDbContext context)
             .Where(o => o.Id == orderId && o.Status == OrderStatus.New)
             .ExecuteUpdateAsync(
                 s => s.SetProperty(o => o.Status, OrderStatus.Paid).SetProperty(o => o.UpdatedAt, now),
+                cancellationToken);
+        return changed == 1;
+    }
+
+    public async Task<bool> TryChangeStatusAsync(
+        Guid orderId,
+        OrderStatus from,
+        OrderStatus to,
+        CancellationToken cancellationToken)
+    {
+        var now = Context.Now;
+        var changed = await Context.Orders
+            .Where(o => o.Id == orderId && o.Status == from)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(o => o.Status, to).SetProperty(o => o.UpdatedAt, now),
                 cancellationToken);
         return changed == 1;
     }

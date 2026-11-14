@@ -60,3 +60,4 @@
 - [0033 – Наличността се взема при потвърждение на поръчката, в същата транзакция](0033-stock-is-taken-at-checkout-in-one-transaction.md)
 - [0034 – Доставката се цени по тегло и е зад `IShippingProvider`](0034-shipping-priced-by-weight-behind-a-provider.md)
 - [0035 – Плащането е зад `IPaymentProvider`, с подписани съобщения и срок за неплатена поръчка](0035-payment-behind-a-provider-with-signed-messages.md)
+- [0036 – Статуси на поръчката, опашка за изходящи писма и достъп до поръчката по номер и имейл или по токен](0036-order-statuses-outgoing-email-queue-and-order-lookup.md)
