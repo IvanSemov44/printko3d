@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Storefront.Api.Requests;
 using Storefront.Application.Catalog;
 using Storefront.Application.Catalog.Queries;
 using Storefront.Application.Orders;
@@ -45,4 +46,35 @@ public sealed class AdminOrdersController(IServiceManager services) : Controller
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<OrderAdminDto>> Get(int number, CancellationToken cancellationToken) =>
         Ok(await services.OrderAdmin.GetAsync(number, cancellationToken));
+
+    /// <summary>
+    /// Moves the order one production step forward (InProduction, ReadyToShip, Shipped, Completed) and returns it. Moving to
+    /// Shipped queues the email to the buyer. Payment and refusal are not steps: see the cancel address.
+    /// </summary>
+    /// <remarks>Errors: 400 validation.failed (unknown status), 404 order.not_found, 409 order.status_transition_invalid.</remarks>
+    [HttpPost("{number:int}/status")]
+    [ProducesResponseType<OrderAdminDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<OrderAdminDto>> ChangeStatus(
+        int number, ChangeOrderStatusRequest request, CancellationToken cancellationToken) =>
+        Ok(await services.OrderAdmin.ChangeStatusAsync(number, request.Status, cancellationToken));
+
+    /// <summary>
+    /// Refuses the order (from New, Paid, InProduction or ReadyToShip) and gives its stock back in the same transaction.
+    /// <c>refundByHand</c> is true when the buyer had paid: the provider has no refund yet, so the money goes back outside
+    /// the shop.
+    /// </summary>
+    /// <remarks>Errors: 404 order.not_found, 409 order.status_transition_invalid (shipped, completed or already cancelled).</remarks>
+    [HttpPost("{number:int}/cancel")]
+    [ProducesResponseType<OrderCancelledDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<OrderCancelledDto>> Cancel(int number, CancellationToken cancellationToken) =>
+        Ok(await services.OrderAdmin.CancelAsync(number, cancellationToken));
 }

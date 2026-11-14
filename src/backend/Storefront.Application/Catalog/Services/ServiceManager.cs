@@ -50,7 +50,9 @@ public sealed class ServiceManager(
 
     private readonly Lazy<IOrderStatusService> _orderStatuses = new(() => new OrderStatusService(repositories, orderOptions ?? new OrderOptions()));
 
-    private readonly Lazy<IOrderAdminService> _orderAdmin = new(() => new OrderAdminService(repositories));
+    private readonly Lazy<IOrderAdminService> _orderAdmin = new(() => new OrderAdminService(
+        repositories,
+        new OrderStatusService(repositories, orderOptions ?? new OrderOptions())));
 
     private readonly Lazy<IShippingService> _shipping = new(() => new ShippingService(
         repositories,

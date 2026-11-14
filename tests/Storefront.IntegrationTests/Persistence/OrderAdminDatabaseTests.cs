@@ -116,6 +116,7 @@ public sealed class OrderAdminDatabaseTests(PostgresFixture postgres)
         Assert.Equal("Paid", detail.Order.Status);
         Assert.Equal(2, detail.Order.Items.Count);
         Assert.Equal(["InProduction"], detail.NextStatuses);
+        Assert.True(detail.CanCancel);
     }
 
     [Fact]

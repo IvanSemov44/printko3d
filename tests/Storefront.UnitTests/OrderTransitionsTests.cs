@@ -13,6 +13,9 @@ public sealed class OrderTransitionsTests
         { OrderStatus.ReadyToShip, OrderStatus.Shipped },
         { OrderStatus.Shipped, OrderStatus.Completed },
         { OrderStatus.Cancelled, OrderStatus.Paid },
+        { OrderStatus.Paid, OrderStatus.Cancelled },
+        { OrderStatus.InProduction, OrderStatus.Cancelled },
+        { OrderStatus.ReadyToShip, OrderStatus.Cancelled },
     };
 
     [Theory]

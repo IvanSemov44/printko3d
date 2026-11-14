@@ -15,4 +15,10 @@ public sealed record OrderAdminListItemDto(
 /// One order for the administrator. <paramref name="NextStatuses"/> are the production steps the administrator can take
 /// now (decision 0037), so the panel does not repeat the rules.
 /// </summary>
-public sealed record OrderAdminDto(OrderDto Order, IReadOnlyList<string> NextStatuses);
+public sealed record OrderAdminDto(OrderDto Order, IReadOnlyList<string> NextStatuses, bool CanCancel);
+
+/// <summary>
+/// The order after the administrator refused it. <paramref name="RefundByHand"/> is true when the buyer had paid: the
+/// provider has no refund yet (decision 0037), so the money goes back outside the shop.
+/// </summary>
+public sealed record OrderCancelledDto(OrderAdminDto Order, bool RefundByHand);

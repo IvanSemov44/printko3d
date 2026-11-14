@@ -9,9 +9,9 @@ public static class OrderTransitions
     private static readonly Dictionary<OrderStatus, OrderStatus[]> Allowed = new()
     {
         [OrderStatus.New] = [OrderStatus.Paid, OrderStatus.Cancelled],
-        [OrderStatus.Paid] = [OrderStatus.InProduction],
-        [OrderStatus.InProduction] = [OrderStatus.ReadyToShip],
-        [OrderStatus.ReadyToShip] = [OrderStatus.Shipped],
+        [OrderStatus.Paid] = [OrderStatus.InProduction, OrderStatus.Cancelled],
+        [OrderStatus.InProduction] = [OrderStatus.ReadyToShip, OrderStatus.Cancelled],
+        [OrderStatus.ReadyToShip] = [OrderStatus.Shipped, OrderStatus.Cancelled],
         [OrderStatus.Shipped] = [OrderStatus.Completed],
         // A payment that arrives after the order was cancelled brings it back (task 26).
         [OrderStatus.Cancelled] = [OrderStatus.Paid],
