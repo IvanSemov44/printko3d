@@ -730,3 +730,18 @@ select {
   border-width: 1px;
   background: var(--color-surface);
 }
+
+.data-table a.row-link:not(.button) {
+  color: var(--color-ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.data-table tbody tr:hover a.row-link:not(.button) {
+  text-decoration: underline;
+}
+
+.data-table .mono,
+.data-table .num {
+  white-space: nowrap;
+}
