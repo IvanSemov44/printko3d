@@ -3,6 +3,8 @@ using Npgsql;
 using Storefront.Application.Exceptions;
 using Storefront.Domain.Carts;
 using Storefront.Domain.Catalog;
+using Storefront.Domain.Orders;
+using Storefront.Domain.Payments;
 
 namespace Storefront.Infrastructure.Repositories;
 
@@ -25,6 +27,12 @@ internal static class SaveErrorTranslator
             ("The variant was added to the cart at the same moment. Try again.", "cart.item_conflict"),
         ["IX_shipping_rates_method_code_max_weight_grams"] =
             ("The tariff was changed at the same moment. Reload it and try again.", "shipping.tariff_conflict"),
+        ["ux_payments_one_open_payment_per_order"] =
+            ("The order already has a payment in progress or paid.", "payment.already_open"),
+        ["IX_payments_provider_provider_reference"] =
+            ("The provider reference is already used.", "payment.reference_taken"),
+        // The repeat of a message the provider is allowed to send; the payment service treats it as handled.
+        ["IX_payment_events_provider_event_id"] = ("The message was already handled.", "payment.event_repeated"),
         // Backstop only: the order service looks for a free number first.
         ["IX_orders_number"] = ("The order number is taken. Try again.", "order.number_taken"),
     };
@@ -64,6 +72,8 @@ internal static class SaveErrorTranslator
             Category => "category.version_conflict",
             Product => "product.version_conflict",
             StoreSettings => "store_settings.version_conflict",
+            Payment => "payment.version_conflict",
+            Order => "order.version_conflict",
             _ => null,
         };
     }

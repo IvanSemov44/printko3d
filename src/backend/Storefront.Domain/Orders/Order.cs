@@ -50,6 +50,9 @@ public sealed class Order : Entity
     /// <summary>When the reserved stock was given back (refusal or expiry). Null while the order still holds it. Set once, so a second refusal cannot give it back twice.</summary>
     public DateTimeOffset? StockReleasedAt { get; set; }
 
+    /// <summary>Until when the buyer can pay (decision 0035). Null for an order made before payment existed: it never expires.</summary>
+    public DateTimeOffset? PaymentDueAt { get; set; }
+
     /// <summary>PostgreSQL row version (xmin). Payment and the admin both change the status, so two writers must be detected.</summary>
     public uint Version { get; set; }
 
