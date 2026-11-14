@@ -223,7 +223,11 @@ public sealed class AdminLoginTests(PostgresFixture postgres)
     public async Task TheApi_StartsInProduction_WhenAdminLoginIsTurnedOff_AndTheLoginAnswers404()
     {
         await using var host = await AuthApiHost.CreateAsync(
-            postgres, "Production", createAdmin: false, loginEnabled: false);
+            postgres,
+            "Production",
+            createAdmin: false,
+            loginEnabled: false,
+            extraSettings: new Dictionary<string, string> { ["Payment:Enabled"] = "false" });
 
         var login = await host.LoginRawAsync(AuthApiHost.AdminEmail, AuthApiHost.AdminPassword);
         var publicList = await host.SendAsync(HttpMethod.Get, "/api/v1/categories");

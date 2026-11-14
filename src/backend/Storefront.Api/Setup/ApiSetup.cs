@@ -7,6 +7,7 @@ using Storefront.Application.Catalog;
 using Storefront.Application.Contracts;
 using Storefront.Application.Health;
 using Storefront.Application.Orders;
+using Storefront.Application.Payments;
 using Storefront.Infrastructure;
 
 namespace Storefront.Api.Setup;
@@ -35,6 +36,7 @@ internal static class ApiSetup
         builder.Services.AddApiCors(builder.Configuration);
         builder.AddCartCleanup();
         builder.AddOrders();
+        builder.AddPayments();
         builder.Services
             .AddOptions<SiteOptions>()
             .Bind(builder.Configuration.GetSection(SiteOptions.SectionName))
@@ -85,6 +87,28 @@ internal static class ApiSetup
             .ValidateOnStart();
         builder.Services.AddSingleton(services => services.GetRequiredService<IOptions<OrderOptions>>().Value);
         builder.Services.AddSingleton<IOrderNumberGenerator, RandomOrderNumberGenerator>();
+    }
+
+    /// <summary>
+    /// Paying an order (decision 0035): the settings, checked at startup, and the guard that keeps the test provider out of
+    /// production. Payment turned off (<c>Payment:Enabled</c>) skips the guard, like the administrator login (decision 0013).
+    /// </summary>
+    private static void AddPayments(this WebApplicationBuilder builder)
+    {
+        var section = builder.Configuration.GetSection(PaymentOptions.SectionName);
+        builder.Services
+            .AddOptions<PaymentOptions>()
+            .Bind(section)
+            .Validate(
+                PaymentOptions.IsValid,
+                "Payment:WindowMinutes must be between 1 minute and 7 days, and Payment:GraceMinutes between 0 and 24 hours.")
+            .ValidateOnStart();
+        builder.Services.AddSingleton(services => services.GetRequiredService<IOptions<PaymentOptions>>().Value);
+
+        if (section.Get<PaymentOptions>()?.Enabled ?? true)
+        {
+            PaymentTestEnvironments.EnsureAllowed(builder.Environment.EnvironmentName);
+        }
     }
 
     /// <summary>The daily cleanup of old carts (decision 0027), with its settings checked at startup.</summary>
