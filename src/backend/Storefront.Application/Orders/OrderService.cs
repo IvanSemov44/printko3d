@@ -101,7 +101,7 @@ internal sealed partial class OrderService(
         await repositories.SaveAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
-        return ToDto(order);
+        return OrderMapper.ToDto(order);
     }
 
     /// <summary>
@@ -244,32 +244,6 @@ internal sealed partial class OrderService(
 
     private static ConflictException CartChanged() =>
         new("The cart was changed at the same moment. Open it and try again.", "cart.changed");
-
-    private static OrderDto ToDto(Order order) => new(
-        order.Number,
-        order.Status.ToString(),
-        order.Currency,
-        order.TotalAmount,
-        order.ShippingMethod,
-        order.ShippingAmount,
-        order.CustomerName,
-        order.Email,
-        order.Phone,
-        order.ShippingStreet,
-        order.ShippingCity,
-        order.ShippingPostalCode,
-        order.ShippingCountry,
-        order.CreatedAt,
-        order.PaymentDueAt,
-        order.Items.Select(i => new OrderItemDto(
-            i.ProductName,
-            i.VariantName,
-            i.Sku,
-            i.UnitPrice,
-            i.Quantity,
-            i.LineTotal,
-            i.FulfilmentType,
-            i.LeadTimeDays)).ToList());
 
     [GeneratedRegex("^[0-9]{4}$")]
     private static partial Regex PostalCodePattern();

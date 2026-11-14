@@ -37,6 +37,13 @@ public interface IOrderRepository
     Task<bool> TryReviveAsync(Guid orderId, CancellationToken cancellationToken);
 
     /// <summary>
+    /// <c>WHERE status = from</c> to <paramref name="to"/>, in one statement, so two writers of the status have one winner.
+    /// Returns false when the order was not in <paramref name="from"/> any more. It does not wait for a save. The caller
+    /// checks <c>OrderTransitions</c> first.
+    /// </summary>
+    Task<bool> TryChangeStatusAsync(Guid orderId, OrderStatus from, OrderStatus to, CancellationToken cancellationToken);
+
+    /// <summary>
     /// The orders that are still new and whose deadline passed before <paramref name="cutoff"/>, the oldest first, with
     /// their lines. At most <paramref name="batchSize"/>. Not tracked.
     /// </summary>

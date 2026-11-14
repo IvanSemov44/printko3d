@@ -42,6 +42,8 @@ public sealed class ServiceManager(
         timeProvider ?? TimeProvider.System,
         paymentOptions ?? new PaymentOptions()));
 
+    private readonly Lazy<IOrderStatusService> _orderStatuses = new(() => new OrderStatusService(repositories));
+
     private readonly Lazy<IShippingService> _shipping = new(() => new ShippingService(
         repositories,
         shippingProvider ?? new NoShippingProvider()));
@@ -65,4 +67,6 @@ public sealed class ServiceManager(
     public IPaymentService Payments => _payments.Value;
 
     public IShippingTariffService ShippingTariff => _shippingTariff.Value;
+
+    public IOrderStatusService OrderStatuses => _orderStatuses.Value;
 }

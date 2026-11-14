@@ -753,7 +753,7 @@ namespace Storefront.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("ck_orders_shipping_country", "char_length(shipping_country) = 2");
 
-                            t.HasCheckConstraint("ck_orders_status", "status IN ('New', 'Paid', 'Cancelled')");
+                            t.HasCheckConstraint("ck_orders_status", "status IN ('New', 'Paid', 'InProduction', 'ReadyToShip', 'Shipped', 'Completed', 'Cancelled')");
 
                             t.HasCheckConstraint("ck_orders_total_amount", "total_amount >= 0");
 

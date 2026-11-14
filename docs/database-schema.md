@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261114084502_AddPaymentRedirectUrl`
+Последна миграция: `20261114110142_AddOrderStatuses`
 
 ## Връзки
 
@@ -353,7 +353,7 @@ erDiagram
 | ck_orders_number | проверка | `CHECK (((number >= 10000000) AND (number <= 99999999)))` |
 | ck_orders_shipping_amount | проверка | `CHECK ((shipping_amount >= 0))` |
 | ck_orders_shipping_country | проверка | `CHECK ((char_length((shipping_country)::text) = 2))` |
-| ck_orders_status | проверка | `CHECK (((status)::text = ANY ((ARRAY['New'::character varying, 'Paid'::character varying, 'Cancelled'::character varying])::text[])))` |
+| ck_orders_status | проверка | `CHECK (((status)::text = ANY ((ARRAY['New'::character varying, 'Paid'::character varying, 'InProduction'::character varying, 'ReadyToShip'::character varying, 'Shipped'::character varying, 'Completed'::character varying, 'Cancelled'::character varying])::text[])))` |
 | ck_orders_total_amount | проверка | `CHECK ((total_amount >= 0))` |
 | ck_orders_total_covers_shipping | проверка | `CHECK ((total_amount >= shipping_amount))` |
 

@@ -13,7 +13,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
             table.HasCheckConstraint(
                 "ck_orders_number",
                 $"number BETWEEN {Order.MinNumber} AND {Order.MaxNumber}");
-            table.HasCheckConstraint("ck_orders_status", "status IN ('New', 'Paid', 'Cancelled')");
+            table.HasCheckConstraint("ck_orders_status", "status IN ('New', 'Paid', 'InProduction', 'ReadyToShip', 'Shipped', 'Completed', 'Cancelled')");
             table.HasCheckConstraint("ck_orders_total_amount", "total_amount >= 0");
             table.HasCheckConstraint("ck_orders_shipping_amount", "shipping_amount >= 0");
             table.HasCheckConstraint("ck_orders_total_covers_shipping", "total_amount >= shipping_amount");

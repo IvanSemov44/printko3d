@@ -32,6 +32,21 @@ internal sealed class OrderRepository(StorefrontDbContext context)
         return changed == 1;
     }
 
+    public async Task<bool> TryChangeStatusAsync(
+        Guid orderId,
+        OrderStatus from,
+        OrderStatus to,
+        CancellationToken cancellationToken)
+    {
+        var now = Context.Now;
+        var changed = await Context.Orders
+            .Where(o => o.Id == orderId && o.Status == from)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(o => o.Status, to).SetProperty(o => o.UpdatedAt, now),
+                cancellationToken);
+        return changed == 1;
+    }
+
     public async Task<bool> TryReviveAsync(Guid orderId, CancellationToken cancellationToken)
     {
         var now = Context.Now;
