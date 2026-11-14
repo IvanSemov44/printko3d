@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Storefront.Domain.Orders;
+using Storefront.Infrastructure.Identity;
 
 namespace Storefront.Infrastructure.Persistence.Configurations;
 
@@ -44,6 +45,8 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.AccessToken).HasMaxLength(64);
         builder.HasIndex(o => o.AccessToken).IsUnique();
         builder.HasIndex(o => o.CreatedAt);
+        builder.HasIndex(o => o.CustomerId);
+        builder.HasOne<CustomerUser>().WithMany().HasForeignKey(o => o.CustomerId).OnDelete(DeleteBehavior.SetNull);
         // The admin list filters by status and shows the newest first (task 28a).
         builder.HasIndex(o => new { o.Status, o.CreatedAt });
 

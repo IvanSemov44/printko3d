@@ -63,3 +63,4 @@
 - [0036 – Статуси на поръчката, опашка за изходящи писма и достъп до поръчката по номер и имейл или по токен](0036-order-statuses-outgoing-email-queue-and-order-lookup.md)
 - [0037 – Админ: поръчки, отказ от платена поръчка и връщане на пари на ръка](0037-admin-orders-refusal-and-refund-by-hand.md)
 - [0038 – Админ панел: рамка, цветове на статусите и брояч по статус](0038-admin-panel-frame-status-colours-and-counts.md)
+- [0039 – Клиентски акаунти: парола и социален вход, отделно от администратора](0039-customer-accounts-password-and-social-login.md)

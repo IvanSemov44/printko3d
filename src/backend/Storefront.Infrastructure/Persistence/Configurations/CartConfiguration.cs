@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Storefront.Domain.Carts;
+using Storefront.Infrastructure.Identity;
 
 namespace Storefront.Infrastructure.Persistence.Configurations;
 
@@ -16,6 +17,8 @@ internal sealed class CartConfiguration : IEntityTypeConfiguration<Cart>
         builder.Property(c => c.TokenHash).IsRequired();
         builder.HasIndex(c => c.TokenHash).IsUnique();
         builder.HasIndex(c => c.UpdatedAt);
+        builder.HasIndex(c => c.CustomerId).IsUnique().HasFilter("customer_id IS NOT NULL");
+        builder.HasOne<CustomerUser>().WithMany().HasForeignKey(c => c.CustomerId).OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(c => c.Items)
             .WithOne()

@@ -44,6 +44,10 @@ public sealed class StorefrontDbContext(DbContextOptions<StorefrontDbContext> op
 
     public DbSet<OutgoingEmail> OutgoingEmails => Set<OutgoingEmail>();
 
+    public DbSet<CustomerUser> CustomerUsers => Set<CustomerUser>();
+
+    public DbSet<CustomerExternalLogin> CustomerExternalLogins => Set<CustomerExternalLogin>();
+
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     /// <summary>The time the stamps use, for writes that bypass the change tracker (ExecuteUpdate).</summary>

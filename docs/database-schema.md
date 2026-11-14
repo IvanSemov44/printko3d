@@ -4,7 +4,7 @@
 > Обновява се с `UPDATE_SCHEMA_DOC=1 dotnet test tests/Storefront.IntegrationTests --filter DatabaseSchemaDocumentTests` (изисква Docker). Тестът пропада, когато файлът не съвпада с миграциите.
 > Понятията и правилата са в [data-model.md](data-model.md), решението е [0007](decisions/0007-generated-database-schema-document.md).
 
-Последна миграция: `20261114123536_AddOrderStatusCreatedIndex`
+Последна миграция: `20261114152901_AddCustomerAccounts`
 
 ## Връзки
 
@@ -18,9 +18,12 @@ erDiagram
     admin_users ||--o{ admin_user_tokens : "user_id"
     carts ||--o{ cart_items : "cart_id"
     product_variants ||--o{ cart_items : "variant_id"
+    customer_users |o--o{ carts : "customer_id"
     categories |o--o{ categories : "parent_id"
+    customer_users ||--o{ customer_external_logins : "customer_id"
     orders ||--o{ order_items : "order_id"
     product_variants ||--o{ order_items : "variant_id"
+    customer_users |o--o{ orders : "customer_id"
     payments ||--o{ payment_events : "payment_id"
     orders ||--o{ payments : "order_id"
     products ||--o{ product_images : "product_id"
@@ -223,18 +226,21 @@ erDiagram
 | token_hash | bytea | не |  |
 | created_at | timestamp with time zone | не |  |
 | updated_at | timestamp with time zone | не |  |
+| customer_id | uuid | да |  |
 
 **Ограничения**
 
 | Име | Вид | Определение |
 | --- | --- | --- |
 | PK_carts | първичен ключ | `PRIMARY KEY (id)` |
+| FK_carts_customer_users_customer_id | външен ключ | `FOREIGN KEY (customer_id) REFERENCES customer_users(id) ON DELETE CASCADE` |
 | ck_carts_token_hash_length | проверка | `CHECK ((octet_length(token_hash) = 32))` |
 
 **Индекси**
 
 | Име | Определение |
 | --- | --- |
+| IX_carts_customer_id | `CREATE UNIQUE INDEX "IX_carts_customer_id" ON public.carts USING btree (customer_id) WHERE (customer_id IS NOT NULL)` |
 | IX_carts_token_hash | `CREATE UNIQUE INDEX "IX_carts_token_hash" ON public.carts USING btree (token_hash)` |
 | IX_carts_updated_at | `CREATE INDEX "IX_carts_updated_at" ON public.carts USING btree (updated_at)` |
 
@@ -266,6 +272,65 @@ erDiagram
 | --- | --- |
 | IX_categories_parent_id | `CREATE INDEX "IX_categories_parent_id" ON public.categories USING btree (parent_id)` |
 | IX_categories_slug | `CREATE UNIQUE INDEX "IX_categories_slug" ON public.categories USING btree (slug)` |
+
+### customer_external_logins
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| customer_id | uuid | не |  |
+| provider | character varying(50) | не |  |
+| provider_key | character varying(200) | не |  |
+| created_at | timestamp with time zone | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_customer_external_logins | първичен ключ | `PRIMARY KEY (id)` |
+| FK_customer_external_logins_customer_users_customer_id | външен ключ | `FOREIGN KEY (customer_id) REFERENCES customer_users(id) ON DELETE CASCADE` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_customer_external_logins_customer_id | `CREATE INDEX "IX_customer_external_logins_customer_id" ON public.customer_external_logins USING btree (customer_id)` |
+| IX_customer_external_logins_provider_provider_key | `CREATE UNIQUE INDEX "IX_customer_external_logins_provider_provider_key" ON public.customer_external_logins USING btree (provider, provider_key)` |
+
+### customer_users
+
+| Колона | Тип | NULL | По подразбиране |
+| --- | --- | --- | --- |
+| id | uuid | не |  |
+| display_name | character varying(200) | не |  |
+| created_at | timestamp with time zone | не |  |
+| user_name | character varying(254) | да |  |
+| normalized_user_name | character varying(254) | да |  |
+| email | character varying(254) | да |  |
+| normalized_email | character varying(254) | да |  |
+| email_confirmed | boolean | не |  |
+| password_hash | text | да |  |
+| security_stamp | text | да |  |
+| concurrency_stamp | text | да |  |
+| phone_number | text | да |  |
+| phone_number_confirmed | boolean | не |  |
+| two_factor_enabled | boolean | не |  |
+| lockout_end | timestamp with time zone | да |  |
+| lockout_enabled | boolean | не |  |
+| access_failed_count | integer | не |  |
+
+**Ограничения**
+
+| Име | Вид | Определение |
+| --- | --- | --- |
+| PK_customer_users | първичен ключ | `PRIMARY KEY (id)` |
+
+**Индекси**
+
+| Име | Определение |
+| --- | --- |
+| IX_customer_users_normalized_email | `CREATE UNIQUE INDEX "IX_customer_users_normalized_email" ON public.customer_users USING btree (normalized_email)` |
+| IX_customer_users_normalized_user_name | `CREATE UNIQUE INDEX "IX_customer_users_normalized_user_name" ON public.customer_users USING btree (normalized_user_name)` |
 
 ### data_protection_keys
 
@@ -344,12 +409,14 @@ erDiagram
 | shipping_method | character varying(50) | не | `''::character varying` |
 | payment_due_at | timestamp with time zone | да |  |
 | access_token | character varying(64) | да |  |
+| customer_id | uuid | да |  |
 
 **Ограничения**
 
 | Име | Вид | Определение |
 | --- | --- | --- |
 | PK_orders | първичен ключ | `PRIMARY KEY (id)` |
+| FK_orders_customer_users_customer_id | външен ключ | `FOREIGN KEY (customer_id) REFERENCES customer_users(id) ON DELETE SET NULL` |
 | ck_orders_currency | проверка | `CHECK ((char_length((currency)::text) = 3))` |
 | ck_orders_number | проверка | `CHECK (((number >= 10000000) AND (number <= 99999999)))` |
 | ck_orders_shipping_amount | проверка | `CHECK ((shipping_amount >= 0))` |
@@ -364,6 +431,7 @@ erDiagram
 | --- | --- |
 | IX_orders_access_token | `CREATE UNIQUE INDEX "IX_orders_access_token" ON public.orders USING btree (access_token)` |
 | IX_orders_created_at | `CREATE INDEX "IX_orders_created_at" ON public.orders USING btree (created_at)` |
+| IX_orders_customer_id | `CREATE INDEX "IX_orders_customer_id" ON public.orders USING btree (customer_id)` |
 | IX_orders_number | `CREATE UNIQUE INDEX "IX_orders_number" ON public.orders USING btree (number)` |
 | IX_orders_status_created_at | `CREATE INDEX "IX_orders_status_created_at" ON public.orders USING btree (status, created_at)` |
 

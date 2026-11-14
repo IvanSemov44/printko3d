@@ -12,5 +12,8 @@ public sealed class Cart : Entity
 
     public byte[] TokenHash { get; set; } = [];
 
+    /// <summary>The account that owns the cart (decision 0039). Null for an anonymous cart. One account has at most one cart.</summary>
+    public Guid? CustomerId { get; set; }
+
     public List<CartItem> Items { get; set; } = [];
 }
