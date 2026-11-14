@@ -273,4 +273,54 @@ public sealed class OrdersApiTests(PostgresFixture postgres)
         Assert.DoesNotContain(BuyerPhone, text, StringComparison.Ordinal);
         Assert.DoesNotContain(BuyerStreet, text, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public async Task Post_WhenTheStockChangedAtTheSameMoment_Answers409AndLogsTheRefusalWithoutPersonalData()
+    {
+        var logs = new CapturingLoggerProvider();
+        await using var host = await AuthApiHost.CreateAsync(
+            postgres, configureServices: services => services.AddLogging(logging => logging.AddProvider(logs)));
+        var variantId = await SeedVariantAsync(host, stock: 5);
+        var cookie = await CartCookieWithAsync(host, variantId);
+
+        // Another buyer holds the variant row and takes the last pieces; the order waits for that row.
+        await using var rival = host.Database.CreateContext();
+        await using var rivalTransaction = await rival.Database.BeginTransactionAsync();
+        await rival.ProductVariants.Where(v => v.Id == variantId)
+            .ExecuteUpdateAsync(s => s.SetProperty(v => v.StockQuantity, 0));
+        var placing = host.SendAsync(HttpMethod.Post, OrdersUrl, Body(), cookie);
+        await WaitUntilSomeoneWaitsForALockAsync(host);
+        await rivalTransaction.CommitAsync();
+        var response = await placing;
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.Equal("order.stock_changed", (await JsonOf(response)).GetProperty("code").GetString());
+        Assert.Equal(0, await OrderCountAsync(host));
+        var text = logs.AllText();
+        Assert.Contains("An order was refused because the stock changed at the same moment.", text, StringComparison.Ordinal);
+        Assert.DoesNotContain(BuyerName, text, StringComparison.Ordinal);
+        Assert.DoesNotContain(BuyerEmail, text, StringComparison.Ordinal);
+        Assert.DoesNotContain(BuyerPhone, text, StringComparison.Ordinal);
+        Assert.DoesNotContain(BuyerStreet, text, StringComparison.Ordinal);
+    }
+
+    private static async Task WaitUntilSomeoneWaitsForALockAsync(AuthApiHost host)
+    {
+        await using var context = host.Database.CreateContext();
+        var until = DateTime.UtcNow.AddSeconds(15);
+        while (DateTime.UtcNow < until)
+        {
+            var waiting = await context.Database
+                .SqlQueryRaw<int>("SELECT count(*)::int AS \"Value\" FROM pg_stat_activity WHERE wait_event_type = 'Lock' AND datname = current_database()")
+                .SingleAsync();
+            if (waiting > 0)
+            {
+                return;
+            }
+
+            await Task.Delay(50);
+        }
+
+        Assert.Fail("The order never waited for the stock row.");
+    }
 }
