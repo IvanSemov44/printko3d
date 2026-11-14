@@ -319,6 +319,8 @@ Pill badges (same shape as store badges, sentence case, not uppercase):
 
 "В печат" is the owner's key state — it shows what is on the printers right now.
 
+The order has seven statuses (decision 0038): "Платена" looks like "Нова" (blue), "Готова за изпращане" and "Завършена" look like "Готова" (green), "В производство" is "В печат". The status filter above a table is a row of pills with the number of rows; the chosen one is dark.
+
 ### Data tables (main admin component)
 
 - Header row: `label` style (12px, 700, uppercase, muted), surface-alt bg, sticky.
