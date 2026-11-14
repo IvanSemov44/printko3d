@@ -1,7 +1,7 @@
 import { ApiError } from '@storefront/shared';
 import { Link, useParams } from 'react-router';
 import { t } from '../../i18n';
-import { useStoreMoney } from '../products/useProducts';
+import { useStoreMoney } from '../../components/useStoreMoney';
 import { orderDateText, orderNumberText, orderStatusText } from './orderLabels';
 import { OrderActions } from './OrderActions';
 import { OrderLines } from './OrderLines';

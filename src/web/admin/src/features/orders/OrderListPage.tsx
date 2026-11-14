@@ -1,7 +1,7 @@
 import { formatMoney, ORDER_STATUSES, type OrderStatus } from '@storefront/shared';
 import { Link, useSearchParams } from 'react-router';
 import { t } from '../../i18n';
-import { useStoreMoney } from '../products/useProducts';
+import { useStoreMoney } from '../../components/useStoreMoney';
 import { ORDER_STATUS_KEYS, orderDateText, orderNumberText } from './orderLabels';
 import { useAdminOrders } from './useOrders';
 

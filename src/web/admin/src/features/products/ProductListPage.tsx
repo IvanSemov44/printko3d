@@ -4,7 +4,8 @@ import { t } from '../../i18n';
 import { useAdminCategories } from '../categories/useCategories';
 import { FULFILMENT_KEYS, PRODUCT_STATUSES, STATUS_KEYS } from './productLabels';
 import { parseWholeNumber } from './productValidation';
-import { useAdminProducts, useStoreMoney } from './useProducts';
+import { useStoreMoney } from '../../components/useStoreMoney';
+import { useAdminProducts } from './useProducts';
 
 const PAGE_SIZE = 20;
 const SEARCH_MAX_LENGTH = 100;

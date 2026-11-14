@@ -24,7 +24,8 @@ import {
   validateProduct,
   type ProductFormErrors,
 } from './productValidation';
-import { useAdminProduct, useCreateProduct, useStoreMoney, useUpdateProduct } from './useProducts';
+import { useStoreMoney } from '../../components/useStoreMoney';
+import { useAdminProduct, useCreateProduct, useUpdateProduct } from './useProducts';
 import { VariantsSection } from './VariantsSection';
 
 const FIELD_ORDER = [
