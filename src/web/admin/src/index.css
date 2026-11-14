@@ -696,3 +696,37 @@ input[type='color'] {
 .filter-count {
   font-family: var(--font-mono);
 }
+
+/* Pages other than lists: the title row, and forms and sections as panels (docs/design.md section 11). */
+.page-header {
+  margin-bottom: 1rem;
+}
+
+.admin-content > form,
+.admin-content > .section {
+  max-width: 48rem;
+  margin-top: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.admin-content .section {
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-content > .section + .section,
+.admin-content > .section + form {
+  margin-top: 1rem;
+}
+
+input,
+select {
+  min-height: 2.5rem;
+}
+
+.category-row {
+  border-width: 1px;
+  background: var(--color-surface);
+}
