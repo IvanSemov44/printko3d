@@ -1,4 +1,5 @@
 using Storefront.Application.Contracts;
+using Storefront.Application.Emails;
 using Storefront.Application.Exceptions;
 using Storefront.Application.Orders;
 using Storefront.Domain.Orders;
@@ -11,7 +12,8 @@ internal sealed class PaymentService(
     IPaymentProvider provider,
     IPaymentSimulator simulator,
     TimeProvider timeProvider,
-    PaymentOptions options) : IPaymentService
+    PaymentOptions options,
+    OrderOptions orderOptions) : IPaymentService
 {
     private const string EventRepeated = "payment.event_repeated";
 
@@ -155,6 +157,7 @@ internal sealed class PaymentService(
         if (await repositories.Order.TryMarkPaidAsync(payment.OrderId, cancellationToken))
         {
             payment.Status = PaymentStatus.Succeeded;
+            await QueuePaidEmailAsync(payment.OrderId, cancellationToken);
             return PaymentNotificationResult.Applied;
         }
 
@@ -170,11 +173,20 @@ internal sealed class PaymentService(
         if (order.Status == OrderStatus.Cancelled && await TryReviveAsync(order, cancellationToken))
         {
             payment.Status = PaymentStatus.Succeeded;
+            await QueuePaidEmailAsync(order.Id, cancellationToken);
             return PaymentNotificationResult.Revived;
         }
 
         payment.Status = PaymentStatus.PaidWithoutOrder;
         return PaymentNotificationResult.PaidWithoutOrder;
+    }
+
+    // The email is saved with the payment and the order, in the transaction of the message: it is sent once, like the payment.
+    private async Task QueuePaidEmailAsync(Guid orderId, CancellationToken cancellationToken)
+    {
+        var order = await repositories.Order.GetByIdAsync(orderId, trackChanges: false, cancellationToken)
+            ?? throw new InvalidOperationException("The order of a payment is missing.");
+        repositories.OutgoingEmails.Enqueue(OrderEmails.Paid(order, orderOptions.StorefrontUrl));
     }
 
     /// <summary>

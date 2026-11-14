@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Storefront.Application.Carts;
 using Storefront.Application.Carts.Queries;
 using Storefront.Application.Contracts;
+using Storefront.Application.Emails;
 using Storefront.Application.Exceptions;
 using Storefront.Application.Payments;
 using Storefront.Application.Shipping;
@@ -72,6 +73,7 @@ internal sealed partial class OrderService(
             ShippingCity = fields.City,
             ShippingPostalCode = fields.PostalCode,
             ShippingCountry = ShippingMethods.Country,
+            AccessToken = OrderAccessToken.Create(),
             TermsVersion = options.TermsVersion,
             TermsAcceptedAt = timeProvider.GetUtcNow(),
             // Payment turned off: nobody can pay, so the order has no deadline and is never cancelled for it.
@@ -96,6 +98,8 @@ internal sealed partial class OrderService(
         await using var transaction = await repositories.BeginTransactionAsync(cancellationToken);
         await TakeStockAsync(order, cancellationToken);
         repositories.Order.Create(order);
+        // The email is queued in the same transaction: an order that is saved always has its email, and one that fails has none.
+        repositories.OutgoingEmails.Enqueue(OrderEmails.Placed(order, options.StorefrontUrl));
         repositories.Cart.RemoveItems(cart);
         repositories.Cart.Touch(cart);
         await repositories.SaveAsync(cancellationToken);

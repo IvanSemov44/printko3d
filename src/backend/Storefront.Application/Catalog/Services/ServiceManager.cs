@@ -40,9 +40,10 @@ public sealed class ServiceManager(
         paymentProvider ?? throw new InvalidOperationException("No payment provider is registered."),
         paymentSimulator ?? throw new InvalidOperationException("No payment simulator is registered."),
         timeProvider ?? TimeProvider.System,
-        paymentOptions ?? new PaymentOptions()));
+        paymentOptions ?? new PaymentOptions(),
+        orderOptions ?? new OrderOptions()));
 
-    private readonly Lazy<IOrderStatusService> _orderStatuses = new(() => new OrderStatusService(repositories));
+    private readonly Lazy<IOrderStatusService> _orderStatuses = new(() => new OrderStatusService(repositories, orderOptions ?? new OrderOptions()));
 
     private readonly Lazy<IShippingService> _shipping = new(() => new ShippingService(
         repositories,

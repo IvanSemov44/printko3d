@@ -10,4 +10,10 @@ public sealed class OrderOptions
     /// this is a placeholder, so it is clear which orders were accepted under which text.
     /// </summary>
     public string TermsVersion { get; set; } = "draft-1";
+
+    /// <summary>
+    /// The address of the shop, for the links in the emails (for example <c>https://shop.example</c>). The default is the
+    /// local address of Docker Compose; the real one is set per environment (task 33).
+    /// </summary>
+    public string StorefrontUrl { get; set; } = "http://localhost:5173";
 }

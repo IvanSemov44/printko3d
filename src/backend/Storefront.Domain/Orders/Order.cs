@@ -42,6 +42,9 @@ public sealed class Order : Entity
     /// <summary>ISO 3166-1 alpha-2 code.</summary>
     public string ShippingCountry { get; set; } = string.Empty;
 
+    /// <summary>Random key in the link of the emails (decision 0036). Null for an order made before it existed.</summary>
+    public string? AccessToken { get; set; }
+
     /// <summary>The version of the terms and conditions the buyer agreed to.</summary>
     public string TermsVersion { get; set; } = string.Empty;
 

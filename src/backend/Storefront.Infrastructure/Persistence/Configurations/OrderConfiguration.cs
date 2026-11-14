@@ -41,6 +41,8 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
             .IsConcurrencyToken();
 
         builder.HasIndex(o => o.Number).IsUnique();
+        builder.Property(o => o.AccessToken).HasMaxLength(64);
+        builder.HasIndex(o => o.AccessToken).IsUnique();
         builder.HasIndex(o => o.CreatedAt);
 
         builder.HasMany(o => o.Items)
