@@ -112,3 +112,22 @@ export { getShippingOptions } from './api/shipping';
 export type { ShippingOptions, ShippingQuote } from './api/shipping';
 export { getShippingTariff, saveShippingTariff } from './api/adminShipping';
 export type { ShippingTariffStep } from './api/adminShipping';
+export {
+  changeCustomerPassword,
+  confirmCustomerEmail,
+  externalLinkAddress,
+  externalSignInAddress,
+  getCurrentCustomer,
+  getExternalProviders,
+  getMyOrder,
+  getMyOrders,
+  loginCustomer,
+  prepareExternalLink,
+  logoutCustomer,
+  readCustomer,
+  registerCustomer,
+  requestPasswordReset,
+  resendCustomerConfirmation,
+  resetCustomerPassword,
+} from './api/account';
+export type { Customer, CustomerOrderListItem, CustomerOrderPage } from './api/account';

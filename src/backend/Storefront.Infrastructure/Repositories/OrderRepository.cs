@@ -26,6 +26,17 @@ internal sealed class OrderRepository(StorefrontDbContext context)
             .Include(o => o.Items)
             .SingleOrDefaultAsync(o => o.AccessToken == token, cancellationToken);
 
+    public async Task<int> LinkGuestOrdersAsync(Guid customerId, string email, CancellationToken cancellationToken)
+    {
+        var wanted = email.Trim().ToLowerInvariant();
+        var now = Context.Now;
+        return await Context.Orders
+            .Where(o => o.CustomerId == null && o.Email.ToLower() == wanted)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(o => o.CustomerId, customerId).SetProperty(o => o.UpdatedAt, now),
+                cancellationToken);
+    }
+
     public async Task<bool> TryMarkPaidAsync(Guid orderId, CancellationToken cancellationToken)
     {
         var now = Context.Now;

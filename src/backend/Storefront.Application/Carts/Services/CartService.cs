@@ -103,6 +103,73 @@ internal sealed class CartService(IRepositoryManager repositories) : ICartServic
         return await SaveAsync(cart, hash, currentToken, touch: true, cancellationToken);
     }
 
+    public async Task<CartChange> MergeIntoAccountAsync(string? token, Guid customerId, CancellationToken cancellationToken)
+    {
+        var (guest, hash, currentToken) = await FindAsync(token, cancellationToken);
+        if (guest is { CustomerId: { } owner } && owner != customerId)
+        {
+            // A cart that another account left in this browser is not this buyer's.
+            guest = null;
+            hash = [];
+            currentToken = null;
+        }
+
+        var account = await repositories.Cart.GetByCustomerIdAsync(customerId, trackChanges: true, cancellationToken);
+        if (guest is null && account is null)
+        {
+            return new CartChange(CartDto.Empty, null);
+        }
+
+        if (guest is null)
+        {
+            // Only the account has a cart: the browser gets a new secret for it.
+            currentToken = CartToken.Create();
+            CartToken.TryHash(currentToken, out hash);
+            account!.TokenHash = hash;
+            return await SaveAsync(account, hash, currentToken, touch: true, cancellationToken);
+        }
+
+        if (account is null)
+        {
+            guest.CustomerId = customerId;
+            return await SaveAsync(guest, hash, currentToken, touch: true, cancellationToken);
+        }
+
+        if (guest.Id != account.Id)
+        {
+            await using var transaction = await repositories.BeginTransactionAsync(cancellationToken);
+            foreach (var line in account.Items)
+            {
+                var same = guest.Items.SingleOrDefault(i => i.VariantId == line.VariantId);
+                if (same is not null)
+                {
+                    same.Quantity = Math.Min(same.Quantity + line.Quantity, Cart.MaxQuantityPerItem);
+                }
+                else if (guest.Items.Count < Cart.MaxItems)
+                {
+                    var item = new CartItem
+                    {
+                        CartId = guest.Id,
+                        VariantId = line.VariantId,
+                        Quantity = Math.Min(line.Quantity, Cart.MaxQuantityPerItem),
+                    };
+                    repositories.Cart.AddItem(item);
+                    guest.Items.Add(item);
+                }
+            }
+
+            // The old cart of the account goes first, so the one cart per account is never two for a moment.
+            repositories.Cart.Remove(account);
+            await repositories.SaveAsync(cancellationToken);
+            guest.CustomerId = customerId;
+            var change = await SaveAsync(guest, hash, currentToken, touch: true, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return change;
+        }
+
+        return await SaveAsync(guest, hash, currentToken, touch: false, cancellationToken);
+    }
+
     private async Task<(Cart? Cart, byte[] Hash, string? Token)> FindAsync(
         string? token, CancellationToken cancellationToken)
     {

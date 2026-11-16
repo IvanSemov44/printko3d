@@ -25,22 +25,25 @@ public static class AdminIdentityRegistration
         services.AddDataProtection()
             .SetApplicationName("printko3d")
             .PersistKeysToDbContext<StorefrontDbContext>();
-        services.AddIdentityCore<AdminUser>(options =>
-            {
-                options.User.RequireUniqueEmail = true;
-                options.Password.RequiredLength = MinimumPasswordLength;
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Lockout.AllowedForNewUsers = true;
-                options.Lockout.MaxFailedAccessAttempts = MaxFailedAccessAttempts;
-                options.Lockout.DefaultLockoutTimeSpan = LockoutDuration;
-            })
+        services.AddIdentityCore<AdminUser>(ApplyRules)
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<StorefrontDbContext>();
         services.AddScoped<IAdminAccountService, AdminAccountService>();
         return services;
+    }
+
+    /// <summary>The password and lockout rules of every account, the administrator and the buyer alike (rule 8).</summary>
+    internal static void ApplyRules(IdentityOptions options)
+    {
+        options.User.RequireUniqueEmail = true;
+        options.Password.RequiredLength = MinimumPasswordLength;
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.MaxFailedAccessAttempts = MaxFailedAccessAttempts;
+        options.Lockout.DefaultLockoutTimeSpan = LockoutDuration;
     }
 
     /// <summary>

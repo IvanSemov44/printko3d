@@ -863,11 +863,25 @@ main .product-card-link {
 }
 
 /* The cart: the button in the header, the panel from the right, and the add button on the product page. */
+.account-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-left: auto;
+  padding: 0 0.5rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.account-link:hover {
+  text-decoration: underline;
+}
+
 .cart-button {
   position: relative;
   min-width: 2.75rem;
   min-height: 2.75rem;
-  margin-left: auto;
+  margin-left: 0.5rem;
   padding: 0 0.5rem;
   color: var(--color-ink);
 }
@@ -1386,4 +1400,38 @@ body:has(.cart-panel[open]) {
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-block: 1rem;
+}
+
+/* The history of orders of a signed-in buyer (decision 0039). */
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.orders-table td:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The buttons of the social providers (decision 0039). */
+.external-sign-in-divider {
+  margin: 1.5rem 0 0.75rem;
+  color: var(--color-ink-muted, inherit);
+  text-align: center;
+}
+
+.external-sign-in-list,
+.external-connections {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }

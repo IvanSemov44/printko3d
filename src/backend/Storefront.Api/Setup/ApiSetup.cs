@@ -34,6 +34,7 @@ internal static class ApiSetup
         builder.Services.AddControllers();
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.AddAdminAuth();
+        builder.AddCustomerAuth();
         builder.Services.AddScoped<HealthService>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddApiCors(builder.Configuration);
@@ -57,6 +58,8 @@ internal static class ApiSetup
         app.UseCors();
         app.UseRateLimiter();
         app.UseCsrfHeaderCheck();
+        // The social sign-in lives at the address of the shop, not at the internal one of the API (decision 0039).
+        app.UseExternalLoginAddress();
         app.UseAuthentication();
         app.UseAuthorization();
 

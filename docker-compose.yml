@@ -42,6 +42,12 @@ services:
       Email__Password: ${EMAIL_PASSWORD:-}
       Email__From: ${EMAIL_FROM:-shop@example.test}
       Email__UseTls: ${EMAIL_USE_TLS:-false}
+      # Sign-in through Google and Facebook (decision 0039). A provider is turned on only when both of its values are set in your own
+      # .env; they are secrets, never in the repository. Empty means off: the buttons are not shown.
+      Authentication__Google__ClientId: ${GOOGLE_CLIENT_ID:-}
+      Authentication__Google__ClientSecret: ${GOOGLE_CLIENT_SECRET:-}
+      Authentication__Facebook__AppId: ${FACEBOOK_APP_ID:-}
+      Authentication__Facebook__AppSecret: ${FACEBOOK_APP_SECRET:-}
     ports:
       - "${API_PORT:-8080}:8080"
     depends_on:

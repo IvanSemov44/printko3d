@@ -37,6 +37,44 @@ const MyOrderPage = lazy(() =>
   import('./features/orders/MyOrderPage').then((module) => ({ default: module.MyOrderPage })),
 );
 
+// The account pages are read by a buyer who has chosen to sign in, so they are loaded when they are opened (decision 0039).
+const LoginPage = lazy(() =>
+  import('./features/account/LoginPage').then((module) => ({ default: module.LoginPage })),
+);
+const RegisterPage = lazy(() =>
+  import('./features/account/RegisterPage').then((module) => ({ default: module.RegisterPage })),
+);
+const AccountPage = lazy(() =>
+  import('./features/account/AccountPage').then((module) => ({ default: module.AccountPage })),
+);
+
+const ConfirmEmailPage = lazy(() =>
+  import('./features/account/ConfirmEmailPage').then((module) => ({
+    default: module.ConfirmEmailPage,
+  })),
+);
+const ForgotPasswordPage = lazy(() =>
+  import('./features/account/ForgotPasswordPage').then((module) => ({
+    default: module.ForgotPasswordPage,
+  })),
+);
+const ResetPasswordPage = lazy(() =>
+  import('./features/account/ResetPasswordPage').then((module) => ({
+    default: module.ResetPasswordPage,
+  })),
+);
+
+const AccountOrdersPage = lazy(() =>
+  import('./features/account/AccountOrdersPage').then((module) => ({
+    default: module.AccountOrdersPage,
+  })),
+);
+const AccountOrderPage = lazy(() =>
+  import('./features/account/AccountOrderPage').then((module) => ({
+    default: module.AccountOrderPage,
+  })),
+);
+
 /** Needs a router and a QueryClientProvider above it (see main.tsx). */
 export function App() {
   return (
@@ -67,6 +105,70 @@ export function App() {
             element={
               <Suspense fallback={<LoadingStatus />}>
                 <OrderConfirmationPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <AccountPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/orders"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <AccountOrdersPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/orders/:number"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <AccountOrderPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/login"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <LoginPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/register"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <RegisterPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/confirm-email"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <ConfirmEmailPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/forgot-password"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <ForgotPasswordPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="account/reset-password"
+            element={
+              <Suspense fallback={<LoadingStatus />}>
+                <ResetPasswordPage />
               </Suspense>
             }
           />

@@ -4,6 +4,778 @@
  */
 
 export interface paths {
+  '/api/v1/account/register': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['RegisterCustomerRequest'];
+          'text/json': components['schemas']['RegisterCustomerRequest'];
+          'application/*+json': components['schemas']['RegisterCustomerRequest'];
+        };
+      };
+      responses: {
+        /** @description Accepted */
+        202: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Too Many Requests */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/confirm-email': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['ConfirmEmailRequest'];
+          'text/json': components['schemas']['ConfirmEmailRequest'];
+          'application/*+json': components['schemas']['ConfirmEmailRequest'];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unprocessable Entity */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Too Many Requests */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/resend-confirmation': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Accepted */
+        202: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Too Many Requests */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/forgot-password': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['ForgotPasswordRequest'];
+          'text/json': components['schemas']['ForgotPasswordRequest'];
+          'application/*+json': components['schemas']['ForgotPasswordRequest'];
+        };
+      };
+      responses: {
+        /** @description Accepted */
+        202: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Too Many Requests */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/reset-password': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['ResetPasswordRequest'];
+          'text/json': components['schemas']['ResetPasswordRequest'];
+          'application/*+json': components['schemas']['ResetPasswordRequest'];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unprocessable Entity */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Too Many Requests */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/login': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CustomerLoginRequest'];
+          'text/json': components['schemas']['CustomerLoginRequest'];
+          'application/*+json': components['schemas']['CustomerLoginRequest'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['CustomerDto'];
+            'application/json': components['schemas']['CustomerDto'];
+            'text/json': components['schemas']['CustomerDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Too Many Requests */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/logout': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['CustomerDto'];
+            'application/json': components['schemas']['CustomerDto'];
+            'text/json': components['schemas']['CustomerDto'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/orders': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          page?: number | string;
+          pageSize?: number | string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['PagedResultOfCustomerOrderListItemDto'];
+            'application/json': components['schemas']['PagedResultOfCustomerOrderListItemDto'];
+            'text/json': components['schemas']['PagedResultOfCustomerOrderListItemDto'];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/orders/{number}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          number: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['OrderDto'];
+            'application/json': components['schemas']['OrderDto'];
+            'text/json': components['schemas']['OrderDto'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/change-password': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['ChangeCustomerPasswordRequest'];
+          'text/json': components['schemas']['ChangeCustomerPasswordRequest'];
+          'application/*+json': components['schemas']['ChangeCustomerPasswordRequest'];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Bad Request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Unprocessable Entity */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/admin/categories': {
     parameters: {
       query?: never;
@@ -3089,6 +3861,194 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/account/external/providers': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ExternalProvidersDto'];
+            'application/json': components['schemas']['ExternalProvidersDto'];
+            'text/json': components['schemas']['ExternalProvidersDto'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/external/{provider}/link': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          provider: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/external/{provider}/start': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          mode?: string;
+        };
+        header?: never;
+        path: {
+          provider: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Found */
+        302: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not Found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/plain': components['schemas']['ProblemDetails'];
+            'application/json': components['schemas']['ProblemDetails'];
+            'text/json': components['schemas']['ProblemDetails'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/account/external/callback': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          mode?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Found */
+        302: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/health': {
     parameters: {
       query?: never;
@@ -4005,11 +4965,19 @@ export interface components {
       /** Format: uint32 */
       version: number | string;
     };
+    ChangeCustomerPasswordRequest: {
+      currentPassword: string;
+      newPassword: string;
+    };
     ChangeOrderStatusRequest: {
       status: components['schemas']['OrderStatus'];
     };
     CompleteTestPaymentRequest: {
       outcome: components['schemas']['PaymentOutcome'];
+    };
+    ConfirmEmailRequest: {
+      email: string;
+      token: string;
     };
     CreateCategoryRequest: {
       name: string;
@@ -4059,6 +5027,35 @@ export interface components {
        * @default 0
        */
       sortOrder: number | string;
+    };
+    CustomerDto: {
+      email: string;
+      displayName: string;
+      emailConfirmed: boolean;
+      hasPassword: boolean;
+      linkedProviders: string[];
+    };
+    CustomerLoginRequest: {
+      email: string;
+      password: string;
+    };
+    CustomerOrderListItemDto: {
+      /** Format: int32 */
+      number: number | string;
+      status: string;
+      currency: string;
+      /** Format: int64 */
+      total: number | string;
+      /** Format: int32 */
+      itemCount: number | string;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    ExternalProvidersDto: {
+      providers: string[];
+    };
+    ForgotPasswordRequest: {
+      email: string;
     };
     /** @enum {unknown} */
     FulfilmentType: 'InStock' | 'MadeToOrder';
@@ -4164,6 +5161,17 @@ export interface components {
     };
     OrderTokenLookupRequest: {
       token: string;
+    };
+    PagedResultOfCustomerOrderListItemDto: {
+      items: components['schemas']['CustomerOrderListItemDto'][];
+      /** Format: int32 */
+      page: number | string;
+      /** Format: int32 */
+      pageSize: number | string;
+      /** Format: int32 */
+      totalCount: number | string;
+      /** Format: int32 */
+      totalPages?: number | string;
     };
     PagedResultOfOrderAdminListItemDto: {
       items: components['schemas']['OrderAdminListItemDto'][];
@@ -4333,8 +5341,18 @@ export interface components {
       /** Format: int32 */
       sortOrder: number | string;
     };
+    RegisterCustomerRequest: {
+      email: string;
+      password: string;
+      name: string;
+    };
     ReplaceShippingTariffRequest: {
       steps: components['schemas']['ShippingStepRequest'][];
+    };
+    ResetPasswordRequest: {
+      email: string;
+      token: string;
+      newPassword: string;
     };
     SetCartItemQuantityRequest: {
       /** Format: int32 */

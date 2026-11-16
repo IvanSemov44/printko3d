@@ -62,6 +62,28 @@ internal sealed class OrderQueries(StorefrontDbContext context) : IOrderQueries
         return new PagedResult<OrderAdminListItemDto>(items, query.Page, query.PageSize, totalCount);
     }
 
+    public async Task<PagedResult<CustomerOrderListItemDto>> GetCustomerOrdersAsync(
+        Guid customerId,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken)
+    {
+        var orders = context.Orders.AsNoTracking().Where(o => o.CustomerId == customerId);
+        var totalCount = await orders.CountAsync(cancellationToken);
+        var rows = await orders
+            .OrderByDescending(o => o.CreatedAt)
+            .ThenByDescending(o => o.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(o => new { o.Number, o.Status, o.Currency, o.TotalAmount, ItemCount = o.Items.Count, o.CreatedAt })
+            .ToListAsync(cancellationToken);
+
+        var items = rows
+            .Select(o => new CustomerOrderListItemDto(o.Number, o.Status.ToString(), o.Currency, o.TotalAmount, o.ItemCount, o.CreatedAt))
+            .ToList();
+        return new PagedResult<CustomerOrderListItemDto>(items, page, pageSize, totalCount);
+    }
+
     public async Task<IReadOnlyDictionary<OrderStatus, int>> GetStatusCountsAsync(CancellationToken cancellationToken) =>
         await context.Orders
             .AsNoTracking()

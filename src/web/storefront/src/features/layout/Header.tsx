@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { AccountLink } from '../account/AccountLink';
 import { CartButton } from '../cart/CartButton';
 import { useStoreSettings } from '../store-settings/useStoreSettings';
 import { CategoryNav } from './CategoryNav';
@@ -11,6 +12,7 @@ export function Header() {
         {storeName}
       </Link>
       <CategoryNav />
+      <AccountLink />
       <CartButton />
     </header>
   );

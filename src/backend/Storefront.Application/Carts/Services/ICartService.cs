@@ -27,6 +27,14 @@ public interface ICartService
     /// <summary>Errors: 404 cart.item_not_found.</summary>
     Task<CartChange> RemoveItemAsync(string? token, Guid variantId, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Joins the cart of the cookie with the cart of the account when the buyer signs in (decision 0039), so there is one cart. Lines of
+    /// the same variant are added together up to 20 units, and lines over 50 different items are left out. The cart of the cookie
+    /// stays if there is one (its token is kept); when only the account has a cart, it gets a new token for the cookie. A cart of the
+    /// cookie that belongs to another account is left alone. Nothing to join is not an error.
+    /// </summary>
+    Task<CartChange> MergeIntoAccountAsync(string? token, Guid customerId, CancellationToken cancellationToken);
+
     /// <summary>Empties the cart. No cart is an empty cart, not an error.</summary>
     Task<CartChange> ClearAsync(string? token, CancellationToken cancellationToken);
 }

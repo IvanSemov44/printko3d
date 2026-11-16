@@ -45,6 +45,9 @@ public sealed class Order : Entity
     /// <summary>Random key in the link of the emails (decision 0036). Null for an order made before it existed.</summary>
     public string? AccessToken { get; set; }
 
+    /// <summary>The buyer's account when the order was placed signed in, or linked later (decision 0039). Null for a guest.</summary>
+    public Guid? CustomerId { get; set; }
+
     /// <summary>The version of the terms and conditions the buyer agreed to.</summary>
     public string TermsVersion { get; set; } = string.Empty;
 
