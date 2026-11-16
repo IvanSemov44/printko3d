@@ -1,5 +1,5 @@
 # Build context is src/web: docker build -f docker/Dockerfile --build-arg APP=storefront src/web
-FROM node:26.13.0-alpine AS build
+FROM node:26.13.1-alpine AS build
 ARG APP
 WORKDIR /web
 COPY package.json package-lock.json ./
