@@ -48,6 +48,18 @@ internal sealed class CustomerAccountService(
         var result = await users.CreateAsync(user, password);
         if (!result.Succeeded)
         {
+            // Two registrations of one new address at the same time: the second one gets the answer of an address that is taken,
+            // not an error that would tell the address is in use.
+            if (result.Errors.Any(e => e.Code is nameof(IdentityErrorDescriber.DuplicateEmail) or nameof(IdentityErrorDescriber.DuplicateUserName))
+                && await users.FindByEmailAsync(address) is { } winner)
+            {
+                logger.LogInformation("Customer registration lost a race for an address that now has an account.");
+                repositories.OutgoingEmails.Enqueue(
+                    CustomerEmails.AlreadyRegistered(winner.Email!, winner.DisplayName, shop.StorefrontUrl));
+                await repositories.SaveAsync(cancellationToken);
+                return;
+            }
+
             throw ToValidationFailure(result);
         }
 
@@ -91,6 +103,9 @@ internal sealed class CustomerAccountService(
         var user = await users.FindByEmailAsync(email.Trim());
         if (user is null)
         {
+            // Make the token anyway, so the time does not tell an address with an account from one without. What is left is
+            // one insert into the queue of emails, which is small next to the rest of the request.
+            await users.GeneratePasswordResetTokenAsync(new CustomerUser { Id = Guid.NewGuid(), SecurityStamp = Guid.NewGuid().ToString("N") });
             logger.LogInformation("Password reset asked for an address with no account.");
             return;
         }
