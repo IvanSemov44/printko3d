@@ -1,5 +1,7 @@
 import {
   ApiError,
+  focusField,
+  useFormValues,
   type AdminCategory,
   type AdminProduct,
   type ProductInput,
@@ -8,7 +10,6 @@ import { useState, type SubmitEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { FormField } from '../../components/FormField';
 import { StatusBadge } from '../../components/StatusBadge';
-import { focusField, useFormValues } from '../../components/useFormValues';
 import { t, type MessageKey } from '../../i18n';
 import { buildCategoryTree } from '../categories/categoryTree';
 import { SLUG_MAX_LENGTH, slugFromName } from '../categories/slug';

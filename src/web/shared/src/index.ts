@@ -6,6 +6,7 @@ export { checkApiHealth } from './health';
 export { createTranslator } from './i18n';
 export { useApiHealth } from './useApiHealth';
 export type { ApiHealthState } from './useApiHealth';
+export { focusField, useFormValues } from './useFormValues';
 export { ApiError, getCategories, getProduct, getProducts, getStoreSettings } from './api/client';
 export type {
   Category,

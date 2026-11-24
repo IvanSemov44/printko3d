@@ -1,14 +1,15 @@
 import {
   ApiError,
   currencyFractionDigits,
+  focusField,
   formatMoneyInput,
+  useFormValues,
   type AdminProduct,
   type AdminVariant,
   type StoreMoneySettings,
 } from '@storefront/shared';
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { FormField } from '../../components/FormField';
-import { focusField, useFormValues } from '../../components/useFormValues';
 import { t, type MessageKey } from '../../i18n';
 import { useAddVariant, useUpdateVariant } from './useProducts';
 import {

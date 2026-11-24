@@ -1,7 +1,12 @@
-import { ApiError, IMAGE_ALT_MAX_LENGTH, type AdminProduct } from '@storefront/shared';
+import {
+  ApiError,
+  IMAGE_ALT_MAX_LENGTH,
+  focusField,
+  useFormValues,
+  type AdminProduct,
+} from '@storefront/shared';
 import { useRef, useState, type SubmitEvent } from 'react';
 import { FormField } from '../../components/FormField';
-import { focusField, useFormValues } from '../../components/useFormValues';
 import { t, type MessageKey } from '../../i18n';
 import { validateImageUpload, type ImageFormErrors } from './imageValidation';
 import { useUploadImage } from './useProducts';

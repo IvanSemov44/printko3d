@@ -1,17 +1,18 @@
 import {
   ApiError,
   MIN_PRIMARY_COLOR_CONTRAST,
+  focusField,
   hasEnoughPrimaryColorContrast,
   isHexColor,
   primaryColorContrast,
   readableTextColor,
+  useFormValues,
   type AdminStoreSettings,
   type StoreSettingsInput,
 } from '@storefront/shared';
 import { useState, type SubmitEvent } from 'react';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { FormField } from '../../components/FormField';
-import { focusField, useFormValues } from '../../components/useFormValues';
 import { t, type MessageKey } from '../../i18n';
 import {
   CURRENCIES,

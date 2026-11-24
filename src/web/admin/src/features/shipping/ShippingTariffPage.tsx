@@ -1,12 +1,12 @@
 import {
   ApiError,
   currencyFractionDigits,
+  focusField,
   formatMoneyInput,
   type ShippingTariffStep,
 } from '@storefront/shared';
 import { useRef, useState, type SubmitEvent } from 'react';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
-import { focusField } from '../../components/useFormValues';
 import { t, type MessageKey } from '../../i18n';
 import { useStoreMoney } from '../../components/useStoreMoney';
 import { MAX_STEPS, validateTariff, type StepErrors, type StepValues } from './shippingValidation';
